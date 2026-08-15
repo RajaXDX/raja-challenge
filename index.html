@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260815b">
-  <link rel="stylesheet" href="css/responsive.css?v=20260815b">
+  <link rel="stylesheet" href="css/style.css?v=20260815c">
+  <link rel="stylesheet" href="css/responsive.css?v=20260815c">
 </head>
 <body>
 
@@ -333,7 +333,7 @@
 <!-- شاشة اختيار الفئات -->
 <div class="screen" id="screen-categories">
   <div class="step-title">اختر فئات الجولة</div>
-  <div class="step-sub">كل 6 فئات تكوّن جولة. اختر أي عدد</div>
+  <div class="step-sub">اختر 6 فئات — هي لوحة الجولة</div>
   <div class="cat-toolbar" id="customCatToolbar" style="display:none;">
     <input type="text" class="custom-cat-input" id="customCatName" placeholder="اسم فئة مخصصة...">
     <button class="add-cat-btn" onclick="addCustomCategory()">+ إضافة فئة</button>
@@ -341,6 +341,10 @@
   <div class="timer-row">
     <span class="timer-label">⏱️ وقت السؤال</span>
     <div class="timer-picker" id="timerPicker"></div>
+  </div>
+  <div class="timer-row">
+    <span class="timer-label">💰 سؤال المراهنة الأخير</span>
+    <div class="timer-picker"><button class="timer-opt" id="betToggle">مفعّل ✓</button></div>
   </div>
   <div class="cat-grid" id="catGrid"></div>
   <div class="selection-status" id="selStatus"></div>
@@ -374,6 +378,11 @@
 
   <div class="round-tabs" id="roundTabs"></div>
   <div class="board-wrap"><div class="board" id="board"></div></div>
+</div>
+
+<!-- شاشة سؤال المراهنة الأخير -->
+<div class="screen" id="screen-bet">
+  <div class="bet-wrap" id="betBody"></div>
 </div>
 
 <!-- شاشة النهاية والفوز -->
@@ -552,17 +561,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260815b"></script>
-<script src="js/utils.js?v=20260815b"></script>
-<script src="js/auth.js?v=20260815b"></script>
-<script src="js/bans.js?v=20260815b"></script>
-<script src="js/friends.js?v=20260815b"></script>
-<script src="js/profile.js?v=20260815b"></script>
-<script src="js/game.js?v=20260815b"></script>
-<script src="js/admin.js?v=20260815b"></script>
-<script src="js/sync.js?v=20260815b"></script>
-<script src="js/rooms.js?v=20260815b"></script>
-<script src="js/chat.js?v=20260815b"></script>
+<script src="js/supabase-config.js?v=20260815c"></script>
+<script src="js/utils.js?v=20260815c"></script>
+<script src="js/auth.js?v=20260815c"></script>
+<script src="js/bans.js?v=20260815c"></script>
+<script src="js/friends.js?v=20260815c"></script>
+<script src="js/profile.js?v=20260815c"></script>
+<script src="js/game.js?v=20260815c"></script>
+<script src="js/admin.js?v=20260815c"></script>
+<script src="js/sync.js?v=20260815c"></script>
+<script src="js/rooms.js?v=20260815c"></script>
+<script src="js/chat.js?v=20260815c"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

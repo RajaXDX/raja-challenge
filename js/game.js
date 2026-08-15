@@ -79,6 +79,11 @@ let teamSetup = {
   B: { name: 'الفريق الثاني', lifelines: [] }
 };
 
+// سقف فئات الجولة. كان الاختيار مفتوحاً وتُقسَّم كل 6 فئات جولةً مستقلة،
+// فتطول الجلسة بلا نهاية واضحة. لوحة واحدة من 6 فئات = 18 سؤالاً = جلسة
+// لها بداية ونهاية، ويُتوَّج آخرها بسؤال المراهنة.
+const MAX_CATS = 6;
+
 let selectedCats = [];
 let rounds = [];
 let stateUsed = {};
@@ -187,9 +192,10 @@ function goToCategories() {
 /* ============================= CATEGORY SELECTION ============================= */
 
 function renderCatGrid() {
-  // المؤقّت يُرسم هنا لا في `goToCategories`: للأخيرة مدخلان (محلي وأونلاين)
-  // وكلاهما يمرّ بهذه الدالة، فلا يُنسى أحدهما
+  // المؤقّت ومفتاح المراهنة يُرسمان هنا لا في `goToCategories`: للأخيرة
+  // مدخلان (محلي وأونلاين) وكلاهما يمرّ بهذه الدالة، فلا يُنسى أحدهما
   renderTimerPicker();
+  renderBetToggle();
 
   const grid = document.getElementById('catGrid');
   if (!grid) return;
@@ -215,12 +221,18 @@ function makeCatCard(c) {
 }
 
 function toggleCategory(c, card) {
-  Sound.select();
   const idx = selectedCats.findIndex(s => s.name === c.name);
   if (idx > -1) {
+    Sound.select();
     selectedCats.splice(idx, 1);
     card.classList.remove('sel');
   } else {
+    if (selectedCats.length >= MAX_CATS) {
+      Sound.skip?.();
+      uiAlert(`الجولة ${MAX_CATS} فئات فقط — شِل وحدة قبل ما تضيف غيرها`);
+      return;
+    }
+    Sound.select();
     selectedCats.push(c);
     card.classList.add('sel');
   }
@@ -253,11 +265,16 @@ async function addCustomCategory() {
 
 function updateSelStatus() {
   const n = selectedCats.length;
-  const roundsCount = Math.ceil(n / 6) || 0;
   const status = document.getElementById('selStatus');
   if (status) {
-    status.innerHTML = `اخترت <b>${n}</b> فئة — راح تتكوّن <b>${roundsCount}</b> جولة${n % 6 !== 0 && n > 0 ? ` (آخر جولة فيها ${n % 6} فئات)` : ''}`;
+    status.innerHTML = n >= MAX_CATS
+      ? `اخترت <b>${n} / ${MAX_CATS}</b> — اللوحة كاملة ✅`
+      : `اخترت <b>${n} / ${MAX_CATS}</b> فئة`;
   }
+
+  // بعد أن صار السقف 6 لم تعد اللوحة تُقسَّم لجولات، فتبويب الجولة الواحدة زينة
+  const grid = document.getElementById('catGrid');
+  if (grid) grid.classList.toggle('at-max', n >= MAX_CATS);
 
   const startBtn = document.getElementById('startBtn');
   if (startBtn) {
@@ -272,9 +289,10 @@ function startGame() {
 
   questionCache = {};
   rounds = [];
+  resetBetState();
 
-  for (let i = 0; i < selectedCats.length; i += 6) {
-    rounds.push(selectedCats.slice(i, i + 6));
+  for (let i = 0; i < selectedCats.length; i += MAX_CATS) {
+    rounds.push(selectedCats.slice(i, i + MAX_CATS));
   }
 
   stateUsed = {};
@@ -515,6 +533,7 @@ async function shareResult() {
 // زر "لعبة جديدة" من شاشة النهاية
 function playAgain() {
   Sound.click();
+  resetBetState();
   if (isOnlineGame()) {
     // نرجع لإعدادات الروم حتى يعيد المضيف اختيار الفئات
     if (isOnlineHost()) {
@@ -778,6 +797,7 @@ async function backToSetupConfirm() {
   if (await uiConfirm('بدء لعبة جديدة؟ بيروح كل التقدم الحالي')) {
     selectedCats = [];
     questionCache = {};
+    resetBetState();
     goToSetup();
   }
 }
@@ -815,6 +835,7 @@ async function exitToHomeConfirm() {
   turnIndex = 0;
   activeTeam = null;
   activeRound = 0;
+  resetBetState();
 
   goToHome();
 }
@@ -1664,8 +1685,9 @@ function award(team, opts = {}) {
     // الدور ينتقل للفريق الآخر، إلا مع «استريح» فيبقى مع نفس الفريق
     if (!opts.keepTurn) switchTurn();
 
-    // انتهت كل الخلايا؟ نعرض شاشة الفوز
+    // انتهت كل الخلايا؟ سؤال المراهنة أولاً إن كان مفعّلاً، وإلا شاشة الفوز
     if (isGameFinished()) {
+      if (startBetRound(hadControl)) return;
       if (hadControl) publishGameState({ phase: 'ended' });
       showEndScreen();
       return;
@@ -1707,8 +1729,12 @@ function isOnlineHost() {
 let answerPublishGrace = false;
 
 // من يحقّ له تحديث حالة اللعبة: المضيف أو صاحب الدور (لأنه هو من يجيب)
+//
+// ⚠️ `betPublishGrace` تفتحها لأي لاعب أثناء المراهنة: لا دور فيها أصلاً،
+// وكل فريق يقفل مراهنته ويجيب من جهازه. سباق البثّ بين الفريقين يعالجه
+// `mergeBetState` بالدمج لا بالمنع.
 function canControlGame() {
-  return isOnlineHost() || isMyTurn() || answerPublishGrace;
+  return isOnlineHost() || isMyTurn() || answerPublishGrace || betPublishGrace;
 }
 
 // صاحب الروم يبثّ حالة اللعبة كاملة حتى تظهر نفسها على كل الأجهزة
@@ -1734,6 +1760,7 @@ function publishGameState(extra = {}) {
       : null,
     lastAnswer,
     questionDeadline,      // طابع زمني لا عدّاد — راجع `startQuestionTimer`
+    bet: betState,
     ...extra
   };
 
@@ -1750,7 +1777,7 @@ function applyRemoteGameState(state) {
     return;
   }
 
-  if (state.phase !== 'playing' && state.phase !== 'ended') return;
+  if (state.phase !== 'playing' && state.phase !== 'ended' && state.phase !== 'bet') return;
 
   // نعيد بناء الجولات من أسماء الفئات المُرسلة
   rounds = (state.categories || []).map(names =>
@@ -1778,6 +1805,24 @@ function applyRemoteGameState(state) {
     activeLifeline = state.lifelines.active || null;
   }
   activeRound = state.activeRound || 0;
+
+  // مرحلة المراهنة → شاشة المراهنة على كل الأجهزة
+  if (state.phase === 'bet') {
+    const mustRepublish = mergeBetState(state.bet);
+    updateGameUI();
+    if (!document.querySelector('#screen-bet.active')) showScreen('screen-bet');
+    renderBet();
+
+    // ما وصلني أنقص ممّا عندي — أعيد بثّ ما أعرفه (راجع `mergeBetState`)
+    if (mustRepublish) publishBet();
+
+    // شبكة أمان: لو ضاع بثّ الحسم يتكفّل المضيف به متى اكتملت الإجابتان
+    if (isOnlineHost() && betState && !betState.resolved &&
+        betState.answers.A && betState.answers.B) {
+      resolveBet();
+    }
+    return;
+  }
 
   // انتهت اللعبة → شاشة الفوز على كل الأجهزة
   if (state.phase === 'ended') {
@@ -2515,6 +2560,7 @@ function finishAnsweredQuestion() {
     switchTurn();
 
     if (isGameFinished()) {
+      if (startBetRound(hadControl)) return;
       if (hadControl) publishGameState({ phase: 'ended' });
       showEndScreen();
       return;
@@ -2524,4 +2570,384 @@ function finishAnsweredQuestion() {
   } finally {
     answerPublishGrace = false;
   }
+}
+
+/* ============================= سؤال المراهنة الأخير ============================= */
+/*
+  خاتمة الجولة: بعد آخر خلية، كل فريق يراهن بجزء من نقاطه على سؤال صعب واحد.
+  صحّ يربحها، غلط يخسرها.
+
+  ⚠️ **المراهنة سرّية حتى يقفل الفريقان**: الرقم لا يظهر للطرف الآخر قبل ذلك.
+  وهذا يلزم حتى في الوضع المحلي — الفريقان على جهاز واحد، فلو بقي رقم الأول
+  معروضاً لاختار الثاني رقمه وهو يعرف كم يكفيه بالضبط، وضاع كل التوتّر.
+
+  ⚠️ **السقف الحقيقي هو الأقل من 1000 ومن رصيد الفريق.** الرصيد شرط لا زينة:
+  بدونه يراهن فريق بلا نقاط بألف — لا شيء يخسره وكل شيء يكسبه.
+
+  ⚠️ **السؤال يُنتقى مرة واحدة على جهاز واحد ويُبثّ مع الحالة.** لو انتقاه كل
+  جهاز عنده لاختلف السؤال بين اللاعبين: `pickFromBank` عشوائية، وذاكرة
+  «ما عُرض» محلية لكل جهاز.
+*/
+
+const BET_MAX = 1000;
+const BET_STEPS = [0, 250, 500, 750, 1000];
+
+let betEnabled = loadJSON('mr_bet', true);
+let betState = null;
+let betPublishGrace = false;
+
+function setBetEnabled(on) {
+  betEnabled = !!on;
+  saveJSON('mr_bet', betEnabled);
+  Sound.click();
+  renderBetToggle();
+}
+
+function renderBetToggle() {
+  const btn = document.getElementById('betToggle');
+  if (!btn) return;
+  btn.classList.toggle('on', betEnabled);
+  btn.textContent = betEnabled ? 'مفعّل ✓' : 'مطفأ';
+  btn.onclick = () => setBetEnabled(!betEnabled);
+}
+
+function resetBetState() {
+  betState = null;
+}
+
+// سقف مراهنة الفريق: لا يتجاوز الألف ولا رصيده
+function betCeiling(team) {
+  return Math.min(BET_MAX, Math.max(0, Number(scores[team]) || 0));
+}
+
+// الفرق التي يملك هذا الجهاز حقّ المراهنة عنها
+function myBetTeams() {
+  if (!isOnlineGame()) return ['A', 'B'];
+  const me = roomPlayers.find(p => p.player_id === currentPlayer?.player_id);
+  return me?.team ? [me.team] : [];
+}
+
+// سؤال صعب من إحدى فئات اللوحة، بترتيب عشوائي حتى نجد فئة فيها سؤال
+function pickBetQuestion() {
+  const cats = rounds[activeRound] || [];
+  if (!cats.length) return null;
+
+  const order = cats.map((_, i) => i).sort(() => Math.random() - 0.5);
+  for (const i of order) {
+    const cat = cats[i];
+    const q = pickFromBank(cat.name, 2);   // 2 = صعب
+    if (!q) continue;
+
+    let item = q;
+    if (isOnlineGame()) {
+      const mc = buildChoices(q, cat.name, 'hard', `${currentRoom.id}-bet-${cat.name}`);
+      if (mc) item = { ...q, choices: mc.choices, correctIndex: mc.correctIndex };
+    }
+    return { item, catName: `${cat.ic || ''} ${cat.name}`.trim() };
+  }
+  return null;
+}
+
+// تُنادى مكان شاشة الفوز. ترجع false فتُنهى اللعبة كالمعتاد
+function startBetRound(hadControl) {
+  if (!betEnabled || betState) return false;
+
+  const picked = pickBetQuestion();
+  if (!picked) return false;   // لا سؤال صعب متاح — لا نُعلّق اللعبة
+
+  betState = {
+    bets:    { A: 0, B: 0 },
+    locked:  { A: false, B: false },
+    answers: { A: null, B: null },
+    judged:  { A: null, B: null },   // الوضع المحلي: حكم من على الجهاز
+    revealed: false,
+    resolved: false,
+    outcome: null,
+    cat: picked.catName,
+    item: picked.item
+  };
+
+  if (isOnlineGame() && hadControl) publishBet();
+  showScreen('screen-bet');
+  renderBet();
+  Sound.start();
+  return true;
+}
+
+function publishBet() {
+  if (!isOnlineGame()) return;
+  betPublishGrace = true;
+  try { publishGameState({ phase: 'bet' }); }
+  finally { betPublishGrace = false; }
+}
+
+/*
+  دمج لا استبدال.
+
+  فريقان يقفلان مراهنتيهما في اللحظة نفسها من جهازين: كلٌّ يبثّ حالةً لا تعرف
+  قفل الآخر، وآخر بثّ يفوز — فيضيع قفل ويتجمّد الجميع في انتظاره. الدمج يأخذ
+  كل قفل وكل إجابة من أي طرف، ومن كان يعرف أكثر ممّا وصله أعاد البثّ فانتشر
+  ما عنده. ترجع true إن وجب إعادة البثّ.
+*/
+function mergeBetState(incoming) {
+  if (!incoming) return false;
+  if (!betState) { betState = incoming; return false; }
+
+  let iKnowMore = false;
+
+  ['A', 'B'].forEach(t => {
+    if (incoming.locked?.[t] && !betState.locked[t]) {
+      betState.locked[t] = true;
+      betState.bets[t] = Number(incoming.bets?.[t]) || 0;
+    } else if (betState.locked[t] && !incoming.locked?.[t]) {
+      iKnowMore = true;
+    }
+
+    if (incoming.answers?.[t] && !betState.answers[t]) {
+      betState.answers[t] = incoming.answers[t];
+    } else if (betState.answers[t] && !incoming.answers?.[t]) {
+      iKnowMore = true;
+    }
+  });
+
+  if (incoming.item && !betState.item) betState.item = incoming.item;
+  if (incoming.cat && !betState.cat) betState.cat = incoming.cat;
+
+  // الحسم نهائي ولا يُدمج: من حسم أرسل النتيجة كاملة ومعها النقاط
+  if (incoming.resolved && !betState.resolved) {
+    betState.resolved = true;
+    betState.outcome = incoming.outcome || betState.outcome;
+    iKnowMore = false;
+  }
+
+  return iKnowMore;
+}
+
+/* ---------- العرض ---------- */
+
+function renderBet() {
+  const wrap = document.getElementById('betBody');
+  if (!wrap || !betState) return;
+
+  if (betState.resolved) return renderBetResult(wrap);
+  if (betState.locked.A && betState.locked.B) return renderBetQuestion(wrap);
+  renderBetWagers(wrap);
+}
+
+function renderBetWagers(wrap) {
+  const mine = myBetTeams();
+
+  wrap.innerHTML = `
+    <div class="bet-head">
+      <div class="bet-title">💰 سؤال المراهنة</div>
+      <div class="bet-sub">راهن بما تشاء حتى ${BET_MAX} نقطة — صح تكسبها، غلط تخسرها</div>
+    </div>
+    <div class="bet-cards">${['A', 'B'].map(t => betCardHtml(t, mine.includes(t))).join('')}</div>
+    ${isOnlineHost() ? '<button class="btn-main btn-ghost bet-skip" id="betSkipBtn">⏭️ تخطّي المراهنة</button>' : ''}
+  `;
+
+  wrap.querySelectorAll('.bet-step').forEach(b => {
+    b.onclick = () => setBetAmount(b.dataset.team, Number(b.dataset.amount));
+  });
+  wrap.querySelectorAll('.bet-lock').forEach(b => {
+    b.onclick = () => lockBet(b.dataset.lock);
+  });
+  const skip = document.getElementById('betSkipBtn');
+  if (skip) skip.onclick = () => skipBet();
+}
+
+function betCardHtml(team, editable) {
+  const icon = team === 'A' ? '🟢' : '🟡';
+  const name = escapeHtml(getTeamName(team));
+  const score = scores[team] || 0;
+  const head = `<div class="bet-team">${icon} ${name}</div>
+                <div class="bet-score">${score} نقطة</div>`;
+
+  if (betState.locked[team]) {
+    return `<div class="bet-card ${team} locked">${head}<div class="bet-ready">✅ جاهز</div></div>`;
+  }
+  if (!editable) {
+    return `<div class="bet-card ${team} waiting">${head}<div class="bet-wait">⏳ يختار مراهنته...</div></div>`;
+  }
+
+  const ceiling = betCeiling(team);
+  const val = Number(betState.bets[team]) || 0;
+  const steps = BET_STEPS.filter(s => s === 0 || s <= ceiling);
+
+  return `<div class="bet-card ${team} mine">
+    ${head}
+    <div class="bet-steps">
+      ${steps.map(s => `<button class="bet-step${s === val ? ' active' : ''}"
+                                data-team="${team}" data-amount="${s}">${s}</button>`).join('')}
+    </div>
+    ${ceiling < BET_MAX ? `<div class="bet-note">سقفك ${ceiling} — ما تقدر تراهن بأكثر من رصيدك</div>` : ''}
+    <button class="btn-main btn-primary bet-lock" data-lock="${team}">تأكيد المراهنة</button>
+  </div>`;
+}
+
+function setBetAmount(team, amount) {
+  if (!betState || betState.locked[team]) return;
+  betState.bets[team] = Math.min(Number(amount) || 0, betCeiling(team));
+  Sound.select();
+  renderBet();   // بلا بثّ: الرقم سرّ حتى القفل
+}
+
+function lockBet(team) {
+  if (!betState || betState.locked[team]) return;
+  betState.bets[team] = Math.min(Number(betState.bets[team]) || 0, betCeiling(team));
+  betState.locked[team] = true;
+  Sound.click();
+  publishBet();
+  renderBet();
+}
+
+async function skipBet() {
+  if (!await uiConfirm('تتخطّى سؤال المراهنة وتروح لشاشة الفوز؟')) return;
+  if (betState) { betState.resolved = true; betState.outcome = null; }
+  finishBet();
+}
+
+function renderBetQuestion(wrap) {
+  const item = betState.item || {};
+  const mine = myBetTeams();
+  const online = isOnlineGame() && Array.isArray(item.choices);
+  const letters = ['أ', 'ب', 'ج', 'د'];
+
+  const chips = ['A', 'B'].map(t => {
+    const done = !!betState.answers[t];
+    return `<div class="bet-chip${done ? ' done' : ''}">${t === 'A' ? '🟢' : '🟡'} ${escapeHtml(getTeamName(t))} — ${done ? '✅ أجاب' : '⏳ ينتظر'}</div>`;
+  }).join('');
+
+  if (online) {
+    const pending = mine.filter(t => !betState.answers[t]);
+    wrap.innerHTML = `
+      <div class="bet-qhead">💰 سؤال المراهنة — ${escapeHtml(betState.cat || '')}</div>
+      ${questionVisual(item)}
+      <div class="qtext">${escapeHtml(item.question || '')}</div>
+      <div class="bet-chips">${chips}</div>
+      <div class="choice-hint">${pending.length ? '👈 اختر إجابة فريقك' : '⏳ بانتظار الفريق الآخر'}</div>
+      <div class="choices">
+        ${(item.choices || []).map((c, i) => `
+          <button class="choice" data-i="${i}"${pending.length ? '' : ' disabled'}>
+            <span class="choice-letter">${letters[i]}</span>
+            <span class="choice-text">${escapeHtml(c)}</span>
+          </button>`).join('')}
+      </div>`;
+
+    if (pending.length) {
+      wrap.querySelectorAll('.choice').forEach(b => {
+        b.onclick = () => answerBet(pending[0], Number(b.dataset.i));
+      });
+    }
+    return;
+  }
+
+  // محلي: يُكشف الجواب ثم يُحكَم على كل فريق
+  const judgedBoth = betState.judged.A !== null && betState.judged.B !== null;
+  wrap.innerHTML = `
+    <div class="bet-qhead">💰 سؤال المراهنة — ${escapeHtml(betState.cat || '')}</div>
+    ${questionVisual(item)}
+    <div class="qtext">${escapeHtml(item.question || '')}</div>
+    ${betState.revealed ? `<div class="bet-answer">${escapeHtml(item.answer || '')}</div>` : ''}
+    ${betState.revealed ? `
+      <div class="bet-judge">
+        ${['A', 'B'].map(t => `
+          <div class="bet-judge-row">
+            <span class="bet-judge-team">${t === 'A' ? '🟢' : '🟡'} ${escapeHtml(getTeamName(t))}</span>
+            <button class="btn-judge ok${betState.judged[t] === true ? ' on' : ''}" data-j="${t}" data-v="1">✓ صح</button>
+            <button class="btn-judge no${betState.judged[t] === false ? ' on' : ''}" data-j="${t}" data-v="0">✗ خطأ</button>
+          </div>`).join('')}
+      </div>
+      <button class="btn-main btn-primary" id="betApplyBtn"${judgedBoth ? '' : ' disabled'}>احسب النتيجة</button>
+    ` : '<button class="btn-main btn-secondary" id="betRevealBtn">عرض الإجابة</button>'}
+  `;
+
+  const reveal = document.getElementById('betRevealBtn');
+  if (reveal) reveal.onclick = () => { betState.revealed = true; Sound.reveal(); renderBet(); };
+
+  wrap.querySelectorAll('.btn-judge').forEach(b => {
+    b.onclick = () => {
+      betState.judged[b.dataset.j] = b.dataset.v === '1';
+      Sound.select();
+      renderBet();
+    };
+  });
+
+  const apply = document.getElementById('betApplyBtn');
+  if (apply) apply.onclick = () => resolveBet();
+}
+
+function answerBet(team, index) {
+  if (!betState || betState.answers[team]) return;
+  const item = betState.item || {};
+
+  betState.answers[team] = {
+    index,
+    correct: index === item.correctIndex,
+    byName: currentPlayer?.name || getTeamName(team)
+  };
+
+  Sound.click();
+  publishBet();
+  renderBet();
+
+  // من أجاب أخيراً هو من يحسم — فلا ينتظر الجميع بعضهم
+  if (betState.answers.A && betState.answers.B) setTimeout(() => resolveBet(), 900);
+}
+
+function resolveBet() {
+  if (!betState || betState.resolved) return;
+
+  const online = isOnlineGame() && Array.isArray(betState.item?.choices);
+  const outcome = {};
+
+  ['A', 'B'].forEach(t => {
+    const amount = Math.min(Number(betState.bets[t]) || 0, BET_MAX);
+    const correct = online ? !!betState.answers[t]?.correct : betState.judged[t] === true;
+    const delta = correct ? amount : -amount;
+    outcome[t] = { amount, correct, delta };
+    scores[t] = Math.max(0, (Number(scores[t]) || 0) + delta);
+  });
+
+  betState.outcome = outcome;
+  betState.resolved = true;
+
+  if (outcome.A.correct || outcome.B.correct) Sound.award(); else Sound.skip();
+  publishBet();
+  renderBet();
+}
+
+function renderBetResult(wrap) {
+  const o = betState.outcome;
+
+  if (!o) {   // تُخُطّيت المراهنة
+    wrap.innerHTML = '<div class="bet-qhead">تُخُطّيت المراهنة</div>' +
+      '<button class="btn-main btn-primary" id="betEndBtn">شوف الفائز 🏆</button>';
+  } else {
+    wrap.innerHTML = `
+      <div class="bet-qhead">💰 نتيجة المراهنة</div>
+      <div class="bet-answer">الإجابة: ${escapeHtml(betState.item?.answer || '')}</div>
+      <div class="bet-cards">
+        ${['A', 'B'].map(t => `
+          <div class="bet-card ${t} result ${o[t].correct ? 'win' : 'lose'}">
+            <div class="bet-team">${t === 'A' ? '🟢' : '🟡'} ${escapeHtml(getTeamName(t))}</div>
+            <div class="bet-verdict">${o[t].correct ? '✅ صحيحة' : '❌ خاطئة'}</div>
+            <div class="bet-delta">${o[t].delta >= 0 ? '+' : ''}${o[t].delta}</div>
+            <div class="bet-total">${scores[t]}</div>
+          </div>`).join('')}
+      </div>
+      <button class="btn-main btn-primary" id="betEndBtn">شوف الفائز 🏆</button>`;
+  }
+
+  const end = document.getElementById('betEndBtn');
+  if (end) end.onclick = () => finishBet();
+}
+
+function finishBet() {
+  if (isOnlineGame() && canControlGame()) {
+    betPublishGrace = true;
+    try { publishGameState({ phase: 'ended' }); }
+    finally { betPublishGrace = false; }
+  }
+  showEndScreen();
 }
