@@ -3565,3 +3565,146 @@ select {
   .choice.correct,
   .bet-card.result.lose { animation: none; }
 }
+
+/* ============================= ملخّص الجولة ============================= */
+
+.end-summary {
+  max-width: 640px;
+  margin: 26px auto 8px;
+  text-align: right;
+}
+
+.end-summary:empty { display: none; }
+
+.sum-title {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.sum-cards {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.sum-card {
+  flex: 1 1 140px;
+  min-width: 132px;
+  background: var(--panel);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 14px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.sum-card.hero {
+  flex-basis: 100%;
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.sum-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.sum-value {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 21px;
+  color: var(--sand);
+  margin: 3px 0;
+}
+
+.sum-card.hero .sum-value {
+  font-size: clamp(20px, 5.5vw, 28px);
+  color: var(--gold);
+}
+
+.sum-unit { font-size: 13px; margin-inline-start: 2px; color: var(--muted); }
+
+.sum-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* الأرقام والنسب تُقرأ يساراً — وإلا قُذفت العلامة لآخرها في الاتجاه العربي */
+.sum-ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+
+/* الجدول */
+.sum-table {
+  background: var(--panel);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.sum-row {
+  display: grid;
+  grid-template-columns: 1fr 44px 44px 56px 62px;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 10px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.sum-row:last-child { border-bottom: none; }
+
+.sum-row.head {
+  background: var(--night-2);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sum-row > span:not(.sum-who) { text-align: center; }
+
+.sum-who {
+  font-weight: 700;
+  color: var(--sand);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sum-ok  { color: var(--success); font-weight: 800; }
+.sum-no  { color: var(--error); font-weight: 800; }
+.sum-pts { color: var(--gold); font-weight: 800; }
+
+/* سطر المراهنة */
+.sum-bet {
+  margin-top: 10px;
+  padding: 9px 10px;
+  background: var(--panel);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.sum-bet-one { color: var(--sand); }
+.sum-bet-one.win  b { color: var(--success); }
+.sum-bet-one.lose b { color: var(--error); }
+
+.sum-foot {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .sum-row { grid-template-columns: 1fr 34px 34px 48px 54px; font-size: 13px; padding: 8px 7px; }
+  .sum-card { min-width: 108px; padding: 9px 6px; }
+  .sum-value { font-size: 18px; }
+}

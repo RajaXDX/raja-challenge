@@ -1,4 +1,4 @@
-/* ============================= GAME STATE ============================= */
+﻿/* ============================= GAME STATE ============================= */
 
 // الثوابت
 // ملاحظة: هذا الرمز يعمل فقط في التشغيل المحلي بدون سحابة، حيث لا يؤثر التعديل
@@ -290,6 +290,7 @@ function startGame() {
   questionCache = {};
   rounds = [];
   resetBetState();
+  resetRoundLog();
 
   for (let i = 0; i < selectedCats.length; i += MAX_CATS) {
     rounds.push(selectedCats.slice(i, i + MAX_CATS));
@@ -484,6 +485,8 @@ function showEndScreen() {
     `;
   }
 
+  renderEndSummary();
+
   showScreen('screen-end');
   Sound.award?.();
   trackEvent('game_finished');
@@ -542,6 +545,7 @@ async function shareResult() {
 function playAgain() {
   Sound.click();
   resetBetState();
+  resetRoundLog();
   if (isOnlineGame()) {
     // نرجع لإعدادات الروم حتى يعيد المضيف اختيار الفئات
     if (isOnlineHost()) {
@@ -784,6 +788,8 @@ function onQuestionTimeout() {
       timedOut: true
     };
     if (isMyTurn()) recordCategoryResult(current.cat?.name, false);
+    logRound({ team: lastAnswer.team, playerId: turn?.player_id || 'local',
+               name: lastAnswer.byName, correct: false, timedOut: true });
     renderChoices(item);
     publishGameState();
     setTimeout(() => finishAnsweredQuestion(), 2600);
@@ -806,6 +812,7 @@ async function backToSetupConfirm() {
     selectedCats = [];
     questionCache = {};
     resetBetState();
+    resetRoundLog();
     goToSetup();
   }
 }
@@ -844,6 +851,7 @@ async function exitToHomeConfirm() {
   activeTeam = null;
   activeRound = 0;
   resetBetState();
+  resetRoundLog();
 
   goToHome();
 }
@@ -1409,6 +1417,7 @@ function openQuestion(ci, row) {
 
   // المهلة تُحسب مرة عند الفتح ثم تُبثّ، فيعدّ الجميع من نفس النقطة
   questionDeadline = questionSeconds > 0 ? Date.now() + questionSeconds * 1000 : 0;
+  questionOpenedAt = Date.now();   // لقياس زمن الإجابة في ملخّص الجولة
 
   renderQuestionBody(item);
   startQuestionTimer();
@@ -1696,6 +1705,14 @@ function award(team, opts = {}) {
     Sound.skip();
   }
 
+  // الأونلاين يسجّل في `submitAnswer` و`onQuestionTimeout` — فلا نُكرّره هنا.
+  // و«استريح» تخطٍّ مقصود لا محاولة، فتُوسَم ولا تُحسب في الدقة.
+  if (!isOnlineGame()) {
+    logRound({ team: team || activeTeam, playerId: null,
+               name: team ? getTeamName(team) : null,
+               correct: !!team, skipped: !team && !!opts.keepTurn });
+  }
+
   // نفس سبب `answerPublishGrace` في finishAnsweredQuestion: من يعطي النقاط
   // قد يكون صاحب الدور لا المضيف، فيفقد صلاحية البثّ فور انتقال الدور عنه
   const hadControl = canControlGame();
@@ -1791,6 +1808,7 @@ function publishGameState(extra = {}) {
     lastAnswer,
     questionDeadline,      // طابع زمني لا عدّاد — راجع `startQuestionTimer`
     bet: betState,
+    log: roundLog,         // سجلّ الجولة، ليُبنى الملخّص نفسه على كل الأجهزة
     ...extra
   };
 
@@ -1822,6 +1840,8 @@ function applyRemoteGameState(state) {
   }
   if (state.used) stateUsed = state.used;
   if (state.scores) scores = state.scores;
+  // السجلّ لا ينمو إلا عند من يجيب، فالوارد أحدث دائماً ممّا عند المشاهد
+  if (Array.isArray(state.log) && state.log.length >= roundLog.length) roundLog = state.log;
   if (state.activeTeam) activeTeam = state.activeTeam;
   if (Array.isArray(state.turnOrder)) turnOrder = state.turnOrder;
   lastAnswer = state.lastAnswer || null;
@@ -2559,6 +2579,9 @@ function submitAnswer(index) {
   // نحتسب أداء الفئة على من أجاب فعلاً — أي على هذا الجهاز
   if (isMyTurn()) recordCategoryResult(current.cat?.name, correct);
 
+  // السجلّ قبل البثّ، وإلا وصل الآخرين ناقصاً هذا السطر
+  logRound({ team, playerId: turn?.player_id || 'local', name: turn?.name || getTeamName(team), correct });
+
   if (correct) {
     scores[team] = (scores[team] || 0) + pts;
     Sound.award();
@@ -2990,4 +3013,214 @@ function finishBet() {
     finally { betPublishGrace = false; }
   }
   showEndScreen();
+}
+
+/* ============================= سجلّ الجولة وملخّصها ============================= */
+/*
+  شاشة الفوز كانت كأساً واسمين ورقمين — ولا كلمة عمّا جرى في الثمانية عشر
+  سؤالاً. تُجمَع الآن سطراً لكل خلية، ويُبنى منها ملخّص.
+
+  ⚠️ **الوضع المحلي لا يعرف اللاعبين ولن يعرفهم.** الفريقان على جهاز واحد،
+  و`award(team)` لا تحمل إلا اسم الفريق. فالملخّص هناك **للفرق لا للأفراد**،
+  ولا نخترع «أفضل لاعب» من عدم. (نفس مبدأ «أداء هذا الجهاز» في
+  `recordCategoryResult`.)
+
+  ⚠️ **الزمن يُقاس على جهاز المجيب وحده.** `questionOpenedAt` تُضبط عند فتح
+  السؤال محلياً، والمجيب في الأونلاين هو من فتحه، فالقياس صحيح له. ولا يُقارن
+  زمنُ جهازٍ بزمن آخر إلا وكلاهما قاس رحلته من فتحه هو.
+*/
+
+let roundLog = [];
+let questionOpenedAt = 0;
+
+function resetRoundLog() {
+  roundLog = [];
+  questionOpenedAt = 0;
+}
+
+function logRound(entry) {
+  if (!current) return;
+  roundLog.push({
+    cat: current.cat?.name || '',
+    row: current.row,
+    points: POINTS[current.row] || 0,
+    ms: questionOpenedAt ? Math.max(0, Date.now() - questionOpenedAt) : 0,
+    ...entry
+  });
+}
+
+/* ---- بناء الملخّص ---- */
+
+function buildRoundSummary() {
+  const played = roundLog.filter(e => !e.skipped);
+  const online = roundLog.some(e => e.playerId);
+
+  const teams = {
+    A: { correct: 0, wrong: 0, points: 0, lost: 0 },
+    B: { correct: 0, wrong: 0, points: 0, lost: 0 }
+  };
+  const players = new Map();
+
+  let fastest = null;
+  let bestStreak = { team: null, n: 0 };
+  let run = { team: null, n: 0 };
+  const byCat = new Map();
+
+  played.forEach(e => {
+    const t = teams[e.team];
+    if (t) {
+      if (e.correct) { t.correct++; t.points += e.points; }
+      else { t.wrong++; t.lost += e.points; }
+    }
+
+    if (e.playerId) {
+      if (!players.has(e.playerId)) {
+        players.set(e.playerId, { name: e.name, team: e.team, correct: 0, wrong: 0, points: 0, msSum: 0 });
+      }
+      const p = players.get(e.playerId);
+      if (e.correct) { p.correct++; p.points += e.points; }
+      else p.wrong++;
+      p.msSum += e.ms;
+    }
+
+    // ⚠️ نصف ثانية حدّاً أدنى: أقلّ منها ليس سرعة بشر بل نقرة على سؤال
+    // كان مفتوحاً من قبل (أو تشغيل آلي) — و«أسرع إجابة: 0.0 ثانية» تُقرأ عطلاً
+    if (e.correct && e.ms >= 500 && (!fastest || e.ms < fastest.ms)) fastest = e;
+
+    // أطول سلسلة صحيحة متتالية لفريق واحد
+    if (e.correct && e.team === run.team) run.n++;
+    else run = { team: e.correct ? e.team : null, n: e.correct ? 1 : 0 };
+    if (run.team && run.n > bestStreak.n) bestStreak = { team: run.team, n: run.n };
+
+    if (e.cat) {
+      if (!byCat.has(e.cat)) byCat.set(e.cat, { name: e.cat, wrong: 0, total: 0 });
+      const c = byCat.get(e.cat);
+      c.total++;
+      if (!e.correct) c.wrong++;
+    }
+  });
+
+  // أصعب فئة: الأكثر خطأً، ولا تُعرض إلا إن سقط فيها سؤالان فأكثر
+  const hardestCat = [...byCat.values()].sort((x, y) => (y.wrong - x.wrong) || (y.total - x.total))[0];
+
+  // البطل: الأكثر إجابات صحيحة، ويفصل بينهم النقاط ثم أسرع متوسط
+  const ranked = [...players.values()].sort((x, y) =>
+    (y.correct - x.correct) ||
+    (y.points - x.points) ||
+    ((x.msSum / Math.max(1, x.correct + x.wrong)) - (y.msSum / Math.max(1, y.correct + y.wrong))));
+
+  const mvp = ranked.length && ranked[0].correct > 0 ? ranked[0] : null;
+
+  return { online, played: played.length, teams, ranked, mvp, fastest, bestStreak, hardestCat };
+}
+
+/* ---- العرض ---- */
+
+function renderEndSummary() {
+  const box = document.getElementById('endSummary');
+  if (!box) return;
+
+  if (!roundLog.length) { box.innerHTML = ''; return; }
+
+  const s = buildRoundSummary();
+  const icon = t => (t === 'A' ? '🟢' : '🟡');
+  const pct = (c, w) => (c + w ? Math.round((c / (c + w)) * 100) : 0);
+
+  // تمييز العدد بالعربية: «6 سؤالاً» خطأ، و«6 أسئلة» صواب، والمثنّى له صيغته
+  const qCount = n => (n === 1 ? 'سؤال واحد' : n === 2 ? 'سؤالين'
+                     : n <= 10 ? `${n} أسئلة` : `${n} سؤالاً`);
+  const aCount = n => (n === 1 ? 'إجابة صحيحة واحدة' : n === 2 ? 'إجابتين صحيحتين'
+                     : n <= 10 ? `${n} إجابات صحيحة` : `${n} إجابة صحيحة`);
+
+  const cards = [];
+
+  if (s.mvp) {
+    cards.push(`<div class="sum-card hero">
+      <div class="sum-label">⭐ أفضل لاعب</div>
+      <div class="sum-value">${icon(s.mvp.team)} ${escapeHtml(s.mvp.name)}</div>
+      <div class="sum-note">${aCount(s.mvp.correct)} · ${s.mvp.points} نقطة</div>
+    </div>`);
+  } else if (!s.online) {
+    const lead = s.teams.A.correct >= s.teams.B.correct ? 'A' : 'B';
+    cards.push(`<div class="sum-card hero">
+      <div class="sum-label">⭐ الأدقّ</div>
+      <div class="sum-value">${icon(lead)} ${escapeHtml(getTeamName(lead))}</div>
+      <div class="sum-note">${s.teams[lead].correct} من ${s.teams[lead].correct + s.teams[lead].wrong} صحيحة</div>
+    </div>`);
+  }
+
+  if (s.fastest) {
+    cards.push(`<div class="sum-card">
+      <div class="sum-label">⚡ أسرع إجابة</div>
+      <div class="sum-value sum-ltr">${(s.fastest.ms / 1000).toFixed(1)}<span class="sum-unit">ث</span></div>
+      <div class="sum-note">${icon(s.fastest.team)} ${escapeHtml(s.fastest.name || getTeamName(s.fastest.team))} — ${escapeHtml(s.fastest.cat)}</div>
+    </div>`);
+  }
+
+  /*
+    ⚠️ **السلسلة معنىً محلّي.** في الأونلاين الدور يتناوب بين الفريقين حتماً
+    (`buildTurnOrder`)، فلا يمكن أن يصيب فريق مرتين متتاليتين — البطاقة كانت
+    لا تظهر هناك أبداً. «أصعب فئة» تعمل في الوضعين، وهي أطرف: تكشف الفئة
+    التي سقط فيها الجميع.
+  */
+  if (s.bestStreak.n >= 2) {
+    cards.push(`<div class="sum-card">
+      <div class="sum-label">🔥 أطول سلسلة</div>
+      <div class="sum-value sum-ltr">${s.bestStreak.n}</div>
+      <div class="sum-note">${icon(s.bestStreak.team)} ${escapeHtml(getTeamName(s.bestStreak.team))} على التوالي</div>
+    </div>`);
+  }
+
+  if (s.hardestCat && s.hardestCat.wrong >= 2) {
+    cards.push(`<div class="sum-card">
+      <div class="sum-label">🎯 أصعب فئة</div>
+      <div class="sum-value">${escapeHtml(s.hardestCat.name)}</div>
+      <div class="sum-note">${s.hardestCat.wrong} من ${s.hardestCat.total} ضاعت</div>
+    </div>`);
+  }
+
+  const lostTotal = s.teams.A.lost + s.teams.B.lost;
+  if (lostTotal > 0) {
+    cards.push(`<div class="sum-card">
+      <div class="sum-label">💸 نقاط ضاعت</div>
+      <div class="sum-value sum-ltr">${lostTotal}</div>
+      <div class="sum-note">على ${qCount(s.teams.A.wrong + s.teams.B.wrong)} بلا إجابة صحيحة</div>
+    </div>`);
+  }
+
+  // جدول: اللاعبون في الأونلاين، والفريقان في المحلي
+  const rows = s.online
+    ? s.ranked.map(p => ({ label: `${icon(p.team)} ${p.name}`, c: p.correct, w: p.wrong, pts: p.points }))
+    : ['A', 'B'].map(t => ({ label: `${icon(t)} ${getTeamName(t)}`, c: s.teams[t].correct, w: s.teams[t].wrong, pts: s.teams[t].points }));
+
+  // سطر المراهنة — الرهان أبرز لحظة في الجولة فلا يُطوى في المجموع
+  let betRow = '';
+  if (betState?.outcome) {
+    const o = betState.outcome;
+    betRow = `<div class="sum-bet">
+      💰 المراهنة:
+      ${['A', 'B'].map(t => `<span class="sum-bet-one ${o[t].correct ? 'win' : 'lose'}">${icon(t)} ${escapeHtml(getTeamName(t))}
+        <b class="sum-ltr">${o[t].delta >= 0 ? '+' : ''}${o[t].delta}</b></span>`).join('')}
+    </div>`;
+  }
+
+  box.innerHTML = `
+    <div class="sum-title">📋 ملخّص الجولة</div>
+    <div class="sum-cards">${cards.join('')}</div>
+    <div class="sum-table">
+      <div class="sum-row head">
+        <span class="sum-who">${s.online ? 'اللاعب' : 'الفريق'}</span>
+        <span>✅</span><span>❌</span><span>الدقة</span><span>النقاط</span>
+      </div>
+      ${rows.map(r => `<div class="sum-row">
+        <span class="sum-who">${escapeHtml(r.label)}</span>
+        <span class="sum-ok">${r.c}</span>
+        <span class="sum-no">${r.w}</span>
+        <span class="sum-ltr">${pct(r.c, r.w)}%</span>
+        <span class="sum-pts">${r.pts}</span>
+      </div>`).join('')}
+    </div>
+    ${betRow}
+    ${s.online ? '' : '<div class="sum-foot">الوضع المحلي يعرف الفرق ولا يعرف الأفراد — الجهاز واحد</div>'}
+  `;
 }
