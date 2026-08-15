@@ -1118,15 +1118,21 @@ function numericDistractors(correct, rand) {
   return [...out].map(v => correct.replace(m[1], String(v)));
 }
 
+/*
+  ⚠️ **الإجابات تدخل المجموعة مقطوعة الشرح.**
+  «جبل السودة (3133 متر)» مشتّتاً وسط ثلاثة بلا أقواس يفضح نفسه بالشكل وحده،
+  والقطع يستوي به الأربعة. والتفريد يقع على النص المقطوع أيضاً، وإلا دخل
+  «جبل السودة» و«جبل السودة (3133 متر)» خيارين لشيء واحد.
+*/
 function collectAnswerPool(categoryName, diffKey, exclude) {
-  const seen = new Set([normalizeAnswer(exclude)]);
+  const seen = new Set([normalizeAnswer(stripTrailingNote(exclude))]);
   const pool = [];
 
   // نحتفظ بنص السؤال مع الإجابة: التشابه بين السؤالين أدلّ على تقارب
   // نوع الإجابة من تشابه طول النص
   const take = (list) => {
     (list || []).forEach(q => {
-      const a = String(q?.answer || '').trim();
+      const a = stripTrailingNote(String(q?.answer || '').trim());
       const key = normalizeAnswer(a);
       if (!a || seen.has(key)) return;
       seen.add(key);
@@ -1134,15 +1140,18 @@ function collectAnswerPool(categoryName, diffKey, exclude) {
     });
   };
 
-  // 1) نفس الفئة ونفس المستوى — الأقرب سياقاً
-  take(QBANK[categoryName]?.[diffKey]);
+  /*
+    ⚠️ **مستويات الفئة الثلاثة تُجمع دائماً، لا عند نقص العدد فقط.**
+    كان الجمع مشروطاً بـ«أقل من 12»، فمستوىً واحد مليء بإجابات رقمية يكفي
+    العدد ولا يكفي **الشكل**: «أرامكو السعودية» كانت تنافسها «حوالي 50%»
+    و«بئر الدمام رقم 7». اختلاف الشكل يفضح الإجابة، واختلاف المستوى لا
+    يراه اللاعب أصلاً — فالمجموعة الأوسع أولى، ومرشّحات الشكل بعدها هي
+    التي تختار.
+  */
+  take(QBANK[categoryName]?.[diffKey]);   // نفس المستوى أولاً فيتقدّم عند التعادل
+  DIFFKEY.filter(k => k !== diffKey).forEach(k => take(QBANK[categoryName]?.[k]));
 
-  // 2) نفس الفئة، مستويات أخرى
-  if (pool.length < 12) {
-    DIFFKEY.filter(k => k !== diffKey).forEach(k => take(QBANK[categoryName]?.[k]));
-  }
-
-  // 3) فئات أخرى — ملاذ أخير
+  // فئات أخرى — ملاذ أخير
   if (pool.length < 3) {
     Object.keys(QBANK).forEach(cat => {
       if (cat === categoryName) return;
@@ -1274,22 +1283,36 @@ function buildChoices(item, categoryName, diffKey, seed) {
   // 3) الملاذ الأخير: إجابات أخرى من نفس الفئة.
   // الترتيب: تشابه السؤال أولاً ثم قرب الطول — الاعتماد على الطول وحده
   // كان يُنتج خيارات بلا صلة («تمر» أمام سؤال عن قارة).
+  //
+  // ⚠️ **يُبنى على `head` لا على `correct`**: الشرح بين القوسين لا يحمله إلا
+  // الصحيح، فيُعرف بشكله قبل قراءته — «صلم (Salm)» وحده بين ثلاثة عربية،
+  // و«نهر النيل (ويُنازعه الأمازون)» وحده الطويل. الإجابة المحفوظة تبقى
+  // كاملة فيظهر الشرح عند الكشف في الوضع المحلي.
   const pool = collectAnswerPool(categoryName, diffKey, correct);
   if (pool.length < 3) return null;
 
   const myWords = contentWords(item?.question || '');
-  const myShape = answerShape(correct);
-  const myLead = leadWord(correct);
+  const myShape = answerShape(head);
+  const myLead = leadWord(head);
 
   const scored = pool.map(c => ({
     answer: c.answer,
     shape: answerShape(c.answer),
     sameLead: !!myLead && leadWord(c.answer) === myLead,
     overlap: questionOverlap(myWords, c.question),
-    lenDiff: Math.abs(c.answer.length - correct.length)
+    lenDiff: Math.abs(c.answer.length - head.length)
   }));
 
-  // أول مرشّح يترك ثلاثة على الأقل هو المعتمد
+  /*
+    أول مرشّح يترك ثلاثة على الأقل هو المعتمد.
+
+    ⚠️ **لا تُوسَّع المجموعة إلى فئات أخرى طلباً للشكل.** جُرِّب: إجابة فيها
+    حرف لاتيني في فئة عربية («الحمض النووي DNA») لا تجد في فئتها ثلاثة
+    تشبهها شكلاً، فجلبها التوسيع من كل الفئات — فصارت خيارات سؤال «هذا شعار
+    أي قناة؟» هي: OSN وفصيلة دم ووحدة فلكية واسم علمي لجمل. الشكل استوى
+    والمعنى انهار، واللاعب يستبعدها بالسخف بدل أن يستبعدها بالشكل. الفئة
+    الواحدة سقفٌ مقصود.
+  */
   let kept = [];
   for (const pass of SHAPE_FILTERS) {
     kept = scored.filter(c => pass(c.shape, myShape));
@@ -1313,7 +1336,7 @@ function buildChoices(item, categoryName, diffKey, seed) {
   }
   if (picked.length < 3) return null;
 
-  return shuffleChoices(correct, picked, rand);
+  return shuffleChoices(head, picked, rand);
 }
 
 // خلط ثابت بنفس البذرة حتى يرى كل اللاعبين نفس الترتيب
