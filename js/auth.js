@@ -345,6 +345,15 @@ async function handleAuthSubmit(mode) {
     return;
   }
 
+  // ⛔ الحظر يُفحص بعد الدخول أيضاً لا عند الفتح فقط: هنا يُربط الجهاز
+  // بالحساب، فمن حُظر حسابه لا يُفلت بفتح اللعبة من جهاز آخر، ومن حُظر
+  // جهازه لا يُفلت بحساب جديد أنشأه للتوّ من نفس الجهاز.
+  const banStatus = await registerDeviceAndCheckBan();
+  if (banStatus.banned) {
+    await showBannedScreen(banStatus.reason);
+    return;
+  }
+
   document.getElementById('authPassword').value = '';
   renderAuthState();
   subscribeToInvites?.();
@@ -369,6 +378,14 @@ async function initAuthGate() {
   renderAuthState();
 
   if (isSignedIn()) {
+    // تسجيل الجهاز عند كل فتح: بهذا السجلّ وحده يمتدّ الحظر لاحقاً من
+    // الحساب إلى أجهزته ومن الجهاز إلى حساباته
+    const banStatus = await registerDeviceAndCheckBan();
+    if (banStatus.banned) {
+      await showBannedScreen(banStatus.reason);
+      return false;
+    }
+
     // الاستماع للدعوات + عرض ما وصل أثناء الغياب
     subscribeToInvites?.();
     checkPendingInvites?.();

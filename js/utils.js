@@ -181,6 +181,22 @@ function escapeHtml(text) {
     .replace(/'/g, '&#39;');
 }
 
+/*
+  نصّ يُوضع داخل سلسلة JavaScript **داخل خاصية HTML** مثل onclick="f('...')".
+  المتصفح يفكّ ترميز الخاصية أولاً ثم يفسّرها كـ JS، ولهذا لا تكفي escapeHtml
+  هنا: هي تحوّل ' إلى &#39; فيفكّها المتصفح إلى ' فتُغلق السلسلة قبل أوانها.
+  الترتيب مقصود: نهرّب لـ JS أولاً (\ و ')، ثم لـ HTML بلا مساس بالمهرّب.
+*/
+function jsStr(text) {
+  return String(text ?? '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 /* ---- MODAL DIALOGS ---- */
 async function showConfirm(message, onConfirm, onCancel) {
   if (await uiConfirm(message)) {

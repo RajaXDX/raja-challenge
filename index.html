@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260804e">
-  <link rel="stylesheet" href="css/responsive.css?v=20260804e">
+  <link rel="stylesheet" href="css/style.css?v=20260815b">
+  <link rel="stylesheet" href="css/responsive.css?v=20260815b">
 </head>
 <body>
 
@@ -91,6 +91,20 @@
       <p class="auth-note" id="authNote">ما عندك حساب؟ اضغط «حساب جديد» فوق</p>
       <button class="auth-link" id="authForgotBtn" style="display:none;" onclick="switchAuthTab('forgot')">نسيت كلمة المرور؟</button>
     </div>
+  </div>
+</div>
+
+<!-- شاشة الحظر — لا مخرج منها: لا أزرار رجوع ولا تسجيل دخول -->
+<div class="screen" id="screen-banned">
+  <div class="banned-container">
+    <div class="banned-icon">⛔</div>
+    <h2 class="banned-title">تم حظر هذا الجهاز</h2>
+    <p class="banned-sub">لا يمكنك الدخول للعبة ولا إنشاء حساب جديد من هذا الجهاز.</p>
+    <div class="banned-reason-box">
+      <span class="banned-reason-label">السبب:</span>
+      <span id="bannedReason">—</span>
+    </div>
+    <p class="banned-note">إذا كنت ترى أن هذا خطأ، تواصل مع صاحب اللعبة.</p>
   </div>
 </div>
 
@@ -459,6 +473,16 @@
       </p>
       <div id="usersBox"><p style="color:#999">اضغط للتحميل</p></div>
       <button class="btn btn-ghost" onclick="loadUsers()" style="width:100%;margin-top:10px;">تحديث القائمة</button>
+
+      <div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.2);">
+        <h4 style="margin:0 0 8px 0;">⛔ المحظورون</h4>
+        <p style="font-size:12px;color:#9FB8AB;margin-bottom:12px;">
+          الحظر يمنع الحساب <b>وجهازه</b> من الدخول أو إنشاء حساب جديد.
+          الحذف وحده لا يمنع العودة — من يُحذف حسابه يسجّل غيره بعد دقيقة.
+        </p>
+        <div id="bansBox"><p style="color:#999">اضغط للتحميل</p></div>
+        <button class="btn btn-ghost" onclick="loadBans()" style="width:100%;margin-top:10px;">تحديث المحظورين</button>
+      </div>
     </div>
 
     <!-- تبويب المزامنة -->
@@ -528,16 +552,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260804e"></script>
-<script src="js/utils.js?v=20260804e"></script>
-<script src="js/auth.js?v=20260804e"></script>
-<script src="js/friends.js?v=20260804e"></script>
-<script src="js/profile.js?v=20260804e"></script>
-<script src="js/game.js?v=20260804e"></script>
-<script src="js/admin.js?v=20260804e"></script>
-<script src="js/sync.js?v=20260804e"></script>
-<script src="js/rooms.js?v=20260804e"></script>
-<script src="js/chat.js?v=20260804e"></script>
+<script src="js/supabase-config.js?v=20260815b"></script>
+<script src="js/utils.js?v=20260815b"></script>
+<script src="js/auth.js?v=20260815b"></script>
+<script src="js/bans.js?v=20260815b"></script>
+<script src="js/friends.js?v=20260815b"></script>
+<script src="js/profile.js?v=20260815b"></script>
+<script src="js/game.js?v=20260815b"></script>
+<script src="js/admin.js?v=20260815b"></script>
+<script src="js/sync.js?v=20260815b"></script>
+<script src="js/rooms.js?v=20260815b"></script>
+<script src="js/chat.js?v=20260815b"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

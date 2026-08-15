@@ -15,7 +15,7 @@
 */
 
 // ارفع الرقم عند تغيير قائمة `SHELL` — `activate` يمسح ما سواه فيُعاد التخزين نظيفاً
-const CACHE = 'raja-v6';
+const CACHE = 'raja-v7';
 
 // هيكل التطبيق: ما يكفي لفتح اللعبة والوضع المحلي بلا شبكة
 const SHELL = [
@@ -27,6 +27,7 @@ const SHELL = [
   './js/supabase-config.js',
   './js/utils.js',
   './js/auth.js',
+  './js/bans.js',
   './js/friends.js',
   './js/profile.js',
   './js/game.js',

@@ -151,6 +151,10 @@ function switchAdminTab(tabName) {
   // تحديث المحتوى
   if (tabName === 'sync') {
     updateSyncInfo();
+  } else if (tabName === 'users') {
+    // الحظر يُدار من هنا، فقائمة المحظورين تُحمَّل مع التبويب لا بضغطة إضافية
+    loadUsers();
+    loadBans();
   }
 }
 
@@ -889,18 +893,23 @@ async function loadUsers() {
   box.innerHTML = '<p style="color:#999">جاري التحميل...</p>';
 
   try {
-    const [{ data, error }, { data: adminRows }] = await Promise.all([
+    const [{ data, error }, { data: adminRows }, { data: banRows }] = await Promise.all([
       supa.from('profiles')
         .select('id, username, created_at, last_seen_at, games_played, games_won, total_score, rooms_created')
         .order('created_at', { ascending: false })
         .limit(500),
       // admins مقروء للإدمن فقط — نعرف منه من يحمل الصلاحية
-      supa.from('admins').select('user_id')
+      supa.from('admins').select('user_id'),
+      // المحظورون: الصف يتلوّن وزرّه ينقلب لرفع الحظر.
+      // ⚠️ لا نُفشل القائمة كلها إن لم يكن supabase-bans.sql مُشغَّلاً بعد
+      supa.from('bans').select('user_id').eq('active', true)
+        .then(r => r, () => ({ data: [] }))
     ]);
 
     if (error) throw error;
 
     const adminIds = new Set((adminRows || []).map(a => a.user_id));
+    const bannedIds = new Set((banRows || []).filter(b => b.user_id).map(b => b.user_id));
     const rows = data || [];
     if (!rows.length) {
       box.innerHTML = '<p style="color:#999">لا توجد حسابات بعد.</p>';
@@ -914,13 +923,16 @@ async function loadUsers() {
       <div class="users-list">
         ${rows.map(u => {
           const isAdmin = adminIds.has(u.id);
+          const isBanned = bannedIds.has(u.id);
           const safeId = escapeHtml(u.id);
-          const safeName = escapeHtml(u.username).replace(/'/g, "\'");
+          // jsStr لا escapeHtml: الاسم يدخل سلسلة JS داخل onclick (راجع utils.js)
+          const safeName = jsStr(u.username);
           return `
-          <div class="user-row${isAdmin ? ' is-admin' : ''}" data-user="${safeId}">
+          <div class="user-row${isAdmin ? ' is-admin' : ''}${isBanned ? ' is-banned' : ''}" data-user="${safeId}">
             <div class="user-main">
               <div class="user-name">
-                ${isAdmin ? '<span class="admin-badge">⚙️ إدمن</span> ' : ''}👤 ${escapeHtml(u.username)}
+                ${isAdmin ? '<span class="admin-badge">⚙️ إدمن</span> ' : ''}
+                ${isBanned ? '<span class="ban-badge">⛔ محظور</span> ' : ''}👤 ${escapeHtml(u.username)}
               </div>
               <div class="user-meta">انضم ${fmtDate(u.created_at)} · آخر ظهور ${fmtDate(u.last_seen_at)}</div>
             </div>
@@ -935,6 +947,11 @@ async function loadUsers() {
                 onclick="setPlayerAdmin('${safeId}', '${safeName}', ${!isAdmin})">
                 ${isAdmin ? '↩️ إزالة الإدارة' : '⚙️ ترقية لإدمن'}
               </button>
+              ${isAdmin ? '' : (isBanned
+                ? `<button class="btn btn-answer user-ban"
+                     onclick="unbanPlayerAccount('${safeId}', '${safeName}')">↩️ رفع الحظر</button>`
+                : `<button class="btn btn-skip user-ban"
+                     onclick="banPlayerAccount('${safeId}', '${safeName}')">⛔ حظر</button>`)}
               <button class="btn btn-skip user-del"
                 onclick="deletePlayerAccount('${safeId}', '${safeName}')">🗑️ حذف</button>
             </div>

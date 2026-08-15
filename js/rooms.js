@@ -20,6 +20,10 @@ async function createRoom(roomName, mode = 'online', playerName = '') {
     return null;
   }
 
+  // من حُظر وصفحته مفتوحة: القاعدة سترفضه على أي حال، لكن بلا هذا الفحص
+  // يرى «تعذّر إنشاء الروم» بلا سبب — والفحص هنا يمسك الحظر أثناء الجلسة
+  if (await blockedByBan()) return null;
+
   try {
     const playerId = generateId();
     const roomCode = generateRoomCode();
@@ -102,6 +106,8 @@ async function joinRoom(roomCode, playerName) {
     uiAlert('❌ قاعدة البيانات غير متصلة');
     return false;
   }
+
+  if (await blockedByBan()) return false;
 
   try {
     // نبحث بالكود فقط بدون تقييد الحالة، حتى يستطيع من انقطع اتصاله أو حدّث

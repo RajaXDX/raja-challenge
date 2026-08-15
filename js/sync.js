@@ -223,6 +223,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // نحفظ كود الروم من الرابط قبل البوابة، وإلا ضاع عند طلب تسجيل الدخول
     stashPendingRoomCode();
 
+    // ⛔ بوابة الحظر **قبل** بوابة الحساب: المحظور يُوقَف عند الباب، فلا
+    // يرى شاشة تسجيل الدخول ولا يستطيع إنشاء حساب جديد من نفس الجهاز.
+    if (await enforceBanGate()) { trackVisitOnce(); return; }
+
     // بوابة الحساب: بلا حساب لا دخول لروم ولا استعادة جلسة
     const allowed = await initAuthGate();
     if (!allowed) { updateTotalStats(); trackVisitOnce(); return; }
