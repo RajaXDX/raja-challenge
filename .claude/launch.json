@@ -1,0 +1,85 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "raja",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "8150",
+        "--bind", "127.0.0.1",
+        "--directory", "C:\\Projects\\M5_M5_Reja"
+      ],
+      "port": 8150
+    },
+    {
+      "name": "raja-bet",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "8151",
+        "--bind", "127.0.0.1",
+        "--directory", "C:\\Projects\\M5_M5_Reja"
+      ],
+      "port": 8151
+    },
+    {
+      "name": "top-ten",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "8190",
+        "--bind", "127.0.0.1",
+        "--directory", "C:\\Projects\\top-ten"
+      ],
+      "port": 8190
+    },
+    {
+      "name": "lawhati",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "8210",
+        "--bind", "127.0.0.1",
+        "--directory", "C:\\Projects\\lawhati"
+      ],
+      "port": 8210
+    },
+    {
+      "name": "seerati",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "8220",
+        "--bind", "127.0.0.1",
+        "--directory", "C:\\Projects\\seerati"
+      ],
+      "port": 8220
+    },
+    {
+      "name": "huroof",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "8177",
+        "--bind", "127.0.0.1",
+        "--directory", "C:\\Users\\ramah\\OneDrive\\Desktop\\Raja project\\7rof_m3_raja"
+      ],
+      "port": 8177
+    },
+    {
+      "name": "workshop",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "8230",
+        "--bind", "127.0.0.1",
+        "--directory", "C:\\Projects\\weapon-workshop"
+      ],
+      "port": 8230
+    },
+    {
+      "name": "huroof2",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m", "http.server", "8178",
+        "--bind", "127.0.0.1",
+        "--directory", "C:\\Users\\ramah\\OneDrive\\Desktop\\Raja project\\7rof_m3_raja"
+      ],
+      "port": 8178
+    }
+  ]
+}
