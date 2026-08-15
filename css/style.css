@@ -3492,3 +3492,76 @@ select {
 
 /* السقف مبلوغ: البطاقات غير المختارة تخفت فيُفهم أن الاختيار اكتمل */
 .cat-grid.at-max .cat-pick:not(.sel) { opacity: 0.42; }
+
+/* ============================= إحساس اللعبة ============================= */
+
+/* نبضة الرقم مع زحفه */
+.score-bump {
+  animation: scoreBump 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scoreBump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* الخيار الخاطئ يهتزّ — الجسد يفهم «لا» قبل أن تقرأها العين */
+.choice.wrong,
+.bet-card.result.lose {
+  animation: wrongShake 0.4s ease;
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-7px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(2px); }
+}
+
+.choice.correct { animation: correctPop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes correctPop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+/* الكونفيتي */
+.confetti-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;   /* وإلا حجب زرّي المشاركة واللعبة الجديدة تحته */
+  z-index: 5;
+}
+
+.confetti-bit {
+  position: absolute;
+  top: -14px;
+  width: 9px;
+  height: 14px;
+  opacity: 0;
+  animation-name: confettiFall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes confettiFall {
+  0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+  8%   { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(105vh) rotate(620deg); }
+}
+
+/* الشاشة التي يسقط فوقها الكونفيتي لا بد أن تكون مرجعاً للتموضع */
+#screen-end .end-wrap,
+.bet-wrap { position: relative; }
+
+@media (prefers-reduced-motion: reduce) {
+  .score-bump,
+  .choice.wrong,
+  .choice.correct,
+  .bet-card.result.lose { animation: none; }
+}

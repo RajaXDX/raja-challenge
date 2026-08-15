@@ -475,11 +475,11 @@ function showEndScreen() {
     scoresEl.innerHTML = `
       <div class="end-score-card A ${a >= b ? 'lead' : ''}">
         <div class="end-team-name">🟢 ${escapeHtml(nameA)}</div>
-        <div class="end-team-score">${a}</div>
+        <div class="end-team-score" data-score="${a}">${a}</div>
       </div>
       <div class="end-score-card B ${b >= a ? 'lead' : ''}">
         <div class="end-team-name">🟡 ${escapeHtml(nameB)}</div>
-        <div class="end-team-score">${b}</div>
+        <div class="end-team-score" data-score="${b}">${b}</div>
       </div>
     `;
   }
@@ -487,6 +487,14 @@ function showEndScreen() {
   showScreen('screen-end');
   Sound.award?.();
   trackEvent('game_finished');
+
+  // النتيجتان تزحفان من الصفر، والكونفيتي يتأخّر قليلاً ليقع مع اكتمالهما
+  document.querySelectorAll('#endScores .end-team-score').forEach(el => {
+    const target = Number(el.dataset.score) || 0;
+    el.textContent = '0';
+    animateNumber(el, target, 900);
+  });
+  setTimeout(() => burstConfetti(document.querySelector('#screen-end .end-wrap')), 450);
 
   // إحصاءات الحساب: نحسب فوز اللاعب حسب فريقه في الأونلاين،
   // وفي المحلي نسجّل الجولة بأعلى نتيجة دون نسبة فوز لأحد بعينه
@@ -562,8 +570,8 @@ function updateGameUI() {
 
   if (nameA) nameA.textContent = `🟢 ${getTeamName('A')}`;
   if (nameB) nameB.textContent = `🟡 ${getTeamName('B')}`;
-  if (scoreA) scoreA.textContent = scores.A;
-  if (scoreB) scoreB.textContent = scores.B;
+  animateNumber(scoreA, scores.A);
+  animateNumber(scoreB, scores.B);
 
   renderTurnIndicator();
   renderLifelineDisplay();
@@ -1659,8 +1667,7 @@ function award(team, opts = {}) {
 
   if (team) {
     scores[team] += pts;
-    const scoreEl = document.getElementById(`score${team}`);
-    if (scoreEl) scoreEl.textContent = scores[team];
+    animateNumber(document.getElementById(`score${team}`), scores[team]);
     Sound.award();
   } else {
     Sound.skip();
@@ -2933,10 +2940,20 @@ function renderBetResult(wrap) {
             <div class="bet-team">${t === 'A' ? '🟢' : '🟡'} ${escapeHtml(getTeamName(t))}</div>
             <div class="bet-verdict">${o[t].correct ? '✅ صحيحة' : '❌ خاطئة'}</div>
             <div class="bet-delta">${o[t].delta >= 0 ? '+' : ''}${o[t].delta}</div>
-            <div class="bet-total">${scores[t]}</div>
+            <div class="bet-total" data-team="${t}">${scores[t]}</div>
           </div>`).join('')}
       </div>
       <button class="btn-main btn-primary" id="betEndBtn">شوف الفائز 🏆</button>`;
+  }
+
+  // المجموع يزحف من رصيد ما قبل المراهنة إلى ما بعدها، فيُرى أثر الرهان نفسه
+  if (o) {
+    wrap.querySelectorAll('.bet-total').forEach(el => {
+      const t = el.dataset.team;
+      el.textContent = (Number(scores[t]) || 0) - o[t].delta;
+      animateNumber(el, scores[t], 800);
+    });
+    if (o.A.correct || o.B.correct) setTimeout(() => burstConfetti(wrap), 500);
   }
 
   const end = document.getElementById('betEndBtn');

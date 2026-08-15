@@ -505,3 +505,97 @@ function uiConfirm(message, okText = 'نعم', cancelText = 'إلغاء') {
 function uiPrompt(message, defaultValue = '') {
   return buildUiModal({ message, kind: 'prompt', defaultValue, okText: 'تم' });
 }
+
+/* ============================= إحساس اللعبة ============================= */
+/*
+  الرقم الذي يقفز لا يُرى، والرقم الذي يزحف يُشاهَد. فرق النقاط هو الحدث
+  الوحيد الذي يهمّ اللاعبين، وكان يتبدّل بلا أن ينتبه له أحد.
+
+  ⚠️ **الحركة تُلغى عند `prefers-reduced-motion`** ويُكتب الرقم فوراً — الحركة
+  متعة لمن يريدها وإزعاج لمن أطفأها في نظامه.
+*/
+
+const _scoreAnims = new WeakMap();
+
+function animateNumber(el, target, ms = 650) {
+  if (!el) return;
+  target = Number(target) || 0;
+
+  const from = Number(String(el.textContent).replace(/[^\d-]/g, '')) || 0;
+
+  // حركة جارية على نفس العنصر تُلغى، وإلا تصارع الاثنتان على النصّ
+  const running = _scoreAnims.get(el);
+  if (running) { cancelAnimationFrame(running.raf); clearTimeout(running.guard); }
+
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  if (reduced || from === target) {
+    el.textContent = target;
+    return;
+  }
+
+  el.classList.add('score-bump');
+  setTimeout(() => el.classList.remove('score-bump'), 420);
+
+  const finish = () => {
+    const s = _scoreAnims.get(el);
+    if (s) { cancelAnimationFrame(s.raf); clearTimeout(s.guard); }
+    el.textContent = target;
+    _scoreAnims.delete(el);
+  };
+
+  /*
+    ⚠️ **حارس بمؤقّت لا بالرفرفة وحدها.** المتصفح يوقف `requestAnimationFrame`
+    في التبويب المخفيّ، فمن نقر «للفريق أ» ثم فتح واتساب يعود ليجد الرقم
+    متجمّداً عند قيمة وسط — أو عند الصفر في شاشة الفوز، وهي أسوأ لحظة يقع
+    فيها هذا. المؤقّت يفرض القيمة النهائية بعد انقضاء المدة مهما جرى.
+  */
+  const t0 = performance.now();
+  const step = now => {
+    const p = Math.min(1, (now - t0) / ms);
+    const eased = 1 - Math.pow(1 - p, 3);          // تباطؤ في النهاية
+    el.textContent = Math.round(from + (target - from) * eased);
+    if (p < 1) {
+      const s = _scoreAnims.get(el);
+      if (s) s.raf = requestAnimationFrame(step);
+    } else {
+      finish();
+    }
+  };
+
+  _scoreAnims.set(el, {
+    raf: requestAnimationFrame(step),
+    guard: setTimeout(finish, ms + 300)
+  });
+}
+
+/*
+  كونفيتي بلا مكتبة ولا canvas: عناصر تسقط بحركة CSS وتُزال بعدها.
+
+  ⚠️ **العدد مقيّد بعرض الشاشة**: 90 قطعة على سطح المكتب تبدو احتفالاً، وعلى
+  جوال متوسط تُثقل أول ثانية من أهمّ لحظة في اللعبة.
+*/
+function burstConfetti(host) {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return;
+
+  const wrap = host || document.body;
+  const layer = document.createElement('div');
+  layer.className = 'confetti-layer';
+
+  const colors = ['#D4AF37', '#3FA796', '#C9A24B', '#EFE3C6', '#27AE60'];
+  const count = window.innerWidth < 600 ? 40 : 80;
+
+  for (let i = 0; i < count; i++) {
+    const bit = document.createElement('i');
+    bit.className = 'confetti-bit';
+    bit.style.left = Math.random() * 100 + '%';
+    bit.style.background = colors[i % colors.length];
+    bit.style.animationDelay = (Math.random() * 0.9).toFixed(2) + 's';
+    bit.style.animationDuration = (2.4 + Math.random() * 1.6).toFixed(2) + 's';
+    bit.style.transform = `rotate(${Math.floor(Math.random() * 360)}deg)`;
+    if (i % 3 === 0) bit.style.borderRadius = '50%';
+    layer.appendChild(bit);
+  }
+
+  wrap.appendChild(layer);
+  setTimeout(() => layer.remove(), 5200);
+}
