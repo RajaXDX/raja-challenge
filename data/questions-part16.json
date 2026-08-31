@@ -1,0 +1,191 @@
+{
+  "_ملاحظة": "فئتا الأعلام من مجلّدَي «AR FLAG» و«WORLD Flags» عند المستخدم، والتقسيم إلى سهل/متوسط/صعب هو تقسيمه نفسه. الصور نُسخت إلى assets/flags-ar/ و assets/flags-world/ بأسماء لاتينية — الأسماء العربية تحتاج ترميزاً في الروابط وتتكسّر على بعض الخوادم، والإجابة العربية هنا لا في اسم الملف. تحقّقنا بصرياً من مطابقة كل علم لإجابته قبل الكتابة. نص كل سؤال مختلف داخل الفئة عمداً: الدمج يطابق بنص السؤال، فلو تكرّر النص لَما نجا إلا سؤال واحد. والإجابات بالأسماء القصيرة الشائعة لا الرسمية الطويلة، لأن المشتّتات تُختار بتقارب الشكل والطول — فاسم واحد طويل بين قصار يفضح نفسه.",
+
+  "أعلام عربية": {
+    "easy": [
+      {
+        "question": "ما اسم الدولة العربية صاحبة هذا العلم؟",
+        "answer": "الإمارات",
+        "image": "assets/flags-ar/uae.webp"
+      },
+      {
+        "question": "أي دولة عربية يمثّلها هذا العلم؟",
+        "answer": "الكويت",
+        "image": "assets/flags-ar/kuwait.webp"
+      },
+      {
+        "question": "لأي دولة عربية يعود هذا العلم؟",
+        "answer": "السعودية",
+        "image": "assets/flags-ar/saudi-arabia.webp"
+      },
+      {
+        "question": "هذا العلم لأي دولة عربية؟",
+        "answer": "اليمن",
+        "image": "assets/flags-ar/yemen.webp"
+      },
+      {
+        "question": "ما الدولة العربية التي ترفع هذا العلم؟",
+        "answer": "سلطنة عُمان",
+        "image": "assets/flags-ar/oman.webp"
+      },
+      {
+        "question": "يرمز هذا العلم إلى أي دولة عربية؟",
+        "answer": "قطر",
+        "image": "assets/flags-ar/qatar.webp"
+      },
+      {
+        "question": "من صاحب هذا العلم من الدول العربية؟",
+        "answer": "مصر",
+        "image": "assets/flags-ar/egypt.webp"
+      },
+      {
+        "question": "أي بلد عربي يرفع هذا العلم؟",
+        "answer": "البحرين",
+        "image": "assets/flags-ar/bahrain.webp"
+      }
+    ],
+    "medium": [
+      {
+        "question": "ما اسم الدولة العربية التي تحمل هذا العلم؟",
+        "answer": "الأردن",
+        "image": "assets/flags-ar/jordan.webp"
+      },
+      {
+        "question": "أي دولة عربية تُعرف بهذا العلم؟",
+        "answer": "سوريا",
+        "image": "assets/flags-ar/syria.webp"
+      },
+      {
+        "question": "هذا العلم يخصّ أي دولة عربية؟",
+        "answer": "فلسطين",
+        "image": "assets/flags-ar/palestine.webp"
+      }
+    ],
+    "hard": [
+      {
+        "question": "ما البلد العربي صاحب هذا العلم؟",
+        "answer": "الصومال",
+        "image": "assets/flags-ar/somalia.webp"
+      },
+      {
+        "question": "لأي بلد عربي ينتمي هذا العلم؟",
+        "answer": "جزر القمر",
+        "image": "assets/flags-ar/comoros.webp"
+      },
+      {
+        "question": "أي دولة عربية ترفع هذا العلم؟",
+        "answer": "جيبوتي",
+        "image": "assets/flags-ar/djibouti.webp"
+      },
+      {
+        "question": "ما اسم البلد العربي الذي يرفع هذا العلم؟",
+        "answer": "موريتانيا",
+        "image": "assets/flags-ar/mauritania.webp"
+      }
+    ]
+  },
+
+  "أعلام العالم": {
+    "easy": [
+      {
+        "question": "ما اسم الدولة صاحبة هذا العلم؟",
+        "answer": "فرنسا",
+        "image": "assets/flags-world/france.webp"
+      },
+      {
+        "question": "أي دولة يمثّلها هذا العلم؟",
+        "answer": "إيطاليا",
+        "image": "assets/flags-world/italy.webp"
+      },
+      {
+        "question": "لأي دولة يعود هذا العلم؟",
+        "answer": "اليابان",
+        "image": "assets/flags-world/japan.webp"
+      },
+      {
+        "question": "هذا العلم لأي دولة؟",
+        "answer": "روسيا",
+        "image": "assets/flags-world/russia.webp"
+      },
+      {
+        "question": "ما الدولة التي ترفع هذا العلم؟",
+        "answer": "الصين",
+        "image": "assets/flags-world/china.webp"
+      },
+      {
+        "question": "يرمز هذا العلم إلى أي دولة؟",
+        "answer": "بريطانيا",
+        "image": "assets/flags-world/united-kingdom.webp"
+      },
+      {
+        "question": "من صاحب هذا العلم من الدول؟",
+        "answer": "أمريكا",
+        "image": "assets/flags-world/usa.webp"
+      }
+    ],
+    "medium": [
+      {
+        "question": "ما اسم الدولة التي تحمل هذا العلم؟",
+        "answer": "أوروغواي",
+        "image": "assets/flags-world/uruguay.webp"
+      },
+      {
+        "question": "أي دولة تُعرف بهذا العلم؟",
+        "answer": "باراغواي",
+        "image": "assets/flags-world/paraguay.webp"
+      },
+      {
+        "question": "هذا العلم يخصّ أي دولة؟",
+        "answer": "جورجيا",
+        "image": "assets/flags-world/georgia.webp"
+      },
+      {
+        "question": "ما الدولة صاحبة هذا العلم؟",
+        "answer": "فنلندا",
+        "image": "assets/flags-world/finland.webp"
+      },
+      {
+        "question": "أي دولة ترفع هذا العلم؟",
+        "answer": "فيتنام",
+        "image": "assets/flags-world/vietnam.webp"
+      },
+      {
+        "question": "لأي بلد يعود هذا العلم؟",
+        "answer": "ويلز",
+        "image": "assets/flags-world/wales.webp"
+      }
+    ],
+    "hard": [
+      {
+        "question": "ما اسم البلد الذي يرفع هذا العلم؟",
+        "answer": "أرمينيا",
+        "image": "assets/flags-world/armenia.webp"
+      },
+      {
+        "question": "أي بلد يرفع هذا العلم؟",
+        "answer": "أنغولا",
+        "image": "assets/flags-world/angola.webp"
+      },
+      {
+        "question": "لأي دولة ينتمي هذا العلم؟",
+        "answer": "ساحل العاج",
+        "image": "assets/flags-world/ivory-coast.webp"
+      },
+      {
+        "question": "ما البلد صاحب هذا العلم؟",
+        "answer": "قيرغيزستان",
+        "image": "assets/flags-world/kyrgyzstan.webp"
+      },
+      {
+        "question": "هذا العلم لأي بلد؟",
+        "answer": "كازاخستان",
+        "image": "assets/flags-world/kazakhstan.webp"
+      },
+      {
+        "question": "أي دولة يخصّها هذا العلم؟",
+        "answer": "كوستاريكا",
+        "image": "assets/flags-world/costa-rica.webp"
+      }
+    ]
+  }
+}

@@ -57,6 +57,8 @@ const DEFAULT_CATEGORIES = [
   { name: '😀 خمن بالإيموجي', ic: '✨' }, { name: 'جغرافيا 🌎', ic: '✨' },
   { name: 'الالغاز 🧩', ic: '✨' }, { name: 'الحساب 🧮', ic: '✨' },
   { name: 'الانبياء 🌙', ic: '✨' }, { name: 'ولا كلمة 🤫', ic: '✨' },
+  // فئتا الأعلام — صور بحتة، أسئلتها في data/questions-part16.json
+  { name: 'أعلام عربية', ic: '🏳️' }, { name: 'أعلام العالم', ic: '🌍' },
 ];
 
 // متغيرات الحالة
@@ -1961,7 +1963,8 @@ const QBANK_FILES = [
   'data/questions-part12.json',
   'data/questions-part13.json',
   'data/questions-part14.json',
-  'data/questions-part15.json'
+  'data/questions-part15.json',
+  'data/questions-part16.json'
 ];
 
 /*
