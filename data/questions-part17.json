@@ -56,6 +56,11 @@
         "question": "لأي بلد يعود هذا العلم القديم؟",
         "answer": "ألمانيا",
         "image": "assets/flags-old/germany.webp"
+      },
+      {
+        "question": "ما البلد الذي كان هذا علمه؟",
+        "answer": "عُمان",
+        "image": "assets/flags-old/oman.webp"
       }
     ]
   }
