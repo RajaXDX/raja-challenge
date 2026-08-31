@@ -1,0 +1,62 @@
+{
+  "_ملاحظة": "أعلام قديمة من مجلّد «old flag» عند المستخدم، بتقسيمه للمستويات. الصور في assets/flags-old/ بأسماء لاتينية. تُحقّق من كل علم بصرياً قبل الكتابة. الإجابة اسم واحد بلا قوسين وبلا شرطة مائلة: القوسان يُلحقان بالخيارات الأربعة فتخرج أسماء لا وجود لها، والشرطة تبقى في الخيار فيتميّز الصحيح بشكله (راجع البند 45). الاسم المكتوب هو الاسم القديم إن سقطت الدولة، والحالي إن بقيت وتغيّر علمها فقط — وفي الوضع المحلي المضيف هو الحكم فيقبل أي اسم صحيح يقوله اللاعب.\n\nملف «عمان.webp» في مجلّد صعب استُبعد: هو خط عربي يقرأ «نصر من الله وفتح قريب» بلا حقل علم، لا علماً — راجع البند 49 في PLAN.md.",
+
+  "أعلام قديمة": {
+    "easy": [
+      {
+        "question": "لأي دولة كان هذا العلم؟",
+        "answer": "الاتحاد السوفيتي",
+        "image": "assets/flags-old/soviet-union.webp"
+      },
+      {
+        "question": "هذا علم قديم لأي دولة؟",
+        "answer": "السعودية",
+        "image": "assets/flags-old/saudi-arabia.webp"
+      },
+      {
+        "question": "أي دولة كانت ترفع هذا العلم؟",
+        "answer": "إيطاليا",
+        "image": "assets/flags-old/italy.webp"
+      }
+    ],
+    "medium": [
+      {
+        "question": "ما اسم الدولة التي كان هذا علمها؟",
+        "answer": "الدولة الأموية",
+        "image": "assets/flags-old/umayyad.webp"
+      },
+      {
+        "question": "أي دولة رفعت هذا العلم سابقاً؟",
+        "answer": "اليابان",
+        "image": "assets/flags-old/japan.webp"
+      },
+      {
+        "question": "لمن كان هذا العلم؟",
+        "answer": "إمارة بني خالد",
+        "image": "assets/flags-old/bani-khalid.webp"
+      },
+      {
+        "question": "هذا العلم القديم لأي دولة؟",
+        "answer": "إيران",
+        "image": "assets/flags-old/iran.webp"
+      }
+    ],
+    "hard": [
+      {
+        "question": "ما الدولة التي كانت ترفع هذا العلم؟",
+        "answer": "السودان",
+        "image": "assets/flags-old/sudan.webp"
+      },
+      {
+        "question": "أي دولة كان هذا علمها سابقاً؟",
+        "answer": "العراق",
+        "image": "assets/flags-old/iraq.webp"
+      },
+      {
+        "question": "لأي بلد يعود هذا العلم القديم؟",
+        "answer": "ألمانيا",
+        "image": "assets/flags-old/germany.webp"
+      }
+    ]
+  }
+}

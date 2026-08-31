@@ -59,6 +59,7 @@ const DEFAULT_CATEGORIES = [
   { name: 'الانبياء 🌙', ic: '✨' }, { name: 'ولا كلمة 🤫', ic: '✨' },
   // فئتا الأعلام — صور بحتة، أسئلتها في data/questions-part16.json
   { name: 'أعلام عربية', ic: '🏳️' }, { name: 'أعلام العالم', ic: '🌍' },
+  { name: 'أعلام قديمة', ic: '📜' },
 ];
 
 // متغيرات الحالة
@@ -1987,7 +1988,8 @@ const QBANK_FILES = [
   'data/questions-part13.json',
   'data/questions-part14.json',
   'data/questions-part15.json',
-  'data/questions-part16.json'
+  'data/questions-part16.json',
+  'data/questions-part17.json'
 ];
 
 /*
