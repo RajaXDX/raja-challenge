@@ -89,6 +89,15 @@ const MAX_CATS = 6;
 
 let selectedCats = [];
 let rounds = [];
+/*
+  ست خلايا لكل فئة (٣×٢) — سؤالان لكل مستوى، كما في تصميم «3a».
+  الخلية تُعرف بـ«slot» من 0 إلى 5، والمستوى يُشتقّ منها: slot 0،1 سهل،
+  و2،3 متوسط، و4،5 صعب. النقاط والصعوبة تبقى ثلاثة كما هي — المتغيّر هو
+  عدد الأسئلة المطروحة لا سلّم الصعوبة.
+*/
+const CELLS_PER_CAT = 6;
+const levelOfSlot = slot => Math.floor(slot / 2);
+
 let stateUsed = {};
 let questionCache = {};
 let scores = { A: 0, B: 0 };
@@ -301,7 +310,7 @@ function startGame() {
 
   stateUsed = {};
   rounds.forEach((r, ri) => {
-    stateUsed[ri] = r.map(() => [false, false, false]);
+    stateUsed[ri] = r.map(() => Array(CELLS_PER_CAT).fill(false));
   });
 
   scores = { A: 0, B: 0 };
@@ -434,6 +443,18 @@ function renderTurnIndicator() {
 }
 
 /* ============================= END OF GAME ============================= */
+
+function normalizeUsedState(used) {
+  const out = {};
+  Object.keys(used || {}).forEach(ri => {
+    out[ri] = (used[ri] || []).map(cells => {
+      const arr = Array.isArray(cells) ? cells.slice(0, CELLS_PER_CAT) : [];
+      while (arr.length < CELLS_PER_CAT) arr.push(false);
+      return arr.map(Boolean);
+    });
+  });
+  return out;
+}
 
 // هل استُهلكت كل الخلايا في كل الجولات؟
 function isGameFinished() {
@@ -809,7 +830,9 @@ function stopQuestionTimer() {
 function onQuestionTimeout() {
   if (!current) return;
 
-  const key = `${activeRound}-${current.ci}-${current.row}`;
+  // بالـ slot لا بالـ row: المخزون مفهرَس بالخلية (0–5) لا بالمستوى (0–2)،
+  // وإلا أعادت الخلية الثانية في المستوى سؤال الخلية الأولى.
+  const key = `${activeRound}-${current.ci}-${current.slot}`;
   const item = questionCache[key];
 
   // أونلاين بخيارات: تُحتسب إجابة خاطئة بلا نقاط، ويُعرض الصحيح ثم ينتقل الدور
@@ -926,32 +949,37 @@ function renderBoard() {
   const board = document.getElementById('board');
   if (!board) return;
 
-  board.style.gridTemplateColumns = `repeat(${cats.length}, 1fr)`;
+  // اللوحة صارت كروتاً لا شبكة أعمدة، فالتنسيق كله في CSS ولا حاجة
+  // لـ gridTemplateColumns المحسوب هنا كما كان
+  board.style.gridTemplateColumns = '';
   board.innerHTML = '';
 
-  // رؤوس الفئات
-  cats.forEach(c => {
-    const h = createElement('div', {
-      class: 'cat-header'
-    }, `<span class="ic">${escapeHtml(c.ic)}</span><span>${escapeHtml(c.name)}</span>`);
-    board.appendChild(h);
-  });
+  cats.forEach((c, ci) => {
+    const card = createElement('div', { class: 'cat-card' }, `
+      <div class="cat-card-head">
+        <span class="cat-name">${escapeHtml(c.name)}</span>
+        <span class="cat-ic">${escapeHtml(c.ic)}</span>
+      </div>
+    `);
 
-  // الخلايا
-  for (let row = 0; row < 3; row++) {
-    cats.forEach((c, ci) => {
-      const used = stateUsed[activeRound][ci][row];
+    const cells = createElement('div', { class: 'cat-cells' });
+
+    for (let slot = 0; slot < CELLS_PER_CAT; slot++) {
+      const used = stateUsed[activeRound]?.[ci]?.[slot];
       const cell = createElement('div', {
         class: `cell${used ? ' used' : ''}`
-      }, used ? '✓' : POINTS[row]);
+      }, used ? '·' : POINTS[levelOfSlot(slot)]);
 
       if (!used) {
-        cell.onclick = () => openQuestion(ci, row);
+        cell.onclick = () => openQuestion(ci, slot);
       }
 
-      board.appendChild(cell);
-    });
-  }
+      cells.appendChild(cell);
+    }
+
+    card.appendChild(cells);
+    board.appendChild(card);
+  });
 }
 
 /* ============================= MULTIPLE CHOICE ============================= */
@@ -1436,7 +1464,7 @@ function makeSeededRandom(seed) {
 
 /* ============================= QUESTION DIALOG ============================= */
 
-function openQuestion(ci, row) {
+function openQuestion(ci, slot) {
   // في الأونلاين صاحب الدور هو من يفتح السؤال ويجيب عليه
   if (isOnlineGame() && !isMyTurn()) {
     const t = currentTurnPlayer();
@@ -1446,7 +1474,10 @@ function openQuestion(ci, row) {
 
   Sound.open();
   const cat = rounds[activeRound][ci];
-  current = { ci, row, cat };
+  // `row` يبقى المستوى (0–2) فتظل كل حسابات النقاط والصعوبة كما هي،
+  // و`slot` هو الخلية (0–5) وبها وحدها تُعلَّم اللوحة ويُفهرَس المخزون.
+  const row = levelOfSlot(slot);
+  current = { ci, row, slot, cat };
 
   const qcat = document.getElementById('qcat');
   const qpoints = document.getElementById('qpoints');
@@ -1457,7 +1488,7 @@ function openQuestion(ci, row) {
   document.getElementById('qbody').innerHTML = '<div class="loadbox">⏳ جاري إحضار السؤال...</div>';
   document.getElementById('overlay').classList.add('show');
 
-  const cacheKey = `${activeRound}-${ci}-${row}`;
+  const cacheKey = `${activeRound}-${ci}-${slot}`;
   let item = questionCache[cacheKey];
 
   if (!item) {
@@ -1470,7 +1501,7 @@ function openQuestion(ci, row) {
       }
       questionCache[cacheKey] = item;
     } else {
-      showQuickAddForm(cat, row, ci);
+      showQuickAddForm(cat, row, ci, slot);
       return;
     }
   }
@@ -1485,21 +1516,21 @@ function openQuestion(ci, row) {
   if (isOnlineHost()) publishGameState();
 }
 
-function showQuickAddForm(cat, row, ci) {
+function showQuickAddForm(cat, row, ci, slot) {
   document.getElementById('qbody').innerHTML = `
     <div class="loadbox">ما فيه سؤال محفوظ لهذه الفئة بعد 🙂</div>
     <div class="admin-row" style="flex-direction:column; align-items:stretch; margin-top:10px;">
       <input type="text" id="quickQText" placeholder="نص السؤال">
       <input type="text" id="quickQAnswer" placeholder="الإجابة الصحيحة">
       <input type="text" id="quickQEmoji" placeholder="إيموجي (اختياري)">
-      <button class="btn btn-answer" style="margin-top:6px;" onclick="quickAddAndShow(${ci},${row})">حفظ وعرض السؤال</button>
+      <button class="btn btn-answer" style="margin-top:6px;" onclick="quickAddAndShow(${ci},${row},${slot})">حفظ وعرض السؤال</button>
     </div>
   `;
   document.getElementById('cornersBar').style.display = 'flex';
   document.getElementById('answerCorner').style.visibility = 'hidden';
 }
 
-async function quickAddAndShow(ci, row) {
+async function quickAddAndShow(ci, row, slot) {
   // ⚠️ للإدمن فقط — نفس تحقق لوحة الإدارة
   if (!(await authenticateAdmin())) return;
 
@@ -1523,7 +1554,8 @@ async function quickAddAndShow(ci, row) {
   saveJSON('mr_bank', QBANK);
   pushToCloud();
 
-  const cacheKey = `${activeRound}-${ci}-${row}`;
+  // بالـ slot: المخزون مفهرَس بالخلية لا بالمستوى (راجع openQuestion)
+  const cacheKey = `${activeRound}-${ci}-${slot}`;
   questionCache[cacheKey] = newItem;
 
   log('سؤال جديد تمت إضافته من قبل الإدمن', 'success');
@@ -1807,7 +1839,7 @@ function award(team, opts = {}) {
       recordCategoryResult(current.cat?.name, !!team);
     }
 
-    stateUsed[activeRound][current.ci][current.row] = true;
+    stateUsed[activeRound][current.ci][current.slot] = true;
     closeQuestion();
     renderBoard();
 
@@ -1885,7 +1917,8 @@ function publishGameState(extra = {}) {
     lifelines: { setup: { A: teamSetup.A.lifelines, B: teamSetup.B.lifelines },
                  used: lifelineUsed, active: activeLifeline },
     openQuestion: current
-      ? { ci: current.ci, row: current.row, round: activeRound, item: questionCache[`${activeRound}-${current.ci}-${current.row}`] }
+      ? { ci: current.ci, row: current.row, slot: current.slot,
+          round: activeRound, item: questionCache[`${activeRound}-${current.ci}-${current.slot}`] }
       : null,
     lastAnswer,
     questionDeadline,      // طابع زمني لا عدّاد — راجع `startQuestionTimer`
@@ -1920,7 +1953,9 @@ function applyRemoteGameState(state) {
     teamSetup.A.name = state.teamNames.A || teamSetup.A.name;
     teamSetup.B.name = state.teamNames.B || teamSetup.B.name;
   }
-  if (state.used) stateUsed = state.used;
+  // جهاز على نسخة أقدم يبثّ ٣ خلايا لكل فئة — نمدّها إلى ٦ بدل أن تنكسر
+  // اللوحة على من حدّث. الخلايا الزائدة تبدأ غير مستخدَمة.
+  if (state.used) stateUsed = normalizeUsedState(state.used);
   if (state.scores) scores = state.scores;
   // السجلّ لا ينمو إلا عند من يجيب، فالوارد أحدث دائماً ممّا عند المشاهد
   if (Array.isArray(state.log) && state.log.length >= roundLog.length) roundLog = state.log;
@@ -1978,8 +2013,9 @@ function applyRemoteGameState(state) {
   if (q && q.item) {
     const cat = rounds[q.round]?.[q.ci];
     if (cat) {
-      current = { ci: q.ci, row: q.row, cat };
-      questionCache[`${q.round}-${q.ci}-${q.row}`] = q.item;
+      const slot = typeof q.slot === 'number' ? q.slot : q.row;
+      current = { ci: q.ci, row: q.row, slot, cat };
+      questionCache[`${q.round}-${q.ci}-${slot}`] = q.item;
       document.getElementById('qcat').innerHTML = `${escapeHtml(cat.ic)} ${escapeHtml(cat.name)}`;
       document.getElementById('qpoints').textContent = `${POINTS[q.row]} نقطة`;
       renderQuestionBody(q.item);
@@ -2646,7 +2682,9 @@ function submitAnswer(index) {
   if (!current || lastAnswer) return;
   if (!isMyTurn()) return;
 
-  const key = `${activeRound}-${current.ci}-${current.row}`;
+  // بالـ slot لا بالـ row: المخزون مفهرَس بالخلية (0–5) لا بالمستوى (0–2)،
+  // وإلا أعادت الخلية الثانية في المستوى سؤال الخلية الأولى.
+  const key = `${activeRound}-${current.ci}-${current.slot}`;
   const item = questionCache[key];
   if (!item || !Array.isArray(item.choices)) return;
 
@@ -2693,7 +2731,7 @@ function finishAnsweredQuestion() {
   answerPublishGrace = hadControl;
 
   try {
-    stateUsed[activeRound][current.ci][current.row] = true;
+    stateUsed[activeRound][current.ci][current.slot] = true;
     lastAnswer = null;
     closeQuestion();
     renderBoard();

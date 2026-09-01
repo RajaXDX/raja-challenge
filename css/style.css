@@ -178,34 +178,54 @@ header {
   ونقشة السدو والتذييل على هذه الشاشة وحدها، وتبقى كما هي في باقي الشاشات
   حتى تُنقل إلى التصميم الجديد بدورها.
 */
+/*
+  الرئيسية ولوحة اللعب في تصميم 3a بلا ترويسة ضخمة: نُخفي الشعار والشعار
+  النصّي ونقشة السدو والتذييل، ويبقى شريط رفيع فيه زر الإدارة وحالة
+  المزامنة — إخفاؤهما بالكامل كان يقطع الطريق الوحيد إلى لوحة الإدارة
+  ويُعمي اللاعب عن انقطاع المزامنة أثناء لعبة أونلاين.
+  باقي الشاشات تبقى كما هي حتى تُنقل إلى التصميم الجديد بدورها.
+*/
 body[data-screen="screen-home"] .sadu,
 body[data-screen="screen-home"] .sadu-strip,
 body[data-screen="screen-home"] header .brand-row,
 body[data-screen="screen-home"] header .tag,
-body[data-screen="screen-home"] footer {
+body[data-screen="screen-home"] footer,
+body[data-screen="screen-game"] .sadu,
+body[data-screen="screen-game"] .sadu-strip,
+body[data-screen="screen-game"] header .brand-row,
+body[data-screen="screen-game"] header .tag,
+body[data-screen="screen-game"] footer {
   display: none;
 }
 
-body[data-screen="screen-home"] header {
+body[data-screen="screen-home"] header,
+body[data-screen="screen-game"] header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-direction: row-reverse;
-  max-width: 460px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 14px 6px 0;
+  padding: 14px 16px 0;
   background: none;
   border: none;
   box-shadow: none;
   min-height: 0;
 }
 
-body[data-screen="screen-home"] header .header-corner {
+body[data-screen="screen-home"] header {
+  max-width: 460px;
+  padding: 14px 6px 0;
+}
+
+body[data-screen="screen-home"] header .header-corner,
+body[data-screen="screen-game"] header .header-corner {
   position: static;
   margin: 0;
 }
 
-body[data-screen="screen-home"] .admin-gear {
+body[data-screen="screen-home"] .admin-gear,
+body[data-screen="screen-game"] .admin-gear {
   position: static;
   background: none;
   border: none;
@@ -215,7 +235,9 @@ body[data-screen="screen-home"] .admin-gear {
   padding: 0;
 }
 
-body[data-screen="screen-home"] .sync-indicator {
+body[data-screen="screen-home"] .sync-indicator,
+body[data-screen="screen-game"] .sync-indicator {
+  position: static;
   background: none;
   border: none;
   color: var(--muted);
@@ -668,8 +690,9 @@ body[data-screen="screen-home"] .sync-indicator {
 
 .btn-skip {
   background: transparent;
-  border: 1px solid rgba(240, 233, 223, 0.3);
+  border: none;
   color: var(--muted);
+  padding: 10px 6px;
 }
 
 .btn-skip:hover {
@@ -700,51 +723,60 @@ body[data-screen="screen-home"] .sync-indicator {
   margin-bottom: 20px;
 }
 
+/*
+  شريط النتيجة في تصميم 3a صفّ واحد مدمج: اسم الفريق ورقمه بجانب بعض،
+  وشارة الدور بينهما — لا بطاقتان ضخمتان تأكلان ثلث الشاشة قبل اللوحة.
+*/
 .scoreboard {
   display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin: 10px auto;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  max-width: 1180px;
+  margin: 6px auto 4px;
+  padding: 0 16px;
 }
 
 .team-card {
-  background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(196, 141, 58, 0.35);
-  border-radius: 14px;
-  padding: 12px 20px;
-  min-width: 210px;
-  text-align: center;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
-}
-
-.team-card.A {
-  border-color: rgba(196, 141, 58, 0.55);
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  min-width: 0;
+  text-align: right;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
 }
 
 .team-card.B {
-  border-color: rgba(138, 131, 117, 0.55);
+  flex-direction: row-reverse;
+  text-align: left;
 }
 
 .team-name {
   font-family: 'Cairo', sans-serif;
-  font-weight: 800;
-  font-size: 15px;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--muted);
 }
 
 .team-score {
   font-family: 'Cairo';
   font-weight: 900;
-  font-size: 32px;
-  margin-top: 2px;
+  font-size: 27px;
+  margin-top: 0;
+  line-height: 1;
 }
 
-.team-card.A .team-score {
-  color: var(--teamA);
-}
+.team-card.A .team-score { color: var(--teamA); }
+.team-card.B .team-score { color: var(--sand); }
 
-.team-card.B .team-score {
-  color: var(--teamB);
+/* الفريق صاحب الدور يُبرَز بلونه لا بإطار متوهّج حول بطاقة لم تعد موجودة */
+.team-card.active-turn .team-name {
+  color: var(--sand);
 }
 
 .team-lifelines {
@@ -992,69 +1024,93 @@ body[data-screen="screen-home"] .sync-indicator {
   padding: 0 16px;
 }
 
+/*
+  لوحة «3a»: كل فئة كرت مستقلّ فيه اسمها وست خلايا (٣×٢). الشبكة تتكيّف
+  مع العرض — كرتان على الجوال وثلاثة أو أكثر على الشاشات الكبيرة — بدل
+  أعمدة بعدد الفئات كانت تُجبر اللوحة على التمرير الأفقي على الجوال.
+*/
 .board {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
 }
 
-.cat-header {
+.cat-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.cat-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.cat-name {
   font-family: 'Cairo';
-  font-weight: 800;
-  font-size: clamp(11px, 1.4vw, 14px);
-  background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(196, 141, 58, 0.3);
-  border-radius: 10px 10px 4px 4px;
-  text-align: center;
-  padding: 12px 4px;
-  min-height: 58px;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--gold);
+  line-height: 1.35;
+}
+
+.cat-ic {
+  font-size: 17px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  flex-direction: column;
-  color: var(--sand);
-  line-height: 1.25;
+  flex: 0 0 auto;
 }
 
-.cat-header .ic {
-  font-size: 18px;
+.cat-cells {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
 .cell {
   background: var(--panel-2);
-  border: 1px solid rgba(196, 141, 58, 0.18);
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
   font-family: 'Cairo';
-  font-weight: 900;
-  font-size: clamp(16px, 2.2vw, 24px);
+  font-weight: 800;
+  font-size: 17px;
   color: var(--gold-soft);
   text-align: center;
-  padding: 16px 4px;
+  padding: 14px 2px;
   cursor: pointer;
   transition: all 0.15s ease;
-  min-height: 60px;
+  min-height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .cell:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(196, 141, 58, 0.18);
+  border-color: rgba(196, 141, 58, 0.45);
   background: var(--surface);
 }
 
+/* الخلية المستخدَمة تنسحب بصرياً: نقطة باهتة لا علامة صحّ صارخة */
 .cell.used {
-  background: var(--used);
+  background: var(--night-2);
   color: var(--muted-2);
   cursor: default;
-  box-shadow: none;
-  transform: none;
+  border-color: transparent;
+  font-size: 15px;
 }
 
 .cell.used:hover {
-  transform: none;
-  box-shadow: none;
+  background: var(--night-2);
+  border-color: transparent;
 }
 
 /* ============================= OVERLAY ============================= */
@@ -1076,10 +1132,10 @@ body[data-screen="screen-home"] .sync-indicator {
 
 .qcard {
   width: min(900px, 96vw);
-  background: linear-gradient(180deg, var(--panel-2), var(--night-2));
-  border: 1px solid rgba(196, 141, 58, 0.4);
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 20px;
-  padding: 30px 30px 18px;
+  padding: 26px 22px 20px;
   position: relative;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
   max-height: 92vh;
@@ -1103,12 +1159,11 @@ body[data-screen="screen-home"] .sync-indicator {
 .qpoints {
   font-family: 'Cairo';
   font-weight: 900;
-  color: var(--sand);
-  background: rgba(196, 141, 58, 0.15);
-  border: 1px solid rgba(196, 141, 58, 0.4);
-  padding: 4px 14px;
-  border-radius: 999px;
-  font-size: 15px;
+  color: var(--gold);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 22px;
 }
 
 .qimg {
@@ -1117,7 +1172,7 @@ body[data-screen="screen-home"] .sync-indicator {
   align-items: center;
   justify-content: center;
   font-size: 64px;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--panel-2);
   border-radius: 14px;
   margin: 10px 0 18px;
   min-height: 100px;
@@ -1188,10 +1243,10 @@ body[data-screen="screen-home"] .sync-indicator {
 .qtext {
   font-family: 'Cairo';
   font-weight: 700;
-  font-size: clamp(18px, 2.5vw, 25px);
+  font-size: clamp(19px, 2.6vw, 26px);
   text-align: center;
   color: var(--sand);
-  line-height: 1.6;
+  line-height: 1.65;
   padding: 6px 4px 18px;
   min-height: 30px;
 }
@@ -1204,13 +1259,13 @@ body[data-screen="screen-home"] .sync-indicator {
   display: none;
   font-family: 'Cairo';
   font-weight: 800;
-  font-size: clamp(17px, 2.3vw, 23px);
+  font-size: clamp(18px, 2.4vw, 24px);
   text-align: center;
-  color: var(--teamA);
-  background: rgba(196, 141, 58, 0.1);
-  border: 1px dashed rgba(196, 141, 58, 0.5);
-  border-radius: 12px;
-  padding: 16px;
+  color: var(--gold-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
   margin: 0 0 18px;
 }
 
@@ -1240,8 +1295,36 @@ body[data-screen="screen-home"] .sync-indicator {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  border-top: 1px solid rgba(196, 141, 58, 0.2);
+  border-top: 1px solid var(--line);
   padding-top: 16px;
+}
+
+/*
+  أزرار منح النقاط في تصميم 3a: الفريق صاحب الدور بذهبي مصمت والآخر داكن
+  بحدّ — لا لونان متنافسان يشتّتان الحكم لحظة الإجابة.
+*/
+.btn-award {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--sand);
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 14.5px;
+}
+
+.btn-award.A {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1A1306;
+}
+
+.btn-award:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn-award.B:hover:not(:disabled) {
+  border-color: var(--gold);
+  filter: none;
 }
 
 .corner {
@@ -2192,21 +2275,24 @@ footer p {
 
 .turn-banner {
   text-align: center;
-  margin: 8px auto 4px;
-  font-size: 15px;
-  color: var(--text);
-  min-height: 22px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1306;
+  background: var(--gold);
+  border-radius: 999px;
+  padding: 7px 15px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.turn-banner:empty {
+  display: none;
 }
 
 .turn-banner .turn-label {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.team-card.active-turn {
-  box-shadow: 0 0 0 2px var(--gold), 0 0 18px rgba(196, 141, 58, 0.35);
-  transform: translateY(-2px);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  color: rgba(26, 19, 6, 0.7);
+  font-size: 12px;
 }
 
 /* إعلان الفريق الذي يبدأ */
@@ -2407,16 +2493,14 @@ footer p {
   .lifeline-chip { font-size: 12px; }
   .chat-input, .chat-send-btn { font-size: 15px; }
 
-  /* لوحة اللعب: تمرير أفقي بدل ضغط 6 أعمدة في شاشة ضيقة */
+  /* لوحة الكروت تلتفّ رأسياً على الجوال — لا تمرير أفقي ولا min-width */
   .board-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     padding: 0 12px 8px;
   }
 
   .board {
-    min-width: 560px;   /* ~93px لكل عمود عند 6 أعمدة */
-    gap: 8px;
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .cell {
@@ -2425,9 +2509,8 @@ footer p {
     padding: 10px 4px;
   }
 
-  .cat-header {
-    font-size: 12px;
-    padding: 8px 4px;
+  .cat-name {
+    font-size: 13px;
   }
 }
 
