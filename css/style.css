@@ -1,18 +1,23 @@
 /* ============================= ROOT VARIABLES ============================= */
 :root {
-  --night: #0A1A14;
-  --night-2: #0F2A20;
-  --panel: #12382A;
-  --panel-2: #173F2F;
-  --gold: #D4AF37;
-  --gold-soft: #C9A24B;
-  --sand: #EFE3C6;
-  --clay: #B85C38;
-  --teamA: #3FA796;
-  --teamB: #C9A24B;
-  --used: #0C2218;
-  --text: #EFE3C6;
-  --muted: #9FB8AB;
+  /* لوحة «3a» — أسود دافئ وذهبي. القيم مأخوذة من ملف التصميم نفسه
+     (tahadi-raja-standalone.html، النموذج 3a) لا مقدّرة بالعين. */
+  --night: #141110;
+  --night-2: #0B0908;
+  --panel: #1A1615;
+  --panel-2: #1F1A18;
+  --surface: #241F1D;
+  --line: #332C29;
+  --gold: #C48D3A;
+  --gold-soft: #E8C37A;
+  --sand: #F0E9DF;
+  --clay: #8E2A2F;
+  --teamA: #C48D3A;
+  --teamB: #8A8375;
+  --used: #1A1615;
+  --text: #F0E9DF;
+  --muted: #9C9081;
+  --muted-2: #7D7368;
   --error: #E74C3C;
   --success: #27AE60;
 }
@@ -29,9 +34,9 @@ html, body {
 }
 
 body {
-  background: radial-gradient(1200px 700px at 50% -10%, #173F2F 0%, var(--night) 55%, #060F0B 100%);
+  background: var(--night);
   color: var(--text);
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'Cairo', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -69,7 +74,7 @@ header {
   top: 20px;
   left: 20px;
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  border: 1px solid rgba(196, 141, 58, 0.35);
   color: var(--gold);
   font-size: 18px;
   border-radius: 10px;
@@ -79,7 +84,7 @@ header {
 }
 
 .admin-gear:hover {
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(196, 141, 58, 0.15);
   transform: scale(1.05);
 }
 
@@ -90,7 +95,7 @@ header {
   font-size: 12px;
   color: var(--muted);
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(212, 175, 55, 0.25);
+  border: 1px solid rgba(196, 141, 58, 0.25);
   border-radius: 999px;
   padding: 5px 12px;
 }
@@ -107,7 +112,7 @@ header {
   height: clamp(72px, 14vw, 122px);
   width: auto;
   flex: 0 0 auto;
-  filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.35));
+  filter: drop-shadow(0 0 14px rgba(196, 141, 58, 0.35));
 }
 
 .brand {
@@ -116,7 +121,7 @@ header {
   font-size: clamp(30px, 6vw, 52px);
   letter-spacing: 1px;
   color: var(--gold);
-  text-shadow: 0 0 18px rgba(212, 175, 55, 0.35), 0 2px 0 rgba(0, 0, 0, 0.4);
+  text-shadow: 0 0 18px rgba(196, 141, 58, 0.35), 0 2px 0 rgba(0, 0, 0, 0.4);
   margin: 0;
 }
 
@@ -155,37 +160,163 @@ header {
 }
 
 /* ============================= HOME SCREEN ============================= */
+/*
+  تنسيق النموذج «3a»: عنوان كوفي كبير، زر ذهبي واحد بارز، وأربعة أزرار
+  ثانوية في شبكة ٢×٢. الأرقام في السطر التعريفي حيّة من بنك الأسئلة.
+*/
 .home-container {
-  max-width: 600px;
+  max-width: 460px;
   margin: 0 auto;
-  text-align: center;
+  padding: 0 4px;
+}
+
+
+
+/*
+  الرئيسية في النموذج 3a بلا ترويسة: العنوان الكوفي نفسه هو الهوية، وفوقه
+  شريط رفيع فيه حالة الوضع وزر الإدارة فقط. فنُخفي الشعار والشعار النصّي
+  ونقشة السدو والتذييل على هذه الشاشة وحدها، وتبقى كما هي في باقي الشاشات
+  حتى تُنقل إلى التصميم الجديد بدورها.
+*/
+body[data-screen="screen-home"] .sadu,
+body[data-screen="screen-home"] .sadu-strip,
+body[data-screen="screen-home"] header .brand-row,
+body[data-screen="screen-home"] header .tag,
+body[data-screen="screen-home"] footer {
+  display: none;
+}
+
+body[data-screen="screen-home"] header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 14px 6px 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  min-height: 0;
+}
+
+body[data-screen="screen-home"] header .header-corner {
+  position: static;
+  margin: 0;
+}
+
+body[data-screen="screen-home"] .admin-gear {
+  position: static;
+  background: none;
+  border: none;
+  box-shadow: none;
+  font-size: 15px;
+  opacity: 0.55;
+  padding: 0;
+}
+
+body[data-screen="screen-home"] .sync-indicator {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 12.5px;
+  padding: 0;
+  box-shadow: none;
 }
 
 .hero-section {
-  margin: 40px 0;
+  margin: 46px 0 34px;
+  text-align: right;
 }
 
+/* العنوان وحده بخط كوفي — هذا جوهر النموذج 3a */
 .hero-title {
-  font-family: 'Cairo', sans-serif;
-  font-weight: 900;
-  font-size: clamp(28px, 5vw, 42px);
-  color: var(--sand);
-  margin: 20px 0 10px;
+  font-family: 'Reem Kufi', serif;
+  font-weight: 600;
+  font-size: clamp(40px, 12vw, 58px);
+  line-height: 1.15;
+  margin: 0 0 16px;
+  letter-spacing: 0.5px;
 }
+
+.hero-title .ht-1 { color: var(--sand); }
+.hero-title .ht-2 { color: var(--gold); }
 
 .hero-subtitle {
   color: var(--muted);
-  font-size: 16px;
+  font-size: 14.5px;
+  line-height: 1.9;
   margin: 0;
+  max-width: 34ch;
 }
 
 .home-buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin: 30px 0;
+  margin: 0 0 30px;
 }
 
+/* الزر الأساسي: النص يمين والسهم يسار، فيمتدّ الزر بعرض البطاقة */
+.home-cta {
+  justify-content: space-between;
+  padding: 18px 22px;
+  font-size: 17px;
+  border-radius: 14px;
+}
+
+.cta-arrow {
+  font-size: 18px;
+  opacity: 0.75;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.home-grid .btn-main {
+  justify-content: center;
+  padding: 18px 10px;
+  font-size: 15px;
+  border-radius: 14px;
+}
+
+.home-last {
+  margin-top: 34px;
+}
+
+.home-last-label {
+  color: var(--muted-2);
+  font-size: 12.5px;
+  margin-bottom: 8px;
+}
+
+.home-last-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.hl-winner {
+  color: var(--sand);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.hl-score {
+  color: var(--gold);
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: 0.5px;
+}
+
+/* بطاقات الإحصاء لم تعد على الرئيسية، لكنها مستخدَمة في شاشات أخرى */
 .home-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -194,8 +325,8 @@ header {
 }
 
 .stat-card {
-  background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -203,13 +334,8 @@ header {
   gap: 12px;
 }
 
-.stat-icon {
-  font-size: 28px;
-}
-
-.stat-info {
-  flex: 1;
-}
+.stat-icon { font-size: 28px; }
+.stat-info { flex: 1; }
 
 .stat-label {
   font-size: 12px;
@@ -256,7 +382,7 @@ header {
 
 .team-setup {
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(196, 141, 58, 0.3);
   border-radius: 16px;
   padding: 20px;
   width: 340px;
@@ -264,11 +390,11 @@ header {
 }
 
 .team-setup.A {
-  border-color: rgba(63, 167, 150, 0.5);
+  border-color: rgba(196, 141, 58, 0.5);
 }
 
 .team-setup.B {
-  border-color: rgba(201, 162, 75, 0.5);
+  border-color: rgba(138, 131, 117, 0.5);
 }
 
 .team-setup label {
@@ -283,7 +409,7 @@ header {
 .team-setup input[type="text"] {
   width: 100%;
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(239, 227, 198, 0.25);
+  border: 1px solid rgba(240, 233, 223, 0.25);
   border-radius: 10px;
   padding: 10px 12px;
   color: var(--text);
@@ -313,7 +439,7 @@ header {
   text-align: center;
   padding: 10px 4px;
   border-radius: 10px;
-  border: 1px solid rgba(239, 227, 198, 0.25);
+  border: 1px solid rgba(240, 233, 223, 0.25);
   background: rgba(0, 0, 0, 0.2);
   cursor: pointer;
   font-size: 12px;
@@ -323,7 +449,7 @@ header {
 
 .lifeline-chip:hover {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(196, 141, 58, 0.1);
 }
 
 .lifeline-chip .ic {
@@ -334,7 +460,7 @@ header {
 
 .lifeline-chip.sel {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(196, 141, 58, 0.15);
   color: var(--sand);
 }
 
@@ -357,11 +483,11 @@ header {
 
 .custom-cat-input {
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(239, 227, 198, 0.3);
+  border: 1px solid rgba(240, 233, 223, 0.3);
   border-radius: 999px;
   padding: 8px 16px;
   color: var(--text);
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 13px;
   width: 220px;
   max-width: 100%;
@@ -394,7 +520,7 @@ header {
 
 .cat-pick {
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 2px solid rgba(212, 175, 55, 0.18);
+  border: 2px solid rgba(196, 141, 58, 0.18);
   border-radius: 12px;
   cursor: pointer;
   text-align: center;
@@ -409,7 +535,7 @@ header {
 
 .cat-pick.sel {
   border-color: var(--gold);
-  background: linear-gradient(180deg, #1c4a35, #143527);
+  background: var(--panel-2);
 }
 
 .cat-pick .ic {
@@ -486,6 +612,8 @@ header {
   color: #1A1306;
 }
 
+.btn-primary.home-cta { box-shadow: none; }
+
 .btn-primary:hover:not(:disabled) {
   filter: brightness(1.1);
   transform: translateY(-2px);
@@ -498,24 +626,24 @@ header {
 
 .btn-secondary {
   background: var(--panel);
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  border: 1px solid var(--line);
   color: var(--sand);
 }
 
 .btn-secondary:hover {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.15);
+  background: var(--panel-2);
 }
 
 .btn-ghost {
   background: transparent;
-  border: 1px solid rgba(239, 227, 198, 0.35);
+  border: 1px solid rgba(240, 233, 223, 0.35);
   color: var(--sand);
 }
 
 .btn-ghost:hover {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(196, 141, 58, 0.1);
 }
 
 .btn {
@@ -540,7 +668,7 @@ header {
 
 .btn-skip {
   background: transparent;
-  border: 1px solid rgba(239, 227, 198, 0.3);
+  border: 1px solid rgba(240, 233, 223, 0.3);
   color: var(--muted);
 }
 
@@ -582,7 +710,7 @@ header {
 
 .team-card {
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  border: 1px solid rgba(196, 141, 58, 0.35);
   border-radius: 14px;
   padding: 12px 20px;
   min-width: 210px;
@@ -591,11 +719,11 @@ header {
 }
 
 .team-card.A {
-  border-color: rgba(63, 167, 150, 0.55);
+  border-color: rgba(196, 141, 58, 0.55);
 }
 
 .team-card.B {
-  border-color: rgba(201, 162, 75, 0.55);
+  border-color: rgba(138, 131, 117, 0.55);
 }
 
 .team-name {
@@ -632,13 +760,13 @@ header {
   border-radius: 8px;
   padding: 4px 6px;
   cursor: pointer;
-  border: 1px solid rgba(239, 227, 198, 0.2);
+  border: 1px solid rgba(240, 233, 223, 0.2);
   transition: all 0.2s;
 }
 
 .team-lifelines .ic:hover {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(196, 141, 58, 0.15);
 }
 
 .team-lifelines .ic.used {
@@ -651,11 +779,11 @@ header {
   display: block;
   margin: 10px auto 0;
   background: none;
-  border: 1px solid rgba(239, 227, 198, 0.3);
+  border: 1px solid rgba(240, 233, 223, 0.3);
   color: var(--muted);
   border-radius: 20px;
   padding: 5px 16px;
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
@@ -686,7 +814,7 @@ header {
 }
 
 .cat-stat-name {
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 14px;
   color: var(--sand);
 }
@@ -701,7 +829,7 @@ header {
 .cat-stat-bar {
   height: 8px;
   border-radius: 6px;
-  background: rgba(239, 227, 198, 0.14);
+  background: rgba(240, 233, 223, 0.14);
   overflow: hidden;
   margin: 5px 0 3px;
 }
@@ -714,13 +842,13 @@ header {
 }
 
 .cat-stat-sub {
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 12px;
   color: var(--muted);
 }
 
 .cat-stats-empty {
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 14px;
   color: var(--muted);
   line-height: 1.7;
@@ -740,8 +868,8 @@ header {
   cursor: pointer;
   background: none;
   color: var(--muted);
-  border: 1px solid rgba(239, 227, 198, 0.3);
-  font-family: 'Tajawal';
+  border: 1px solid rgba(240, 233, 223, 0.3);
+  font-family: 'Cairo';
   font-size: 12px;
 }
 
@@ -759,7 +887,7 @@ header {
 }
 
 .timer-label {
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 14px;
   color: var(--muted);
 }
@@ -772,7 +900,7 @@ header {
 }
 
 .timer-opt {
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 13px;
   min-height: 40px;
   padding: 6px 14px;
@@ -780,7 +908,7 @@ header {
   cursor: pointer;
   background: none;
   color: var(--muted);
-  border: 1px solid rgba(239, 227, 198, 0.3);
+  border: 1px solid rgba(240, 233, 223, 0.3);
   transition: all 0.2s;
 }
 
@@ -789,7 +917,7 @@ header {
 .timer-opt.active {
   background: var(--gold);
   border-color: var(--gold);
-  color: #12261C;
+  color: #1A1306;
   font-weight: 700;
 }
 
@@ -839,7 +967,7 @@ header {
   font-family: 'Cairo';
   font-weight: 700;
   background: var(--panel);
-  border: 1px solid rgba(212, 175, 55, 0.25);
+  border: 1px solid rgba(196, 141, 58, 0.25);
   color: var(--muted);
   padding: 8px 20px;
   border-radius: 999px;
@@ -874,7 +1002,7 @@ header {
   font-weight: 800;
   font-size: clamp(11px, 1.4vw, 14px);
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(196, 141, 58, 0.3);
   border-radius: 10px 10px 4px 4px;
   text-align: center;
   padding: 12px 4px;
@@ -893,8 +1021,8 @@ header {
 }
 
 .cell {
-  background: linear-gradient(180deg, #0E2B20, #0A2118);
-  border: 1px solid rgba(212, 175, 55, 0.18);
+  background: var(--panel-2);
+  border: 1px solid rgba(196, 141, 58, 0.18);
   border-radius: 8px;
   font-family: 'Cairo';
   font-weight: 900;
@@ -912,13 +1040,13 @@ header {
 
 .cell:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(212, 175, 55, 0.18);
-  background: linear-gradient(180deg, #123726, #0D2B1F);
+  box-shadow: 0 8px 18px rgba(196, 141, 58, 0.18);
+  background: var(--surface);
 }
 
 .cell.used {
   background: var(--used);
-  color: #2C4A3D;
+  color: var(--muted-2);
   cursor: default;
   box-shadow: none;
   transform: none;
@@ -949,7 +1077,7 @@ header {
 .qcard {
   width: min(900px, 96vw);
   background: linear-gradient(180deg, var(--panel-2), var(--night-2));
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  border: 1px solid rgba(196, 141, 58, 0.4);
   border-radius: 20px;
   padding: 30px 30px 18px;
   position: relative;
@@ -976,8 +1104,8 @@ header {
   font-family: 'Cairo';
   font-weight: 900;
   color: var(--sand);
-  background: rgba(212, 175, 55, 0.15);
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: rgba(196, 141, 58, 0.15);
+  border: 1px solid rgba(196, 141, 58, 0.4);
   padding: 4px 14px;
   border-radius: 999px;
   font-size: 15px;
@@ -1079,8 +1207,8 @@ header {
   font-size: clamp(17px, 2.3vw, 23px);
   text-align: center;
   color: var(--teamA);
-  background: rgba(63, 167, 150, 0.1);
-  border: 1px dashed rgba(63, 167, 150, 0.5);
+  background: rgba(196, 141, 58, 0.1);
+  border: 1px dashed rgba(196, 141, 58, 0.5);
   border-radius: 12px;
   padding: 16px;
   margin: 0 0 18px;
@@ -1112,7 +1240,7 @@ header {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  border-top: 1px solid rgba(196, 141, 58, 0.2);
   padding-top: 16px;
 }
 
@@ -1152,7 +1280,7 @@ header {
   font-family: 'Cairo';
   font-weight: 700;
   background: var(--panel);
-  border: 1px solid rgba(212, 175, 55, 0.25);
+  border: 1px solid rgba(196, 141, 58, 0.25);
   color: var(--muted);
   padding: 10px 16px;
   border-radius: 8px;
@@ -1190,13 +1318,13 @@ header {
   color: var(--gold);
   font-size: 18px;
   margin: 0 0 16px;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  border-bottom: 1px solid rgba(196, 141, 58, 0.3);
   padding-bottom: 12px;
 }
 
 .admin-section {
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(212, 175, 55, 0.25);
+  border: 1px solid rgba(196, 141, 58, 0.25);
   border-radius: 14px;
   padding: 18px;
   margin-bottom: 20px;
@@ -1215,11 +1343,11 @@ header {
 .admin-row select,
 .admin-row textarea {
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(239, 227, 198, 0.25);
+  border: 1px solid rgba(240, 233, 223, 0.25);
   border-radius: 8px;
   padding: 8px 10px;
   color: var(--text);
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 13px;
   flex: 1;
   min-width: 150px;
@@ -1229,7 +1357,7 @@ header {
   width: 100%;
   min-height: 56px;
   resize: vertical;
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
 }
 
 .points-inputs {
@@ -1262,7 +1390,7 @@ header {
   align-items: center;
   gap: 6px;
   background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(196, 141, 58, 0.2);
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 12px;
@@ -1287,18 +1415,18 @@ header {
 
 .bank-controls select {
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(239, 227, 198, 0.25);
+  border: 1px solid rgba(240, 233, 223, 0.25);
   border-radius: 8px;
   padding: 8px 10px;
   color: var(--text);
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-size: 13px;
 }
 
 .bank-list {
   max-height: 350px;
   overflow: auto;
-  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  border-top: 1px solid rgba(196, 141, 58, 0.15);
   margin-top: 10px;
 }
 
@@ -1308,7 +1436,7 @@ header {
   gap: 10px;
   align-items: flex-start;
   padding: 10px 4px;
-  border-bottom: 1px solid rgba(239, 227, 198, 0.08);
+  border-bottom: 1px solid rgba(240, 233, 223, 0.08);
   font-size: 13px;
 }
 
@@ -1494,7 +1622,7 @@ footer {
   color: var(--muted);
   font-size: 12px;
   padding: 20px;
-  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  border-top: 1px solid rgba(196, 141, 58, 0.15);
   margin-top: 40px;
 }
 
@@ -1512,12 +1640,12 @@ footer p {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(212, 175, 55, 0.4);
+  background: rgba(196, 141, 58, 0.4);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 175, 55, 0.6);
+  background: rgba(196, 141, 58, 0.6);
 }
 
 /* ============================= ONLINE MODE ============================= */
@@ -1533,7 +1661,7 @@ footer p {
   padding: 30px 20px;
   border: 2px solid var(--gold);
   border-radius: 12px;
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(196, 141, 58, 0.05);
   cursor: pointer;
   transition: all 0.3s ease;
   color: var(--text);
@@ -1541,7 +1669,7 @@ footer p {
 }
 
 .mode-btn:hover {
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(196, 141, 58, 0.15);
   transform: translateY(-2px);
 }
 
@@ -1599,7 +1727,7 @@ footer p {
   padding: 15px;
   border: 1px solid var(--gold);
   border-radius: 8px;
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(196, 141, 58, 0.05);
 }
 
 .room-name {
@@ -1629,7 +1757,7 @@ footer p {
 .room-info {
   display: flex;
   justify-content: space-around;
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(196, 141, 58, 0.1);
   padding: 15px;
   border-radius: 8px;
   margin: 20px 0;
@@ -1689,7 +1817,7 @@ footer p {
 
 .player-team {
   padding: 4px 12px;
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(196, 141, 58, 0.2);
   border-radius: 4px;
   font-size: 12px;
   margin: 0 10px;
@@ -1710,7 +1838,7 @@ footer p {
 
 .team-btn {
   padding: 6px 12px;
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(196, 141, 58, 0.2);
   border: 1px solid var(--gold);
   border-radius: 4px;
   color: var(--text);
@@ -1720,7 +1848,7 @@ footer p {
 }
 
 .team-btn:hover {
-  background: rgba(212, 175, 55, 0.4);
+  background: rgba(196, 141, 58, 0.4);
 }
 
 .team-btn.selected {
@@ -1757,7 +1885,7 @@ footer p {
   align-items: center;
   padding: 12px;
   border-bottom: 1px solid var(--gold);
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(196, 141, 58, 0.1);
   border-radius: 10px 10px 0 0;
   flex: 0 0 auto;
 }
@@ -1875,7 +2003,7 @@ footer p {
 
 .reaction-btn {
   padding: 2px 6px;
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(196, 141, 58, 0.2);
   border: 1px solid var(--gold);
   border-radius: 4px;
   cursor: pointer;
@@ -1885,7 +2013,7 @@ footer p {
 }
 
 .reaction-btn:hover {
-  background: rgba(212, 175, 55, 0.4);
+  background: rgba(196, 141, 58, 0.4);
 }
 
 .reaction-btn span {
@@ -1899,7 +2027,7 @@ footer p {
   gap: 6px;
   padding: 10px;
   border-top: 1px solid var(--gold);
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(196, 141, 58, 0.05);
 }
 
 .chat-input {
@@ -1943,7 +2071,7 @@ footer p {
 
 .emoji-picker button {
   padding: 8px;
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(196, 141, 58, 0.1);
   border: 1px solid var(--gold);
   border-radius: 4px;
   cursor: pointer;
@@ -1952,7 +2080,7 @@ footer p {
 }
 
 .emoji-picker button:hover {
-  background: rgba(212, 175, 55, 0.3);
+  background: rgba(196, 141, 58, 0.3);
 }
 
 /* ============================= RESPONSIVE ============================= */
@@ -2076,7 +2204,7 @@ footer p {
 }
 
 .team-card.active-turn {
-  box-shadow: 0 0 0 2px var(--gold), 0 0 18px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 0 2px var(--gold), 0 0 18px rgba(196, 141, 58, 0.35);
   transform: translateY(-2px);
   transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
@@ -2155,7 +2283,7 @@ footer p {
   font-weight: 900;
   font-size: clamp(26px, 7vw, 44px);
   color: var(--gold);
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  text-shadow: 0 0 20px rgba(196, 141, 58, 0.4);
 }
 
 .winner-margin,
@@ -2183,7 +2311,7 @@ footer p {
 
 .end-score-card.lead {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.12);
+  background: rgba(196, 141, 58, 0.12);
 }
 
 .end-team-name {
@@ -2217,8 +2345,8 @@ footer p {
 .room-share {
   margin: 16px auto 22px;
   padding: 16px;
-  background: rgba(212, 175, 55, 0.07);
-  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(196, 141, 58, 0.07);
+  border: 1px solid rgba(196, 141, 58, 0.28);
   border-radius: 14px;
   text-align: center;
 }
@@ -2308,7 +2436,7 @@ footer p {
 .lifeline-banner {
   margin: 10px auto 4px;
   padding: 10px 14px;
-  background: rgba(212, 175, 55, 0.12);
+  background: rgba(196, 141, 58, 0.12);
   border: 1px solid var(--gold);
   border-radius: 10px;
   text-align: center;
@@ -2399,14 +2527,14 @@ footer p {
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.3);
   color: var(--text);
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'Cairo', sans-serif;
   font-size: 16px;
   margin-bottom: 16px;
 }
 
 .ui-modal-input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 0 2px rgba(196, 141, 58, 0.35);
 }
 
 .ui-modal-actions {
@@ -2536,7 +2664,7 @@ select {
   gap: 8px;
   font-size: 13px;
   background: rgba(0, 0, 0, 0.28);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(196, 141, 58, 0.3);
   border-radius: 999px;
   padding: 4px 6px 4px 12px;
   white-space: nowrap;
@@ -2551,7 +2679,7 @@ select {
 
 .auth-signout {
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  border: 1px solid rgba(196, 141, 58, 0.35);
   color: var(--gold);
   border-radius: 8px;
   padding: 6px 10px;
@@ -2576,7 +2704,7 @@ select {
   min-height: 44px;
   padding: 10px;
   background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(196, 141, 58, 0.3);
   border-radius: 10px;
   color: var(--muted);
   font-family: 'Cairo', sans-serif;
@@ -2587,14 +2715,14 @@ select {
 }
 
 .auth-tab.active {
-  background: rgba(212, 175, 55, 0.16);
+  background: rgba(196, 141, 58, 0.16);
   border-color: var(--gold);
   color: var(--sand);
 }
 
 .auth-form {
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(196, 141, 58, 0.3);
   border-radius: 16px;
   padding: 20px;
 }
@@ -2611,10 +2739,10 @@ select {
   padding: 12px 14px;
   margin-bottom: 14px;
   background: rgba(0, 0, 0, 0.28);
-  border: 1px solid rgba(239, 227, 198, 0.25);
+  border: 1px solid rgba(240, 233, 223, 0.25);
   border-radius: 10px;
   color: var(--text);
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'Cairo', sans-serif;
   font-size: 16px;
 }
 
@@ -2651,7 +2779,7 @@ select {
   gap: 10px;
   padding: 12px;
   background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(196, 141, 58, 0.2);
   border-radius: 10px;
   flex-wrap: wrap;
 }
@@ -2695,7 +2823,7 @@ select {
 
 .user-row.is-admin {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.08);
+  background: rgba(196, 141, 58, 0.08);
 }
 
 .admin-badge {
@@ -2787,7 +2915,7 @@ select {
 }
 
 .turn-banner.my-turn {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(196, 141, 58, 0.1);
   border-radius: 10px;
   padding: 6px 12px;
 }
@@ -2817,17 +2945,17 @@ select {
   padding: 12px 14px;
   text-align: right;
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  border: 1px solid rgba(196, 141, 58, 0.35);
   border-radius: 12px;
   color: var(--text);
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'Cairo', sans-serif;
   font-size: 15px;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
 }
 
 .choice:not(:disabled):hover {
-  background: rgba(212, 175, 55, 0.14);
+  background: rgba(196, 141, 58, 0.14);
   border-color: var(--gold);
   transform: translateY(-1px);
 }
@@ -2839,7 +2967,7 @@ select {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(196, 141, 58, 0.2);
   color: var(--gold);
   font-weight: 700;
   display: inline-flex;
@@ -2889,7 +3017,7 @@ select {
   background: none;
   border: none;
   color: var(--gold);
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'Cairo', sans-serif;
   font-size: 13px;
   cursor: pointer;
   text-decoration: underline;
@@ -2914,10 +3042,10 @@ select {
   min-width: 0;
   padding: 12px 14px;
   background: rgba(0, 0, 0, 0.28);
-  border: 1px solid rgba(239, 227, 198, 0.25);
+  border: 1px solid rgba(240, 233, 223, 0.25);
   border-radius: 10px;
   color: var(--text);
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'Cairo', sans-serif;
   font-size: 16px;
 }
 
@@ -2936,7 +3064,7 @@ select {
 }
 
 .friends-count {
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(196, 141, 58, 0.2);
   border: 1px solid var(--gold);
   color: var(--gold);
   border-radius: 999px;
@@ -2951,7 +3079,7 @@ select {
   padding: 12px;
   margin-bottom: 8px;
   background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(196, 141, 58, 0.2);
   border-radius: 10px;
   flex-wrap: wrap;
 }
@@ -3015,7 +3143,7 @@ select {
 .privacy-box,
 .profile-section {
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(196, 141, 58, 0.3);
   border-radius: 14px;
   padding: 16px;
   margin-bottom: 16px;
@@ -3043,16 +3171,16 @@ select {
   gap: 4px;
   padding: 10px 6px;
   background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(212, 175, 55, 0.25);
+  border: 1px solid rgba(196, 141, 58, 0.25);
   border-radius: 10px;
   color: var(--muted);
   cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'Cairo', sans-serif;
   transition: all 0.2s;
 }
 
 .privacy-btn.active {
-  background: rgba(212, 175, 55, 0.16);
+  background: rgba(196, 141, 58, 0.16);
   border-color: var(--gold);
   color: var(--sand);
 }
@@ -3072,7 +3200,7 @@ select {
   margin-top: 12px;
   padding: 14px;
   background: rgba(0, 0, 0, 0.24);
-  border: 1px solid rgba(212, 175, 55, 0.28);
+  border: 1px solid rgba(196, 141, 58, 0.28);
   border-radius: 12px;
 }
 
@@ -3098,7 +3226,7 @@ select {
   align-items: center;
   gap: 2px;
   padding: 10px 4px;
-  background: rgba(212, 175, 55, 0.08);
+  background: rgba(196, 141, 58, 0.08);
   border-radius: 8px;
 }
 
@@ -3125,12 +3253,12 @@ select {
   gap: 10px;
   padding: 10px 12px;
   background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(196, 141, 58, 0.15);
   border-radius: 8px;
   font-size: 14px;
 }
 
-.lb-row.me { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); }
+.lb-row.me { border-color: var(--gold); background: rgba(196, 141, 58, 0.1); }
 .lb-rank { min-width: 28px; font-size: 17px; text-align: center; }
 .lb-name { flex: 1; color: var(--sand); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lb-score, .lb-wins { color: var(--gold); font-size: 13px; white-space: nowrap; }
@@ -3148,7 +3276,7 @@ select {
   margin-top: 12px;
   padding: 14px;
   background: rgba(0, 0, 0, 0.24);
-  border: 1px solid rgba(212, 175, 55, 0.28);
+  border: 1px solid rgba(196, 141, 58, 0.28);
   border-radius: 12px;
 }
 
@@ -3167,7 +3295,7 @@ select {
   justify-content: space-between;
   gap: 10px;
   padding: 10px 12px;
-  background: rgba(212, 175, 55, 0.07);
+  background: rgba(196, 141, 58, 0.07);
   border-radius: 8px;
 }
 
@@ -3214,7 +3342,7 @@ select {
 }
 
 .ib-text code {
-  background: rgba(212, 175, 55, 0.16);
+  background: rgba(196, 141, 58, 0.16);
   color: var(--gold);
   padding: 2px 8px;
   border-radius: 6px;
@@ -3308,7 +3436,7 @@ select {
   font-size: 12px;
   color: var(--muted);
   line-height: 1.7;
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(196, 141, 58, 0.1);
   border-radius: 8px;
   padding: 10px;
   margin: 12px 0 4px;
@@ -3335,7 +3463,7 @@ select {
   font-weight: 900;
   font-size: clamp(24px, 6vw, 38px);
   color: var(--gold);
-  text-shadow: 0 0 22px rgba(212, 175, 55, 0.35);
+  text-shadow: 0 0 22px rgba(196, 141, 58, 0.35);
   animation: betPop 0.5s ease;
 }
 
@@ -3372,13 +3500,13 @@ select {
   flex: 1 1 260px;
   min-width: 240px;
   background: var(--panel);
-  border: 2px solid rgba(212, 175, 55, 0.25);
+  border: 2px solid rgba(196, 141, 58, 0.25);
   border-radius: 16px;
   padding: 14px 12px;
 }
 
-.bet-card.A { border-color: rgba(63, 167, 150, 0.55); }
-.bet-card.B { border-color: rgba(201, 162, 75, 0.55); }
+.bet-card.A { border-color: rgba(196, 141, 58, 0.55); }
+.bet-card.B { border-color: rgba(138, 131, 117, 0.55); }
 
 .bet-team {
   font-family: 'Cairo', sans-serif;
@@ -3421,7 +3549,7 @@ select {
   padding: 8px 12px;
   background: var(--night-2);
   color: var(--muted);
-  border: 2px solid rgba(212, 175, 55, 0.25);
+  border: 2px solid rgba(196, 141, 58, 0.25);
   border-radius: 12px;
   font-family: inherit;
   font-size: 16px;
@@ -3435,7 +3563,7 @@ select {
 .bet-step.active {
   background: var(--gold);
   border-color: var(--gold);
-  color: #17251C;
+  color: #1A1306;
   transform: translateY(-2px);
 }
 
@@ -3465,7 +3593,7 @@ select {
   padding: 6px 12px;
   border-radius: 999px;
   background: var(--night-2);
-  border: 1px solid rgba(212, 175, 55, 0.22);
+  border: 1px solid rgba(196, 141, 58, 0.22);
   color: var(--muted);
   font-size: 13px;
 }
@@ -3476,7 +3604,7 @@ select {
 }
 
 .bet-answer {
-  background: rgba(212, 175, 55, 0.12);
+  background: rgba(196, 141, 58, 0.12);
   border: 2px solid var(--gold);
   border-radius: 14px;
   padding: 12px;
@@ -3516,7 +3644,7 @@ select {
   min-height: 44px;
   min-width: 84px;
   border-radius: 10px;
-  border: 2px solid rgba(212, 175, 55, 0.3);
+  border: 2px solid rgba(196, 141, 58, 0.3);
   background: var(--night-2);
   color: var(--muted);
   font-family: inherit;
@@ -3661,7 +3789,7 @@ select {
   flex: 1 1 140px;
   min-width: 132px;
   background: var(--panel);
-  border: 1px solid rgba(212, 175, 55, 0.22);
+  border: 1px solid rgba(196, 141, 58, 0.22);
   border-radius: 14px;
   padding: 10px 8px;
   text-align: center;
@@ -3670,7 +3798,7 @@ select {
 .sum-card.hero {
   flex-basis: 100%;
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(196, 141, 58, 0.1);
 }
 
 .sum-label {
@@ -3715,7 +3843,7 @@ select {
   gap: 4px;
   padding: 9px 10px;
   font-size: 14px;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+  border-bottom: 1px solid rgba(196, 141, 58, 0.1);
 }
 
 .sum-row:last-child { border-bottom: none; }
@@ -3745,7 +3873,7 @@ select {
   margin-top: 10px;
   padding: 9px 10px;
   background: var(--panel);
-  border: 1px solid rgba(212, 175, 55, 0.22);
+  border: 1px solid rgba(196, 141, 58, 0.22);
   border-radius: 12px;
   font-size: 13px;
   color: var(--muted);

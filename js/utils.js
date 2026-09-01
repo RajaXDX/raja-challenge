@@ -198,11 +198,16 @@ function showScreen(screenId) {
     screen.classList.add('active');
     window.scrollTo(0, 0);
   }
+  // اسم الشاشة على <body> ليتمكّن CSS من تغيير الترويسة والتذييل حسبها.
+  // البديل `body:has(#screen-home.active)` يسقط على المتصفحات الأقدم بصمت.
+  document.body.dataset.screen = screenId;
 }
 
 function goToHome() {
   Sound.click();
   showScreen('screen-home');
+  // بطاقة «آخر لعبة» تتغيّر بعد كل جولة، فتُقرأ عند كل عودة للرئيسية
+  if (typeof renderLastGame === 'function') renderLastGame();
 }
 
 function goToSetup() {

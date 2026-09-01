@@ -50,10 +50,11 @@
     font-size: 12px;
   }
 
-  /* Home Screen */
+  /* Home Screen — العنوان الكوفي يبقى كبيراً على الجوال، فهو هوية الشاشة
+     في النموذج 3a لا مجرّد عنوان يُصغَّر عند ضيق الشاشة */
   .hero-title {
-    font-size: clamp(24px, 4vw, 32px);
-    margin: 15px 0 8px;
+    font-size: clamp(38px, 12vw, 54px);
+    margin: 0 0 16px;
   }
 
   .hero-subtitle {
@@ -297,16 +298,16 @@
 
   /* Home */
   .hero-section {
-    margin: 20px 0;
+    margin: 34px 0 28px;
   }
 
   .hero-title {
-    font-size: clamp(20px, 3vw, 26px);
-    margin: 10px 0 6px;
+    font-size: clamp(36px, 12vw, 50px);
+    margin: 0 0 14px;
   }
 
   .hero-subtitle {
-    font-size: 12px;
+    font-size: 13.5px;
   }
 
   .home-buttons {

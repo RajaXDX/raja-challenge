@@ -446,6 +446,39 @@ function isGameFinished() {
   });
 }
 
+/*
+  بطاقة «آخر لعبة» في الرئيسية (النموذج 3a). لم يكن للّعبة سجلّ نتائج أصلاً،
+  فنحفظ سطراً واحداً محلياً — لا يُدفع للسحابة ولا يخصّ حساباً، فهو ذاكرة
+  الجهاز لا اللاعب.
+*/
+function saveLastGame(a, b, nameA, nameB) {
+  const tie = a === b;
+  saveJSON('mr_last_game', {
+    tie,
+    winner: tie ? '' : (a > b ? nameA : nameB),
+    high: Math.max(a, b),
+    low: Math.min(a, b),
+    at: Date.now()
+  });
+}
+
+function renderLastGame() {
+  const box = document.getElementById('homeLastGame');
+  if (!box) return;
+
+  const last = loadJSON('mr_last_game', null);
+  if (!last || typeof last.high !== 'number') {
+    box.style.display = 'none';
+    return;
+  }
+
+  const w = document.getElementById('homeLastWinner');
+  const sc = document.getElementById('homeLastScore');
+  if (w) w.textContent = last.tie ? 'تعادل' : `${last.winner} فاز`;
+  if (sc) sc.textContent = `${last.high} – ${last.low}`;
+  box.style.display = '';
+}
+
 function showEndScreen() {
   const a = scores.A;
   const b = scores.B;
@@ -489,6 +522,7 @@ function showEndScreen() {
   }
 
   renderEndSummary();
+  saveLastGame(a, b, nameA, nameB);
 
   showScreen('screen-end');
   Sound.award?.();
@@ -1985,6 +2019,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   updateTotalStats();
+  renderLastGame();
   // نبدأ قراءة قوائم السحب فوراً حتى تكون جاهزة قبل أول دمج من السحابة
   fetchRetiredQuestions();
   fetchRetiredCategories();

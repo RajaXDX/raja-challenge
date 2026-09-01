@@ -35,12 +35,13 @@
   <meta name="twitter:image" content="https://rajaxdx.github.io/raja-challenge/assets/share.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260901c">
-  <link rel="stylesheet" href="css/responsive.css?v=20260901c">
+  <link rel="stylesheet" href="css/style.css?v=20260901d">
+  <link rel="stylesheet" href="css/responsive.css?v=20260901d">
 </head>
-<body>
+<!-- data-screen يُحدَّث في showScreen؛ القيمة هنا للحظة ما قبل أول استدعاء -->
+<body data-screen="screen-home">
 
 <div class="sadu"></div>
 <header>
@@ -112,50 +113,32 @@
 <div class="screen active" id="screen-home">
   <div class="home-container">
     <div class="hero-section">
-      <h2 class="hero-title">مرحباً بك في تحدي رجا 🎮</h2>
-      <p class="hero-subtitle">لعبة أسئلة ذكية للعائلة والأصدقاء</p>
+      <h2 class="hero-title"><span class="ht-1">تحدي</span> <span class="ht-2">رجا</span></h2>
+      <p class="hero-subtitle">
+        فريقان، <span id="totalCategories">--</span> فئة، وأكثر من <span id="totalQuestions">--</span> سؤال.
+        العبوا من جهاز واحد أو بكود روم.
+      </p>
     </div>
 
     <div class="home-buttons">
-      <button class="btn-main btn-primary" onclick="goToModeSelect()">
-        <span class="btn-icon">🎯</span>
+      <button class="btn-main btn-primary home-cta" onclick="goToModeSelect()">
         <span>لعبة جديدة</span>
+        <span class="cta-arrow">←</span>
       </button>
-      <button class="btn-main btn-secondary" onclick="goToProfile()">
-        <span class="btn-icon">📊</span>
-        <span>ملفي والإحصائيات</span>
-      </button>
-      <button class="btn-main btn-secondary" id="friendsHomeBtn" onclick="goToFriends()">
-        <span class="btn-icon">🤝</span>
-        <span>الأصدقاء</span>
-      </button>
-      <button class="btn-main btn-secondary" onclick="showAbout()">
-        <span class="btn-icon">ℹ️</span>
-        <span>عن اللعبة</span>
-      </button>
+
+      <div class="home-grid">
+        <button class="btn-main btn-secondary" onclick="goToProfile()">إحصائياتي</button>
+        <button class="btn-main btn-secondary" id="friendsHomeBtn" onclick="goToFriends()">الأصدقاء</button>
+        <button class="btn-main btn-secondary" onclick="goToRooms()">الرومات</button>
+        <button class="btn-main btn-secondary" onclick="showAbout()">عن اللعبة</button>
+      </div>
     </div>
 
-    <div class="home-stats">
-      <div class="stat-card">
-        <div class="stat-icon">📚</div>
-        <div class="stat-info">
-          <div class="stat-label">أسئلة متاحة</div>
-          <div class="stat-value" id="totalQuestions">--</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📂</div>
-        <div class="stat-info">
-          <div class="stat-label">فئات</div>
-          <div class="stat-value" id="totalCategories">--</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-info">
-          <div class="stat-label">الفرق</div>
-          <div class="stat-value">فريقان</div>
-        </div>
+    <div class="home-last" id="homeLastGame" style="display:none;">
+      <div class="home-last-label">آخر لعبة</div>
+      <div class="home-last-card">
+        <span class="hl-winner" id="homeLastWinner"></span>
+        <span class="hl-score" id="homeLastScore"></span>
       </div>
     </div>
   </div>
@@ -569,17 +552,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260901c"></script>
-<script src="js/utils.js?v=20260901c"></script>
-<script src="js/auth.js?v=20260901c"></script>
-<script src="js/bans.js?v=20260901c"></script>
-<script src="js/friends.js?v=20260901c"></script>
-<script src="js/profile.js?v=20260901c"></script>
-<script src="js/game.js?v=20260901c"></script>
-<script src="js/admin.js?v=20260901c"></script>
-<script src="js/sync.js?v=20260901c"></script>
-<script src="js/rooms.js?v=20260901c"></script>
-<script src="js/chat.js?v=20260901c"></script>
+<script src="js/supabase-config.js?v=20260901d"></script>
+<script src="js/utils.js?v=20260901d"></script>
+<script src="js/auth.js?v=20260901d"></script>
+<script src="js/bans.js?v=20260901d"></script>
+<script src="js/friends.js?v=20260901d"></script>
+<script src="js/profile.js?v=20260901d"></script>
+<script src="js/game.js?v=20260901d"></script>
+<script src="js/admin.js?v=20260901d"></script>
+<script src="js/sync.js?v=20260901d"></script>
+<script src="js/rooms.js?v=20260901d"></script>
+<script src="js/chat.js?v=20260901d"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>
