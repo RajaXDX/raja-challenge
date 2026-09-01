@@ -742,7 +742,7 @@ function burstConfetti(host) {
   const layer = document.createElement('div');
   layer.className = 'confetti-layer';
 
-  const colors = ['#D4AF37', '#3FA796', '#C9A24B', '#EFE3C6', '#27AE60'];
+  const colors = ['#C48D3A', '#E8C37A', '#F0E9DF', '#8A8375', '#8E2A2F'];
   const count = window.innerWidth < 600 ? 40 : 80;
 
   for (let i = 0; i < count; i++) {

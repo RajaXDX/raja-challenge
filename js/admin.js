@@ -1103,18 +1103,18 @@ async function loadAnalytics() {
            ['🏆 اكتملت', count('game_finished')]]
           .map(([l, v]) => `
             <div style="padding:12px;background:rgba(212,175,55,.1);border-radius:8px;text-align:center">
-              <div style="font-size:12px;color:#9FB8AB">${l}</div>
-              <div style="font-size:22px;font-weight:900;color:#D4AF37">${v}</div>
+              <div style="font-size:12px;color:var(--muted)">${l}</div>
+              <div style="font-size:22px;font-weight:900;color:var(--gold)">${v}</div>
             </div>`).join('')}
       </div>
 
       <div style="padding:12px;background:rgba(0,0,0,.2);border-radius:8px;margin-bottom:10px">
         <strong>من أين جاؤوا:</strong>
         ${top.map(([s, n]) => `<div style="display:flex;justify-content:space-between;margin-top:6px">
-            <span>${escapeHtml(s)}</span><b style="color:#D4AF37">${n}</b></div>`).join('') || '<p>—</p>'}
+            <span>${escapeHtml(s)}</span><b style="color:var(--gold)">${n}</b></div>`).join('') || '<p>—</p>'}
       </div>
 
-      <p style="font-size:12px;color:#9FB8AB">
+      <p style="font-size:12px;color:var(--muted)">
         📱 ${Math.round(mobile / rows.length * 100)}% من الجوال ·
         آخر 14 يوماً · ${rows.length} حدث
       </p>`;
@@ -1164,7 +1164,7 @@ async function loadUsers() {
     const fmtDate = d => d ? new Date(d).toLocaleDateString('ar-SA') : '—';
 
     box.innerHTML = `
-      <p style="font-size:13px;color:#9FB8AB;margin-bottom:10px;">${rows.length} حساب</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">${rows.length} حساب</p>
       <div class="users-list">
         ${rows.map(u => {
           const isAdmin = adminIds.has(u.id);

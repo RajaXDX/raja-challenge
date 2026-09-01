@@ -9,7 +9,7 @@
   <!-- أيقونة الموقع -->
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="apple-touch-icon" href="assets/logo.png">
-  <meta name="theme-color" content="#0A1A14">
+  <meta name="theme-color" content="#141110">
 
   <!-- التثبيت على الجوال والعمل بلا إنترنت -->
   <link rel="manifest" href="manifest.json">
@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260901g">
-  <link rel="stylesheet" href="css/responsive.css?v=20260901g">
+  <link rel="stylesheet" href="css/style.css?v=20260901h">
+  <link rel="stylesheet" href="css/responsive.css?v=20260901h">
 </head>
 <!-- data-screen يُحدَّث في showScreen؛ القيمة هنا للحظة ما قبل أول استدعاء -->
 <body data-screen="screen-home">
@@ -469,7 +469,7 @@
     <!-- تبويب اللاعبين -->
     <div class="admin-section" id="tab-users">
       <h3>👥 حسابات اللاعبين</h3>
-      <p style="font-size:13px;color:#9FB8AB;margin-bottom:12px;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
         كلمات المرور غير معروضة — تُحفظ مشفّرة في Supabase ولا يمكن لأحد قراءتها، ولا حتى أنت.
       </p>
       <div id="usersBox"><p style="color:#999">اضغط للتحميل</p></div>
@@ -477,7 +477,7 @@
 
       <div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.2);">
         <h4 style="margin:0 0 8px 0;">⛔ المحظورون</h4>
-        <p style="font-size:12px;color:#9FB8AB;margin-bottom:12px;">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
           الحظر يمنع الحساب <b>وجهازه</b> من الدخول أو إنشاء حساب جديد.
           الحذف وحده لا يمنع العودة — من يُحذف حسابه يسجّل غيره بعد دقيقة.
         </p>
@@ -553,17 +553,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260901g"></script>
-<script src="js/utils.js?v=20260901g"></script>
-<script src="js/auth.js?v=20260901g"></script>
-<script src="js/bans.js?v=20260901g"></script>
-<script src="js/friends.js?v=20260901g"></script>
-<script src="js/profile.js?v=20260901g"></script>
-<script src="js/game.js?v=20260901g"></script>
-<script src="js/admin.js?v=20260901g"></script>
-<script src="js/sync.js?v=20260901g"></script>
-<script src="js/rooms.js?v=20260901g"></script>
-<script src="js/chat.js?v=20260901g"></script>
+<script src="js/supabase-config.js?v=20260901h"></script>
+<script src="js/utils.js?v=20260901h"></script>
+<script src="js/auth.js?v=20260901h"></script>
+<script src="js/bans.js?v=20260901h"></script>
+<script src="js/friends.js?v=20260901h"></script>
+<script src="js/profile.js?v=20260901h"></script>
+<script src="js/game.js?v=20260901h"></script>
+<script src="js/admin.js?v=20260901h"></script>
+<script src="js/sync.js?v=20260901h"></script>
+<script src="js/rooms.js?v=20260901h"></script>
+<script src="js/chat.js?v=20260901h"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

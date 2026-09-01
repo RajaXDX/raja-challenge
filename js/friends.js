@@ -163,7 +163,7 @@ async function renderFriendsScreen(keepMessage) {
     if (msg) { msg.textContent = ''; msg.className = 'auth-message'; }
   }
 
-  box.innerHTML = '<p style="color:#9FB8AB">جاري التحميل...</p>';
+  box.innerHTML = '<p style="color:var(--muted)">جاري التحميل...</p>';
   const f = await loadFriends();
 
   const row = (item, kind) => `

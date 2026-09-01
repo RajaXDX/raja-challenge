@@ -39,6 +39,11 @@ function canvasSignature() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return 'no-canvas';
 
+    /*
+      ⚠️ هذه الألوان **بذرة بصمة لا ألوان واجهة**. الناتج يُهشَّم إلى معرّف
+      الجهاز، فتغييرها — ولو ضمن تحديث لوحة ألوان — يبدّل بصمة كل الأجهزة
+      فتسقط الحظورات القائمة وينقطع ربط `device_accounts`. لا تلمسها.
+    */
     ctx.textBaseline = 'top';
     ctx.font = '16px "Cairo", Arial';
     ctx.fillStyle = '#3FA796';
@@ -353,7 +358,7 @@ async function loadBans() {
     const rows = data || [];
 
     if (!rows.length) {
-      box.innerHTML = '<p style="color:#9FB8AB">لا يوجد محظورون. 👍</p>';
+      box.innerHTML = '<p style="color:var(--muted)">لا يوجد محظورون. 👍</p>';
       return;
     }
 
@@ -362,7 +367,7 @@ async function loadBans() {
     const short = t => t ? escapeHtml(String(t).slice(0, 10)) + '…' : '';
 
     box.innerHTML = `
-      <p style="font-size:13px;color:#9FB8AB;margin-bottom:10px;">${rows.length} حظر نشط</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">${rows.length} حظر نشط</p>
       <div class="users-list">
         ${rows.map(r => `
           <div class="user-row is-banned">
