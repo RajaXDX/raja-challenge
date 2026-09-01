@@ -165,7 +165,7 @@ function formatBytes(bytes) {
 
   السبب: البنك كله يُحفظ في localStorage (~5MB) ويُدفع كاملاً إلى السحابة عند
   كل تعديل، وdata URL يضخّم الملف ~33%. فمقطع واحد كان يلتهم مساحة البنك كله،
-  ولذلك كان الحدّ 1MB (~15 ثانية). بالرابط: المقطع حتى 50MB، والعدد غير محدود،
+  ولذلك كان الحدّ 1MB (~15 ثانية). بالرابط: المقطع حتى 100MB، والعدد غير محدود،
   والبنك يبقى نصّاً خفيفاً كما كان.
 
   الأسئلة القديمة تحمل data URL في نفس الحقل `video`، و<video src> يقبل الاثنين
@@ -174,7 +174,7 @@ function formatBytes(bytes) {
   الدلو وسياساته في `supabase-storage.sql` (يُشغَّل مرة واحدة).
 */
 const QUESTION_MEDIA_BUCKET = 'question-media';
-const VIDEO_MAX_BYTES = 50 * 1024 * 1024;    // نفس سقف الدلو في supabase-storage.sql
+const VIDEO_MAX_BYTES = 100 * 1024 * 1024;   // نفس سقف الدلو في supabase-storage.sql
 const VIDEO_INLINE_MAX_BYTES = 1024 * 1024;  // السقف حين لا سحابة: المقطع يسكن البنك
 
 // لا نثق باسم الملف الأصلي داخل مسار التخزين (مسافات، حروف عربية، ../)
@@ -206,6 +206,15 @@ async function uploadVideoFile(file) {
     }
     if (/policy|unauthorized|403|401|violates|permission/i.test(msg)) {
       throw new Error('الرفع مرفوض — سجّل دخول الإدمن أولاً (المخزن يقبل الرفع من الإدمن فقط).');
+    }
+    // الخادم له سقفه الخاص وقد يكون أقلّ من VIDEO_MAX_BYTES: سقف الدلو في
+    // `supabase-storage.sql`، وفوقه الحدّ العام للمشروع (50MB في المجاني)
+    if (/payload too large|413|exceeded the maximum allowed size/i.test(msg)) {
+      throw new Error(
+        `المقطع (${formatBytes(file.size)}) تجاوز سقف المخزن في Supabase.
+` +
+        `اضغطه إلى 480p، أو ارفع السقف من Dashboard ← Storage ← Settings.`
+      );
     }
     throw new Error('تعذّر رفع الفيديو: ' + msg);
   }
