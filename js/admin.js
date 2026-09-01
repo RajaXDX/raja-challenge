@@ -325,6 +325,9 @@ let pendingQuestionImage = null;
 // المقطع الصوتي المختار لسؤال جديد لم يُضف بعد
 let pendingQuestionAudio = null;
 
+// مقطع الفيديو المختار لسؤال جديد لم يُضف بعد
+let pendingQuestionVideo = null;
+
 // حدّ آمن دون سقف localStorage (~5MB): نرفض قبل الامتلاء لا بعده.
 // الامتلاء بلا حارس يعني فشل الحفظ صامتاً وضياع البنك كلّه.
 const BANK_SIZE_LIMIT = 4 * 1024 * 1024;
@@ -486,6 +489,76 @@ async function removeQuestionImage(cat, diffKey, idx) {
   renderBankList();
 }
 
+/* ---- فيديو الأسئلة ---- */
+
+async function previewNewQuestionVideo() {
+  const input = document.getElementById('newQVideo');
+  const box = document.getElementById('newQVideoPreview');
+  const file = input?.files?.[0];
+  if (!file) { clearNewQuestionVideo(); return; }
+
+  try {
+    pendingQuestionVideo = await readVideoFile(file);
+    if (box) {
+      box.innerHTML =
+        `<video controls preload="metadata" src="${pendingQuestionVideo}"></video>
+         <span>${formatBytes(dataUrlBytes(pendingQuestionVideo))}</span>
+         <button type="button" class="del-q" onclick="clearNewQuestionVideo()">✕</button>`;
+    }
+  } catch (e) {
+    uiAlert(`❌ ${e.message}`);
+    clearNewQuestionVideo();
+  }
+}
+
+function clearNewQuestionVideo() {
+  pendingQuestionVideo = null;
+  const input = document.getElementById('newQVideo');
+  const box = document.getElementById('newQVideoPreview');
+  if (input) input.value = '';
+  if (box) box.innerHTML = '';
+}
+
+// إلصاق فيديو بسؤال موجود — يخدم فئات مثل «ميمز» و«صوت المشهور» بمقطع مرئي
+async function attachVideoToQuestion(cat, diffKey, idx) {
+  if (!isAdminLoggedIn) { uiAlert('❌ يجب تسجيل الدخول كإدمن أولاً'); return; }
+  const item = QBANK[cat]?.[diffKey]?.[idx];
+  if (!item) return;
+
+  const picker = document.createElement('input');
+  picker.type = 'file';
+  picker.accept = 'video/*';
+  picker.onchange = async () => {
+    const file = picker.files?.[0];
+    if (!file) return;
+    try {
+      const previous = item.video;
+      item.video = await readVideoFile(file);
+      if (!saveBankWithImages()) {
+        if (previous) item.video = previous; else delete item.video;
+        return;
+      }
+      pushToCloud();
+      renderBankList();
+      log(`🎬 أُلصق فيديو بسؤال في ${cat}`, 'success');
+      uiAlert('✅ تم إلصاق الفيديو بالسؤال');
+    } catch (e) {
+      uiAlert(`❌ ${e.message}`);
+    }
+  };
+  picker.click();
+}
+
+async function removeQuestionVideo(cat, diffKey, idx) {
+  const item = QBANK[cat]?.[diffKey]?.[idx];
+  if (!item?.video) return;
+  if (!await uiConfirm('حذف فيديو هذا السؤال؟')) return;
+  delete item.video;
+  saveBankWithImages();
+  pushToCloud();
+  renderBankList();
+}
+
 function addBankQuestion() {
   // ✅ حماية أمنية: فقط الإدمن يمكنه إضافة أسئلة
   if (!isAdminLoggedIn) {
@@ -517,6 +590,7 @@ function addBankQuestion() {
   };
   if (pendingQuestionImage) entry.image = pendingQuestionImage;
   if (pendingQuestionAudio) entry.audio = pendingQuestionAudio;
+  if (pendingQuestionVideo) entry.video = pendingQuestionVideo;
 
   QBANK[cat][diffKey].push(entry);
 
@@ -531,6 +605,7 @@ function addBankQuestion() {
   document.getElementById('newQEmoji').value = '';
   clearNewQuestionImage();
   clearNewQuestionAudio();
+  clearNewQuestionVideo();
 
   log(`✅ تمت إضافة سؤال جديد في فئة ${cat}`, 'success');
   Sound.award();
@@ -599,6 +674,19 @@ function renderBankList() {
       const rmAud = createElement('button', { class: 'img-q', title: 'حذف الصوت' }, '🔇');
       rmAud.onclick = () => removeQuestionAudio(cat, diffKey, idx);
       row.appendChild(rmAud);
+    }
+
+    const vidBtn = createElement('button', {
+      class: 'img-q',
+      title: item.video ? 'استبدال الفيديو' : 'إلصاق فيديو'
+    }, '🎬');
+    vidBtn.onclick = () => attachVideoToQuestion(cat, diffKey, idx);
+    row.appendChild(vidBtn);
+
+    if (item.video) {
+      const rmVid = createElement('button', { class: 'img-q', title: 'حذف الفيديو' }, '⛔');
+      rmVid.onclick = () => removeQuestionVideo(cat, diffKey, idx);
+      row.appendChild(rmVid);
     }
 
     const delBtn = createElement('button', { class: 'del-q', title: 'حذف' }, '✕');

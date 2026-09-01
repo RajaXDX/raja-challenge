@@ -157,6 +157,39 @@ function formatBytes(bytes) {
   return `${(n / (1024 * 1024)).toFixed(2)} ميجابايت`;
 }
 
+/* ---- VIDEO ---- */
+
+/*
+  الفيديو أثقل ما يمكن وضعه في البنك: مثل الصوت لا يُضغط في المتصفح، وأكبر
+  منه بمراتب. والبنك كله (نصّاً وصوراً وصوتاً وفيديو) يُحفظ في localStorage
+  (~5MB) ويُدفع كاملاً إلى Supabase عند كل تعديل.
+  1MB ≈ 15–20 ثانية بجودة 480p — تكفي مقطعاً يُسأل عنه، ولا تكفي فيديو طويلاً.
+  إن احتجت مقاطع أطول أو كثيرة: Supabase Storage ورابط بدل data URL.
+*/
+const VIDEO_MAX_BYTES = 1024 * 1024;
+
+function readVideoFile(file, maxBytes = VIDEO_MAX_BYTES) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('video/')) {
+      reject(new Error('الملف ليس مقطع فيديو'));
+      return;
+    }
+    if (file.size > maxBytes) {
+      reject(new Error(
+        `المقطع كبير (${formatBytes(file.size)}) — الحدّ ${formatBytes(maxBytes)}.
+` +
+        `اقتصّ المقطع أو صغّر دقّته (480p تكفي داخل نافذة السؤال).`
+      ));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('تعذّرت قراءة الملف'));
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+}
+
 /* ---- SCREEN NAVIGATION ---- */
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));

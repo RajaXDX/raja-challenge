@@ -1636,6 +1636,10 @@ function questionVisual(item, id = '') {
                    onload="capPhotoUpscale(this)">
             </div>`;
   }
+  // مع فيديو، المقطع نفسه هو الصورة — مربّع الإيموجي فوقه حشو يزاحمه
+  // على ارتفاع الشاشة بلا فائدة. (الصوت يختلف: لا شيء يُرى معه.)
+  if (item?.video) return '';
+
   return `<div class="qimg"${idAttr}>${escapeHtml(item?.emoji || '❓')}</div>`;
 }
 
@@ -1644,6 +1648,14 @@ function questionAudio(item) {
   if (!item?.audio) return '';
   return `<div class="qaudio">
             <audio controls preload="metadata" src="${escapeHtml(item.audio)}"></audio>
+          </div>`;
+}
+
+// مشغّل فيديو السؤال — لمقاطع «ميمز» وما شابهها حيث المقطع هو السؤال
+function questionVideo(item) {
+  if (!item?.video) return '';
+  return `<div class="qvideo">
+            <video controls preload="metadata" playsinline src="${escapeHtml(item.video)}"></video>
           </div>`;
 }
 
@@ -1660,6 +1672,7 @@ function renderQuestionBody(item) {
   body.innerHTML = `
     ${questionVisual(item, 'qimg')}
     ${questionAudio(item)}
+    ${questionVideo(item)}
     <div class="qtext" id="qtext">${item.question}</div>
     <div class="atext" id="atext">${item.answer}</div>
   `;
@@ -2554,6 +2567,7 @@ function renderChoices(item) {
   body.innerHTML = `
     ${questionVisual(item)}
     ${questionAudio(item)}
+    ${questionVideo(item)}
     <div class="qtext">${escapeHtml(item.question)}</div>
     <div class="choice-hint">${
       done ? '' : (mine ? '👈 اختر إجابتك' : `⏳ ${escapeHtml(turn?.name || 'لاعب آخر')} يجيب الآن`)
