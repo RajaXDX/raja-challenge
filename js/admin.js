@@ -535,20 +535,22 @@ async function previewNewQuestionVideo() {
   const input = document.getElementById('newQVideo');
   const box = document.getElementById('newQVideoPreview');
   const file = input?.files?.[0];
-  if (!file) { clearNewQuestionVideo(); return; }
+  if (!file) { discardNewQuestionVideo(); return; }
 
-  if (box) box.innerHTML = '<span>⏳ جاري قراءة الفيديو…</span>';
-  const job = readVideoFile(file);
+  // الرفع للسحابة قد يأخذ وقتاً محسوساً مع مقطع بعشرات الميجات — نقول ذلك
+  if (box) box.innerHTML = '<span>⏳ جاري رفع الفيديو…</span>';
+  const job = storeVideoFile(file);
   inflightMedia.video = job;
   setAddQuestionBusy();
 
   try {
     pendingQuestionVideo = await job;
     if (box) {
+      // الحجم من الملف نفسه لا من الحقل: الحقل صار رابطاً لا data URL
       box.innerHTML =
-        `<video controls preload="metadata" src="${pendingQuestionVideo}"></video>
-         <span>${formatBytes(dataUrlBytes(pendingQuestionVideo))}</span>
-         <button type="button" class="del-q" onclick="clearNewQuestionVideo()">✕</button>`;
+        `<video controls preload="metadata" src="${escapeHtml(pendingQuestionVideo)}"></video>
+         <span>${formatBytes(file.size)}</span>
+         <button type="button" class="del-q" onclick="discardNewQuestionVideo()">✕</button>`;
     }
   } catch (e) {
     uiAlert(`❌ ${e.message}`);
@@ -557,6 +559,15 @@ async function previewNewQuestionVideo() {
     if (inflightMedia.video === job) inflightMedia.video = null;
     setAddQuestionBusy();
   }
+}
+
+// إلغاء صريح من المستخدم: المقطع رُفع للمخزن ولن يُربط بأي سؤال، فنحذفه.
+// منفصلة عن clearNewQuestionVideo لأن تلك تُستدعى أيضاً **بعد** حفظ السؤال —
+// وهناك الرابط صار ملك السؤال، وحذفه يكسره.
+function discardNewQuestionVideo() {
+  const dropped = pendingQuestionVideo;
+  clearNewQuestionVideo();
+  deleteStoredVideo(dropped);
 }
 
 function clearNewQuestionVideo() {
@@ -581,11 +592,15 @@ async function attachVideoToQuestion(cat, diffKey, idx) {
     if (!file) return;
     try {
       const previous = item.video;
-      item.video = await readVideoFile(file);
+      item.video = await storeVideoFile(file);
       if (!saveBankWithImages()) {
+        // فشل الحفظ ⇒ الرفع صار بلا صاحب: نُرجع القديم وننظّف الجديد
+        const orphan = item.video;
         if (previous) item.video = previous; else delete item.video;
+        deleteStoredVideo(orphan);
         return;
       }
+      deleteStoredVideo(previous);   // المقطع المستبدَل لم يعد يشير إليه شيء
       pushToCloud();
       renderBankList();
       log(`🎬 أُلصق فيديو بسؤال في ${cat}`, 'success');
@@ -601,8 +616,10 @@ async function removeQuestionVideo(cat, diffKey, idx) {
   const item = QBANK[cat]?.[diffKey]?.[idx];
   if (!item?.video) return;
   if (!await uiConfirm('حذف فيديو هذا السؤال؟')) return;
+  const removed = item.video;
   delete item.video;
   saveBankWithImages();
+  deleteStoredVideo(removed);
   pushToCloud();
   renderBankList();
 }

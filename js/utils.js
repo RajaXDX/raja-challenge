@@ -160,15 +160,106 @@ function formatBytes(bytes) {
 /* ---- VIDEO ---- */
 
 /*
-  الفيديو أثقل ما يمكن وضعه في البنك: مثل الصوت لا يُضغط في المتصفح، وأكبر
-  منه بمراتب. والبنك كله (نصّاً وصوراً وصوتاً وفيديو) يُحفظ في localStorage
-  (~5MB) ويُدفع كاملاً إلى Supabase عند كل تعديل.
-  1MB ≈ 15–20 ثانية بجودة 480p — تكفي مقطعاً يُسأل عنه، ولا تكفي فيديو طويلاً.
-  إن احتجت مقاطع أطول أو كثيرة: Supabase Storage ورابط بدل data URL.
-*/
-const VIDEO_MAX_BYTES = 1024 * 1024;
+  الفيديو لم يعد يسكن بنك الأسئلة، بل **Supabase Storage**، ويُحفظ في السؤال
+  رابطه فقط.
 
-function readVideoFile(file, maxBytes = VIDEO_MAX_BYTES) {
+  السبب: البنك كله يُحفظ في localStorage (~5MB) ويُدفع كاملاً إلى السحابة عند
+  كل تعديل، وdata URL يضخّم الملف ~33%. فمقطع واحد كان يلتهم مساحة البنك كله،
+  ولذلك كان الحدّ 1MB (~15 ثانية). بالرابط: المقطع حتى 50MB، والعدد غير محدود،
+  والبنك يبقى نصّاً خفيفاً كما كان.
+
+  الأسئلة القديمة تحمل data URL في نفس الحقل `video`، و<video src> يقبل الاثنين
+  بلا فرق — فلا شيء ينكسر ولا حاجة لترحيل.
+
+  الدلو وسياساته في `supabase-storage.sql` (يُشغَّل مرة واحدة).
+*/
+const QUESTION_MEDIA_BUCKET = 'question-media';
+const VIDEO_MAX_BYTES = 50 * 1024 * 1024;    // نفس سقف الدلو في supabase-storage.sql
+const VIDEO_INLINE_MAX_BYTES = 1024 * 1024;  // السقف حين لا سحابة: المقطع يسكن البنك
+
+// لا نثق باسم الملف الأصلي داخل مسار التخزين (مسافات، حروف عربية، ../)
+function makeVideoObjectPath(file) {
+  const m = /\.([a-zA-Z0-9]{1,5})$/.exec(file.name || '');
+  const ext = m ? m[1].toLowerCase() : 'mp4';
+  const rand = Math.random().toString(36).slice(2, 10);
+  return `videos/${Date.now()}-${rand}.${ext}`;
+}
+
+// هل هذا الحقل رابط داخل دلونا؟ (لتمييزه عن data URL القديم عند الحذف)
+function isStoredVideoUrl(value) {
+  const v = String(value || '');
+  return v.startsWith('http') && v.includes(`/${QUESTION_MEDIA_BUCKET}/`);
+}
+
+async function uploadVideoFile(file) {
+  const path = makeVideoObjectPath(file);
+
+  const { error } = await supa.storage
+    .from(QUESTION_MEDIA_BUCKET)
+    .upload(path, file, { contentType: file.type || 'video/mp4', upsert: false });
+
+  if (error) {
+    // رسائل Storage الخام إنجليزية وغامضة — نترجم الحالتين المتوقّعتين فعلاً
+    const msg = String(error.message || error);
+    if (/bucket/i.test(msg) && /not.?found|exist/i.test(msg)) {
+      throw new Error('مخزن الفيديو غير موجود — شغّل `supabase-storage.sql` في Supabase مرة واحدة.');
+    }
+    if (/policy|unauthorized|403|401|violates|permission/i.test(msg)) {
+      throw new Error('الرفع مرفوض — سجّل دخول الإدمن أولاً (المخزن يقبل الرفع من الإدمن فقط).');
+    }
+    throw new Error('تعذّر رفع الفيديو: ' + msg);
+  }
+
+  const { data } = supa.storage.from(QUESTION_MEDIA_BUCKET).getPublicUrl(path);
+  if (!data?.publicUrl) throw new Error('رُفع الفيديو لكن تعذّر الحصول على رابطه');
+  return data.publicUrl;
+}
+
+// حذف المقطع من المخزن بعد أن يُنزع من السؤال — وإلا بقي الدلو يمتلئ بمقاطع
+// لا يشير إليها شيء. أفضل جهد: فشل الحذف لا يُبطل نزع الفيديو من السؤال.
+async function deleteStoredVideo(url) {
+  if (!supa || !isStoredVideoUrl(url)) return;
+  const i = String(url).indexOf(`/${QUESTION_MEDIA_BUCKET}/`);
+  const path = String(url).slice(i + QUESTION_MEDIA_BUCKET.length + 2).split('?')[0];
+  if (!path) return;
+  try {
+    await supa.storage.from(QUESTION_MEDIA_BUCKET).remove([decodeURIComponent(path)]);
+  } catch (e) {
+    console.warn('تعذّر حذف الفيديو من المخزن:', e);
+  }
+}
+
+// المدخل الوحيد لإضافة فيديو: يُعيد رابطاً، أو data URL حين لا سحابة
+async function storeVideoFile(file) {
+  if (!file || !file.type.startsWith('video/')) {
+    throw new Error('الملف ليس مقطع فيديو');
+  }
+  if (file.size > VIDEO_MAX_BYTES) {
+    throw new Error(
+      `المقطع كبير (${formatBytes(file.size)}) — الحدّ ${formatBytes(VIDEO_MAX_BYTES)}.
+` +
+      `اقتصّ المقطع أو صغّر دقّته (480p تكفي داخل نافذة السؤال).`
+    );
+  }
+
+  // بلا شبكة لا يُجدي الرفع؛ نعود للطريقة القديمة بدل أن نمنع العمل أصلاً.
+  // (navigator.onLine كاذب أحياناً بالإيجاب، لكنه صادق دائماً بالنفي — وهذا
+  //  ما نحتاجه هنا: أي فشل شبكة رغم onLine يبقى خطأً صريحاً لا فشلاً صامتاً.)
+  if (supa && navigator.onLine !== false) return uploadVideoFile(file);
+
+  // بلا سحابة يسكن المقطع البنك نفسه، فالحدّ الضيّق القديم يبقى قائماً
+  if (file.size > VIDEO_INLINE_MAX_BYTES) {
+    throw new Error(
+      `لا اتصال بالسحابة، والمقطع (${formatBytes(file.size)}) أكبر من ` +
+      `${formatBytes(VIDEO_INLINE_MAX_BYTES)} — وهو حدّ التخزين المحلي.
+` +
+      `اتصل بالإنترنت وسجّل دخول الإدمن لرفع مقاطع أكبر.`
+    );
+  }
+  return readVideoFile(file, VIDEO_INLINE_MAX_BYTES);
+}
+
+function readVideoFile(file, maxBytes = VIDEO_INLINE_MAX_BYTES) {
   return new Promise((resolve, reject) => {
     if (!file || !file.type.startsWith('video/')) {
       reject(new Error('الملف ليس مقطع فيديو'));
