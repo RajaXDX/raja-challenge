@@ -322,6 +322,9 @@ function populateBankCatSelect() {
 // الصورة المختارة لسؤال جديد لم يُضف بعد
 let pendingQuestionImage = null;
 
+// المقطع الصوتي المختار لسؤال جديد لم يُضف بعد
+let pendingQuestionAudio = null;
+
 // حدّ آمن دون سقف localStorage (~5MB): نرفض قبل الامتلاء لا بعده.
 // الامتلاء بلا حارس يعني فشل الحفظ صامتاً وضياع البنك كلّه.
 const BANK_SIZE_LIMIT = 4 * 1024 * 1024;
@@ -371,6 +374,76 @@ function clearNewQuestionImage() {
   const box = document.getElementById('newQImagePreview');
   if (input) input.value = '';
   if (box) box.innerHTML = '';
+}
+
+/* ---- أصوات الأسئلة ---- */
+
+async function previewNewQuestionAudio() {
+  const input = document.getElementById('newQAudio');
+  const box = document.getElementById('newQAudioPreview');
+  const file = input?.files?.[0];
+  if (!file) { clearNewQuestionAudio(); return; }
+
+  try {
+    pendingQuestionAudio = await readAudioFile(file);
+    if (box) {
+      box.innerHTML =
+        `<audio controls src="${pendingQuestionAudio}"></audio>
+         <span>${formatBytes(dataUrlBytes(pendingQuestionAudio))}</span>
+         <button type="button" class="del-q" onclick="clearNewQuestionAudio()">✕</button>`;
+    }
+  } catch (e) {
+    uiAlert(`❌ ${e.message}`);
+    clearNewQuestionAudio();
+  }
+}
+
+function clearNewQuestionAudio() {
+  pendingQuestionAudio = null;
+  const input = document.getElementById('newQAudio');
+  const box = document.getElementById('newQAudioPreview');
+  if (input) input.value = '';
+  if (box) box.innerHTML = '';
+}
+
+// إلصاق صوت بسؤال موجود — يخدم فئات مثل «صوت المشهور» و«أغاني وطنية»
+async function attachAudioToQuestion(cat, diffKey, idx) {
+  if (!isAdminLoggedIn) { uiAlert('❌ يجب تسجيل الدخول كإدمن أولاً'); return; }
+  const item = QBANK[cat]?.[diffKey]?.[idx];
+  if (!item) return;
+
+  const picker = document.createElement('input');
+  picker.type = 'file';
+  picker.accept = 'audio/*';
+  picker.onchange = async () => {
+    const file = picker.files?.[0];
+    if (!file) return;
+    try {
+      const previous = item.audio;
+      item.audio = await readAudioFile(file);
+      if (!saveBankWithImages()) {
+        if (previous) item.audio = previous; else delete item.audio;
+        return;
+      }
+      pushToCloud();
+      renderBankList();
+      log(`🔊 أُلصق صوت بسؤال في ${cat}`, 'success');
+      uiAlert('✅ تم إلصاق الصوت بالسؤال');
+    } catch (e) {
+      uiAlert(`❌ ${e.message}`);
+    }
+  };
+  picker.click();
+}
+
+async function removeQuestionAudio(cat, diffKey, idx) {
+  const item = QBANK[cat]?.[diffKey]?.[idx];
+  if (!item?.audio) return;
+  if (!await uiConfirm('حذف صوت هذا السؤال؟')) return;
+  delete item.audio;
+  saveBankWithImages();
+  pushToCloud();
+  renderBankList();
 }
 
 // إلصاق صورة بسؤال موجود — هذا ما يجعل فئات الشعارات والمشاهير قابلة للعب
@@ -443,6 +516,7 @@ function addBankQuestion() {
     imageQuery: ''
   };
   if (pendingQuestionImage) entry.image = pendingQuestionImage;
+  if (pendingQuestionAudio) entry.audio = pendingQuestionAudio;
 
   QBANK[cat][diffKey].push(entry);
 
@@ -456,6 +530,7 @@ function addBankQuestion() {
   document.getElementById('newQAnswer').value = '';
   document.getElementById('newQEmoji').value = '';
   clearNewQuestionImage();
+  clearNewQuestionAudio();
 
   log(`✅ تمت إضافة سؤال جديد في فئة ${cat}`, 'success');
   Sound.award();
@@ -511,6 +586,19 @@ function renderBankList() {
       const rmImg = createElement('button', { class: 'img-q', title: 'حذف الصورة' }, '🚫');
       rmImg.onclick = () => removeQuestionImage(cat, diffKey, idx);
       row.appendChild(rmImg);
+    }
+
+    const audBtn = createElement('button', {
+      class: 'img-q',
+      title: item.audio ? 'استبدال الصوت' : 'إلصاق صوت'
+    }, '🔊');
+    audBtn.onclick = () => attachAudioToQuestion(cat, diffKey, idx);
+    row.appendChild(audBtn);
+
+    if (item.audio) {
+      const rmAud = createElement('button', { class: 'img-q', title: 'حذف الصوت' }, '🔇');
+      rmAud.onclick = () => removeQuestionAudio(cat, diffKey, idx);
+      row.appendChild(rmAud);
     }
 
     const delBtn = createElement('button', { class: 'del-q', title: 'حذف' }, '✕');

@@ -1639,6 +1639,14 @@ function questionVisual(item, id = '') {
   return `<div class="qimg"${idAttr}>${escapeHtml(item?.emoji || '❓')}</div>`;
 }
 
+// مشغّل صوت السؤال — لفئات مثل «صوت المشهور» حيث المقطع هو السؤال نفسه
+function questionAudio(item) {
+  if (!item?.audio) return '';
+  return `<div class="qaudio">
+            <audio controls preload="metadata" src="${escapeHtml(item.audio)}"></audio>
+          </div>`;
+}
+
 function renderQuestionBody(item) {
   const body = document.getElementById('qbody');
   if (!body) return;
@@ -1651,6 +1659,7 @@ function renderQuestionBody(item) {
 
   body.innerHTML = `
     ${questionVisual(item, 'qimg')}
+    ${questionAudio(item)}
     <div class="qtext" id="qtext">${item.question}</div>
     <div class="atext" id="atext">${item.answer}</div>
   `;
@@ -2544,6 +2553,7 @@ function renderChoices(item) {
 
   body.innerHTML = `
     ${questionVisual(item)}
+    ${questionAudio(item)}
     <div class="qtext">${escapeHtml(item.question)}</div>
     <div class="choice-hint">${
       done ? '' : (mine ? '👈 اختر إجابتك' : `⏳ ${escapeHtml(turn?.name || 'لاعب آخر')} يجيب الآن`)

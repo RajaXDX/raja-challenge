@@ -111,6 +111,38 @@ function downscaleImageFile(file, maxDim = IMAGE_MAX_DIM, quality = IMAGE_QUALIT
   });
 }
 
+/* ---- AUDIO ---- */
+
+/*
+  الصوت يُخزَّن مثل الصورة تماماً: data URL داخل بنك الأسئلة، ويُدفع كاملاً إلى
+  localStorage (~5MB) وإلى Supabase. لكن الصوت — بخلاف الصورة — لا يمكن
+  «تصغيره» في المتصفح، فالحارس الوحيد هو رفض الملف الكبير قبل قراءته.
+  400 كيلوبايت ≈ 50 ثانية بجودة 64kbps، وهي أكثر من كافية لمقطع «صوت المشهور».
+*/
+const AUDIO_MAX_BYTES = 400 * 1024;
+
+function readAudioFile(file, maxBytes = AUDIO_MAX_BYTES) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('audio/')) {
+      reject(new Error('الملف ليس مقطعاً صوتياً'));
+      return;
+    }
+    if (file.size > maxBytes) {
+      reject(new Error(
+        `المقطع كبير (${formatBytes(file.size)}) — الحدّ ${formatBytes(maxBytes)}.
+` +
+        `اقتصّ المقطع أو استخدم جودة أقل (64kbps تكفي).`
+      ));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('تعذّرت قراءة الملف'));
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+}
+
 // حجم نصّ data URL بالبايت تقريباً (base64 يزيد الحجم ~33%)
 function dataUrlBytes(dataUrl) {
   const i = String(dataUrl || '').indexOf(',');
