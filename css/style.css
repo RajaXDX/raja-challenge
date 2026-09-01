@@ -198,18 +198,23 @@ header {
   ويُعمي اللاعب عن انقطاع المزامنة أثناء لعبة أونلاين.
   باقي الشاشات تبقى كما هي حتى تُنقل إلى التصميم الجديد بدورها.
 */
-body[data-screen="screen-home"] .sadu,
 body[data-screen="screen-home"] .sadu-strip,
 body[data-screen="screen-home"] header .brand-row,
 body[data-screen="screen-home"] header .tag,
 body[data-screen="screen-home"] footer,
-body[data-screen="screen-game"] .sadu,
 body[data-screen="screen-game"] .sadu-strip,
 body[data-screen="screen-game"] header .brand-row,
 body[data-screen="screen-game"] header .tag,
 body[data-screen="screen-game"] footer {
   display: none;
 }
+
+/*
+  شريط السدو العلوي يظهر في **كل** الشاشات بطلب المستخدم — هو الأثر التراثي
+  الوحيد الباقي بعد أن انكمشت الترويسة. أمّا الشريط الرفيع الثاني فيبقى
+  مخفياً هنا: الترويسة على هاتين الشاشتين سطر رفيع، فشريطان يحصرانه يجعلانه
+  حشواً بين نقشتين.
+*/
 
 body[data-screen="screen-home"] header,
 body[data-screen="screen-game"] header {
