@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260901b">
-  <link rel="stylesheet" href="css/responsive.css?v=20260901b">
+  <link rel="stylesheet" href="css/style.css?v=20260901c">
+  <link rel="stylesheet" href="css/responsive.css?v=20260901c">
 </head>
 <body>
 
@@ -444,7 +444,7 @@
         <label class="admin-file-label" for="newQVideo">🎬 فيديو السؤال (اختياري)</label>
         <input type="file" id="newQVideo" accept="video/*" class="admin-file" onchange="previewNewQuestionVideo()">
         <div id="newQVideoPreview" class="q-video-preview"></div>
-        <button class="btn btn-answer" onclick="addBankQuestion()">+ إضافة سؤال</button>
+        <button class="btn btn-answer" id="addQuestionBtn" onclick="addBankQuestion()">+ إضافة سؤال</button>
       </div>
       <div class="admin-row" style="flex-direction:column; align-items:stretch; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
         <h4 style="margin: 0 0 12px 0;">📸 مكتبة الصور</h4>
@@ -569,17 +569,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260901b"></script>
-<script src="js/utils.js?v=20260901b"></script>
-<script src="js/auth.js?v=20260901b"></script>
-<script src="js/bans.js?v=20260901b"></script>
-<script src="js/friends.js?v=20260901b"></script>
-<script src="js/profile.js?v=20260901b"></script>
-<script src="js/game.js?v=20260901b"></script>
-<script src="js/admin.js?v=20260901b"></script>
-<script src="js/sync.js?v=20260901b"></script>
-<script src="js/rooms.js?v=20260901b"></script>
-<script src="js/chat.js?v=20260901b"></script>
+<script src="js/supabase-config.js?v=20260901c"></script>
+<script src="js/utils.js?v=20260901c"></script>
+<script src="js/auth.js?v=20260901c"></script>
+<script src="js/bans.js?v=20260901c"></script>
+<script src="js/friends.js?v=20260901c"></script>
+<script src="js/profile.js?v=20260901c"></script>
+<script src="js/game.js?v=20260901c"></script>
+<script src="js/admin.js?v=20260901c"></script>
+<script src="js/sync.js?v=20260901c"></script>
+<script src="js/rooms.js?v=20260901c"></script>
+<script src="js/chat.js?v=20260901c"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

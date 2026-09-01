@@ -328,6 +328,30 @@ let pendingQuestionAudio = null;
 // مقطع الفيديو المختار لسؤال جديد لم يُضف بعد
 let pendingQuestionVideo = null;
 
+/*
+  ⚠️ قراءة الملف غير متزامنة، و«+ إضافة سؤال» متزامن.
+  فبين اختيار الملف وانتهاء قراءته تبقى pendingQuestion* فارغة — ومن يضغط
+  «إضافة» في تلك اللحظة يُضاف سؤاله **بلا وسائط وبلا أي رسالة خطأ**.
+  والفيديو أبطأ ما يُقرأ، فهو أول من يقع في هذه الفجوة.
+  العلاج ثلاثي: نُبقي وعد القراءة هنا ليُنتظر، ونعطّل الزر أثناءها، ونُظهر
+  «جاري القراءة» حتى لا تبدو الخانة فارغة بلا سبب.
+*/
+const inflightMedia = { image: null, audio: null, video: null };
+
+function setAddQuestionBusy() {
+  const btn = document.getElementById('addQuestionBtn');
+  if (!btn) return;
+  const busy = !!(inflightMedia.image || inflightMedia.audio || inflightMedia.video);
+  btn.disabled = busy;
+  btn.textContent = busy ? '⏳ جاري قراءة الملف…' : '+ إضافة سؤال';
+}
+
+// ينتظر أي قراءة لم تنتهِ. allSettled: الملف المرفوض أبلغ عن نفسه أصلاً
+// ولا يجوز أن يمنع إضافة السؤال ببقية وسائطه.
+function awaitPendingMedia() {
+  return Promise.allSettled([inflightMedia.image, inflightMedia.audio, inflightMedia.video]);
+}
+
 // حدّ آمن دون سقف localStorage (~5MB): نرفض قبل الامتلاء لا بعده.
 // الامتلاء بلا حارس يعني فشل الحفظ صامتاً وضياع البنك كلّه.
 const BANK_SIZE_LIMIT = 4 * 1024 * 1024;
@@ -357,8 +381,13 @@ async function previewNewQuestionImage() {
   const file = input?.files?.[0];
   if (!file) { clearNewQuestionImage(); return; }
 
+  if (box) box.innerHTML = '<span>⏳ جاري قراءة الصورة…</span>';
+  const job = downscaleImageFile(file);
+  inflightMedia.image = job;
+  setAddQuestionBusy();
+
   try {
-    pendingQuestionImage = await downscaleImageFile(file);
+    pendingQuestionImage = await job;
     if (box) {
       box.innerHTML =
         `<img src="${pendingQuestionImage}" alt="معاينة">
@@ -368,6 +397,9 @@ async function previewNewQuestionImage() {
   } catch (e) {
     uiAlert(`❌ ${e.message}`);
     clearNewQuestionImage();
+  } finally {
+    if (inflightMedia.image === job) inflightMedia.image = null;
+    setAddQuestionBusy();
   }
 }
 
@@ -387,8 +419,13 @@ async function previewNewQuestionAudio() {
   const file = input?.files?.[0];
   if (!file) { clearNewQuestionAudio(); return; }
 
+  if (box) box.innerHTML = '<span>⏳ جاري قراءة الصوت…</span>';
+  const job = readAudioFile(file);
+  inflightMedia.audio = job;
+  setAddQuestionBusy();
+
   try {
-    pendingQuestionAudio = await readAudioFile(file);
+    pendingQuestionAudio = await job;
     if (box) {
       box.innerHTML =
         `<audio controls src="${pendingQuestionAudio}"></audio>
@@ -398,6 +435,9 @@ async function previewNewQuestionAudio() {
   } catch (e) {
     uiAlert(`❌ ${e.message}`);
     clearNewQuestionAudio();
+  } finally {
+    if (inflightMedia.audio === job) inflightMedia.audio = null;
+    setAddQuestionBusy();
   }
 }
 
@@ -497,8 +537,13 @@ async function previewNewQuestionVideo() {
   const file = input?.files?.[0];
   if (!file) { clearNewQuestionVideo(); return; }
 
+  if (box) box.innerHTML = '<span>⏳ جاري قراءة الفيديو…</span>';
+  const job = readVideoFile(file);
+  inflightMedia.video = job;
+  setAddQuestionBusy();
+
   try {
-    pendingQuestionVideo = await readVideoFile(file);
+    pendingQuestionVideo = await job;
     if (box) {
       box.innerHTML =
         `<video controls preload="metadata" src="${pendingQuestionVideo}"></video>
@@ -508,6 +553,9 @@ async function previewNewQuestionVideo() {
   } catch (e) {
     uiAlert(`❌ ${e.message}`);
     clearNewQuestionVideo();
+  } finally {
+    if (inflightMedia.video === job) inflightMedia.video = null;
+    setAddQuestionBusy();
   }
 }
 
@@ -559,12 +607,16 @@ async function removeQuestionVideo(cat, diffKey, idx) {
   renderBankList();
 }
 
-function addBankQuestion() {
+async function addBankQuestion() {
   // ✅ حماية أمنية: فقط الإدمن يمكنه إضافة أسئلة
   if (!isAdminLoggedIn) {
     uiAlert('❌ يجب تسجيل الدخول كإدمن أولاً');
     return;
   }
+
+  // الزر معطَّل أثناء القراءة، لكن الانتظار هنا هو الضمان الحقيقي:
+  // نقرة مبكرة أو استدعاء من مكان آخر لا يجوز أن يبتلع الوسائط بصمت.
+  await awaitPendingMedia();
 
   const cat = document.getElementById('bankCatSelect').value;
   const diffKey = document.getElementById('bankDiffSelect').value;
