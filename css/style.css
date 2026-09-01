@@ -1255,6 +1255,48 @@ body[data-screen="screen-game"] .sync-indicator {
   display: none;
 }
 
+/*
+  قفل «شاهد وأجب»: يحلّ محلّ نصّ السؤال (وخياراته) حتى ينتهي المقطع.
+  يأخذ ارتفاع النصّ تقريباً حتى لا تقفز النافذة عند الظهور.
+*/
+.qgate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 18px 4px 22px;
+  min-height: 30px;
+}
+
+.qgate-text {
+  font-family: 'Cairo';
+  font-weight: 700;
+  font-size: clamp(16px, 2.2vw, 21px);
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* مخرج يدوي: مقطع تالف أو شبكة متعثّرة يجب ألّا تُجمّد السؤال إلى الأبد */
+.qgate-btn {
+  font-family: 'Cairo';
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--sand);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 20px;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.qgate-btn:hover {
+  opacity: 1;
+  border-color: var(--gold);
+}
+
 .atext {
   display: none;
   font-family: 'Cairo';

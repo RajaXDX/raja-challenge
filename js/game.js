@@ -1506,8 +1506,12 @@ function openQuestion(ci, slot) {
     }
   }
 
-  // المهلة تُحسب مرة عند الفتح ثم تُبثّ، فيعدّ الجميع من نفس النقطة
-  questionDeadline = questionSeconds > 0 ? Date.now() + questionSeconds * 1000 : 0;
+  // المهلة تُحسب مرة عند الفتح ثم تُبثّ، فيعدّ الجميع من نفس النقطة.
+  // إلا سؤالاً مقفولاً خلف مقطعه: مهلته تبدأ عند ظهوره لا عند فتحه
+  // (`revealWatchedQuestion`)، وإلا التهم المقطعُ وقتَ الإجابة.
+  questionDeadline = (questionSeconds > 0 && !isQuestionGated(item))
+    ? Date.now() + questionSeconds * 1000
+    : 0;
   questionOpenedAt = Date.now();   // لقياس زمن الإجابة في ملخّص الجولة
 
   renderQuestionBody(item);
@@ -1717,6 +1721,108 @@ function questionAudio(item) {
           </div>`;
 }
 
+/* ============================= شاهد وأجب ============================= */
+
+/*
+  فئة «شاهد وأجب»: نصّ السؤال (وخياراته في الأونلاين) لا يظهر إلا بعد أن
+  ينتهي المقطع. بدون هذا يقرأ اللاعبون السؤال ويجيبون قبل أن يشاهدوا شيئاً،
+  فتفقد الفئة معناها كلّها.
+
+  المطابقة بعد تجريد كل ما ليس حرفاً عربياً: الاسم في السحابة «شاهد وأجب 🎬»
+  وقد يُكتب بلا إيموجي أو بمسافات مختلفة — والثلاثة يجب أن تعمل.
+*/
+const WATCH_FIRST_CATEGORY = 'شاهد وأجب';
+
+function isWatchFirstCategory(name) {
+  const strip = t => String(t || '').replace(/[^؀-ۿ]/g, '');
+  return strip(name).includes(strip(WATCH_FIRST_CATEGORY));
+}
+
+/*
+  مفتاح السؤال الذي انتهى مقطعه. يعيش هنا لا في الـ DOM لأن
+  `renderQuestionBody` تُستدعى مع **كل** بثّ حالة في الأونلاين — ولو كانت
+  الحالة داخل الصفحة لأُعيد قفل السؤال بعد كل تحديث.
+*/
+let watchedQuestionKey = null;
+
+function currentQuestionKey() {
+  return current ? `${activeRound}-${current.ci}-${current.slot}` : null;
+}
+
+// سؤال بلا مقطع في هذه الفئة لا يُقفل — وإلا اختفى نصّه إلى الأبد
+function isQuestionGated(item) {
+  return !!item?.video
+      && isWatchFirstCategory(current?.cat?.name)
+      && watchedQuestionKey !== currentQuestionKey();
+}
+
+function watchGateBox() {
+  return `<div class="qgate">
+            <div class="qgate-text">🎬 شاهد المقطع كاملاً — بعده يظهر السؤال</div>
+            <button type="button" class="qgate-btn" onclick="revealWatchedQuestion()">أظهر السؤال الآن</button>
+          </div>`;
+}
+
+// يُستدعى عند انتهاء المقطع، أو يدوياً حين يتعذّر تشغيله (مقطع تالف، شبكة)
+function revealWatchedQuestion() {
+  const key = currentQuestionKey();
+  if (!key || watchedQuestionKey === key) return;
+  watchedQuestionKey = key;
+
+  /*
+    المؤقّت يبدأ **الآن** لا عند فتح السؤال: مقطع من 30 ثانية كان سيلتهم
+    مهلة الإجابة كاملة قبل أن يرى اللاعب السؤال أصلاً.
+    في الأونلاين يبثّها صاحب القرار وحده فيعدّ الجميع إلى نفس اللحظة.
+  */
+  if (questionSeconds > 0 && !questionDeadline) {
+    questionDeadline = Date.now() + questionSeconds * 1000;
+    if (isOnlineGame() && !canControlGame()) questionDeadline = 0;
+  }
+
+  const item = questionCache[key];
+  if (item) renderQuestionBody(item);
+  startQuestionTimer();
+  if (isOnlineGame() && canControlGame()) publishGameState();
+}
+
+// نربط الانتهاء بعد كل رندر: الاستبدال يولّد عنصر <video> جديداً في كل مرة
+function wireWatchGate(item) {
+  if (!isQuestionGated(item)) return;
+  const v = document.querySelector('#qbody video');
+  if (v) v.addEventListener('ended', revealWatchedQuestion, { once: true });
+}
+
+/*
+  `#qbody` يُستبدل كاملاً عند كل رندر، والأونلاين يعيد الرندر مع كل بثّ حالة
+  — فيولد عنصر وسائط جديداً يبدأ من الصفر. مع «شاهد وأجب» هذا قاتل: المقطع
+  لا يصل إلى نهايته أبداً فلا يظهر السؤال. نحفظ موضع التشغيل ونعيده.
+  (يفيد الصوت أيضاً بنفس القدر: كان مقطع «صوت المشهور» يعيد نفسه كذلك.)
+*/
+function snapshotQuestionMedia() {
+  const snap = [];
+  document.querySelectorAll('#qbody video, #qbody audio').forEach((el, i) => {
+    if (el.currentTime > 0) snap[i] = { t: el.currentTime, playing: !el.paused };
+  });
+  return snap;
+}
+
+function restoreQuestionMedia(snap) {
+  if (!snap || !snap.length) return;
+  document.querySelectorAll('#qbody video, #qbody audio').forEach((el, i) => {
+    const s = snap[i];
+    if (!s) return;
+    const apply = () => {
+      try {
+        el.currentTime = s.t;
+        if (s.playing) el.play().catch(() => {});
+      } catch (e) { /* المصدر لم يُحمَّل بعد — لا شيء نستعيده */ }
+    };
+    // ضبط currentTime قبل معرفة المدّة لا أثر له، فننتظر البيانات الوصفية
+    if (el.readyState >= 1) apply();
+    else el.addEventListener('loadedmetadata', apply, { once: true });
+  });
+}
+
 // مشغّل فيديو السؤال — لمقاطع «ميمز» وما شابهها حيث المقطع هو السؤال
 function questionVideo(item) {
   if (!item?.video) return '';
@@ -1735,18 +1841,25 @@ function renderQuestionBody(item) {
     return;
   }
 
+  const gated = isQuestionGated(item);
+  const media = snapshotQuestionMedia();
+
   body.innerHTML = `
     ${questionVisual(item, 'qimg')}
     ${questionAudio(item)}
     ${questionVideo(item)}
-    <div class="qtext" id="qtext">${item.question}</div>
-    <div class="atext" id="atext">${item.answer}</div>
+    ${gated ? watchGateBox() : `<div class="qtext" id="qtext">${item.question}</div>
+    <div class="atext" id="atext">${item.answer}</div>`}
   `;
+
+  restoreQuestionMedia(media);
+  wireWatchGate(item);
 
   document.getElementById('toggleAnswerBtn').textContent = 'عرض الإجابة';
   document.getElementById('answerCorner').style.visibility = 'visible';
-  document.getElementById('cornersBar').style.display = 'flex';
-  Sound.reveal();
+  // مقفول: لا «عرض الإجابة» ولا إعطاء نقاط قبل أن يُطرح السؤال أصلاً
+  document.getElementById('cornersBar').style.display = gated ? 'none' : 'flex';
+  if (!gated) Sound.reveal();
 
   renderAwardButtons();
 }
@@ -1865,6 +1978,7 @@ function closeQuestion() {
   document.getElementById('cornersBar').style.display = '';
   current = null;
   lastAnswer = null;
+  watchedQuestionKey = null;
   stopQuestionTimer();
   questionDeadline = 0;
   clearActiveLifeline();
@@ -2634,8 +2748,16 @@ function renderChoices(item) {
   const done = !!lastAnswer;
 
   const letters = ['أ', 'ب', 'ج', 'د'];
+  const gated = isQuestionGated(item);
+  const media = snapshotQuestionMedia();
 
-  body.innerHTML = `
+  // مقفول: الخيارات تُخفى مع النصّ — رؤيتها وحدها تكفي للتخمين بلا مشاهدة
+  body.innerHTML = gated ? `
+    ${questionVisual(item)}
+    ${questionAudio(item)}
+    ${questionVideo(item)}
+    ${watchGateBox()}
+  ` : `
     ${questionVisual(item)}
     ${questionAudio(item)}
     ${questionVideo(item)}
@@ -2665,6 +2787,9 @@ function renderChoices(item) {
             : `❌ إجابة خاطئة من ${escapeHtml(lastAnswer.byName)} — الصحيحة: ${escapeHtml(item.choices[item.correctIndex])}`}
       </div>` : ''}
   `;
+
+  restoreQuestionMedia(media);
+  wireWatchGate(item);
 
   if (mine && !done) {
     body.querySelectorAll('.choice').forEach(btn => {
