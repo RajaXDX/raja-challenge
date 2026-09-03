@@ -60,6 +60,8 @@ const DEFAULT_CATEGORIES = [
   // فئتا الأعلام — صور بحتة، أسئلتها في data/questions-part16.json
   { name: 'أعلام عربية', ic: '🏳️' }, { name: 'أعلام العالم', ic: '🌍' },
   { name: 'أعلام قديمة', ic: '📜' },
+  // خرائط الدول — صور بحتة، أسئلتها في data/questions-part18.json
+  { name: 'خرائط الدول', ic: '🗺️' },
 ];
 
 // متغيرات الحالة
@@ -2199,7 +2201,8 @@ const QBANK_FILES = [
   'data/questions-part14.json',
   'data/questions-part15.json',
   'data/questions-part16.json',
-  'data/questions-part17.json'
+  'data/questions-part17.json',
+  'data/questions-part18.json'
 ];
 
 /*

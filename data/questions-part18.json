@@ -1,0 +1,97 @@
+{
+  "_ملاحظة": "خرائط دول من مجلّد «MAPS» عند المستخدم، بتقسيمه للمستويات (سهل/متوسط/صعب). الصور في assets/maps/ بأسماء لاتينية، وكل واحدة تُحقّق بصرياً قبل الكتابة: الدولة المظلّلة بالأخضر الغامق هي الإجابة.\n\nالإجابة اسم الدولة وحده بلا قوسين وبلا شرطة مائلة (راجع البند 45 و49 في PLAN.md): القوسان يُلحقان بالخيارات الأربعة، والشرطة تبقى في الخيار فيتميّز الصحيح بشكله.\n\nالأسماء مكتوبة كما في «أعلام العالم» حرفاً بحرف (أمريكا · بريطانيا · الصين · روسيا · جورجيا · فيتنام · كوستاريكا) فلا يخرج اسمان لدولة واحدة في الخيارات.\n\nصورتان قُصّتا لأن الدولة كانت أصغر من أن تُرى عند عرض 440px: costa-rica.jpg (كانت 762×566 والدولة فيها ~10px) و south-korea.jpg (كانت 456×334 والشبه جزيرة عند حافة الإطار).",
+
+  "خرائط الدول": {
+    "easy": [
+      {
+        "question": "ما الدولة المظلّلة بالأخضر على الخريطة؟",
+        "answer": "السعودية",
+        "image": "assets/maps/saudi-arabia.jpg"
+      },
+      {
+        "question": "أي دولة هذه على الخريطة؟",
+        "answer": "الصين",
+        "image": "assets/maps/china.jpg"
+      },
+      {
+        "question": "ما اسم الدولة الظاهرة بالأخضر؟",
+        "answer": "أمريكا",
+        "image": "assets/maps/usa.jpg"
+      },
+      {
+        "question": "لأي دولة هذه الحدود على الخريطة؟",
+        "answer": "إيران",
+        "image": "assets/maps/iran.jpg"
+      },
+      {
+        "question": "ما الدولة المُلوّنة على هذه الخريطة؟",
+        "answer": "بريطانيا",
+        "image": "assets/maps/united-kingdom.jpg"
+      },
+      {
+        "question": "أي دولة تشغل المساحة الخضراء على الخريطة؟",
+        "answer": "روسيا",
+        "image": "assets/maps/russia.jpg"
+      }
+    ],
+    "medium": [
+      {
+        "question": "ما الدولة المظلّلة بالأخضر على الخريطة؟",
+        "answer": "الأرجنتين",
+        "image": "assets/maps/argentina.jpg"
+      },
+      {
+        "question": "أي دولة أوروبية هذه على الخريطة؟",
+        "answer": "السويد",
+        "image": "assets/maps/sweden.webp"
+      },
+      {
+        "question": "ما اسم الدولة الظاهرة بالأخضر؟",
+        "answer": "جورجيا",
+        "image": "assets/maps/georgia.jpg"
+      },
+      {
+        "question": "لأي دولة هذه الحدود على الخريطة؟",
+        "answer": "كوريا الجنوبية",
+        "image": "assets/maps/south-korea.jpg"
+      },
+      {
+        "question": "ما اسم هذه الجزيرة الدولة على الخريطة؟",
+        "answer": "مدغشقر",
+        "image": "assets/maps/madagascar.jpg"
+      }
+    ],
+    "hard": [
+      {
+        "question": "ما الدولة الأفريقية المظلّلة على الخريطة؟",
+        "answer": "إثيوبيا",
+        "image": "assets/maps/ethiopia.jpg"
+      },
+      {
+        "question": "ما اسم الدولة الظاهرة بالأخضر على الخريطة؟",
+        "answer": "أذربيجان",
+        "image": "assets/maps/azerbaijan.jpg"
+      },
+      {
+        "question": "أي دولة هذه على ساحل غرب أفريقيا؟",
+        "answer": "غانا",
+        "image": "assets/maps/ghana.jpg"
+      },
+      {
+        "question": "لأي دولة هذه الحدود على الخريطة؟",
+        "answer": "فيتنام",
+        "image": "assets/maps/vietnam.jpg"
+      },
+      {
+        "question": "ما الدولة المُلوّنة بالأخضر على الخريطة؟",
+        "answer": "كوستاريكا",
+        "image": "assets/maps/costa-rica.jpg"
+      },
+      {
+        "question": "أي دولة تتكوّن من هاتين الجزيرتين على الخريطة؟",
+        "answer": "نيوزيلندا",
+        "image": "assets/maps/new-zealand.jpg"
+      }
+    ]
+  }
+}

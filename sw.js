@@ -15,7 +15,7 @@
 */
 
 // ارفع الرقم عند تغيير قائمة `SHELL` — `activate` يمسح ما سواه فيُعاد التخزين نظيفاً
-const CACHE = 'raja-v19';
+const CACHE = 'raja-v20';
 
 // هيكل التطبيق: ما يكفي لفتح اللعبة والوضع المحلي بلا شبكة
 const SHELL = [
@@ -52,6 +52,7 @@ const SHELL = [
   './data/questions-part13.json',
   './data/questions-part14.json',
   './data/questions-part15.json',
+  './data/questions-part18.json',
   './data/retired-questions.json',
   './data/retired-categories.json',
 
@@ -112,7 +113,26 @@ const SHELL = [
   './assets/sa-logos/maaden.jpg',
   './assets/sa-logos/mofa.jpg',
   './assets/sa-logos/mos.jpg',
-  './assets/sa-logos/mot.jpg'
+  './assets/sa-logos/mot.jpg',
+
+  // خرائط «خرائط الدول» — الفئة كلها صور، فبدونها تنكسر بلا إنترنت
+  './assets/maps/saudi-arabia.jpg',
+  './assets/maps/china.jpg',
+  './assets/maps/usa.jpg',
+  './assets/maps/iran.jpg',
+  './assets/maps/united-kingdom.jpg',
+  './assets/maps/russia.jpg',
+  './assets/maps/argentina.jpg',
+  './assets/maps/sweden.webp',
+  './assets/maps/georgia.jpg',
+  './assets/maps/south-korea.jpg',
+  './assets/maps/madagascar.jpg',
+  './assets/maps/ethiopia.jpg',
+  './assets/maps/azerbaijan.jpg',
+  './assets/maps/ghana.jpg',
+  './assets/maps/vietnam.jpg',
+  './assets/maps/costa-rica.jpg',
+  './assets/maps/new-zealand.jpg'
 ];
 
 self.addEventListener('install', (event) => {
