@@ -15,7 +15,7 @@
 */
 
 // ارفع الرقم عند تغيير قائمة `SHELL` — `activate` يمسح ما سواه فيُعاد التخزين نظيفاً
-const CACHE = 'raja-v20';
+const CACHE = 'raja-v21';
 
 // هيكل التطبيق: ما يكفي لفتح اللعبة والوضع المحلي بلا شبكة
 const SHELL = [
@@ -52,6 +52,8 @@ const SHELL = [
   './data/questions-part13.json',
   './data/questions-part14.json',
   './data/questions-part15.json',
+  './data/questions-part16.json',
+  './data/questions-part17.json',
   './data/questions-part18.json',
   './data/retired-questions.json',
   './data/retired-categories.json',
@@ -132,7 +134,58 @@ const SHELL = [
   './assets/maps/ghana.jpg',
   './assets/maps/vietnam.jpg',
   './assets/maps/costa-rica.jpg',
-  './assets/maps/new-zealand.jpg'
+  './assets/maps/new-zealand.jpg',
+
+  // أعلام «أعلام عربية» — data/questions-part16.json
+  './assets/flags-ar/bahrain.webp',
+  './assets/flags-ar/comoros.webp',
+  './assets/flags-ar/djibouti.webp',
+  './assets/flags-ar/egypt.webp',
+  './assets/flags-ar/jordan.webp',
+  './assets/flags-ar/kuwait.webp',
+  './assets/flags-ar/mauritania.webp',
+  './assets/flags-ar/oman.webp',
+  './assets/flags-ar/palestine.webp',
+  './assets/flags-ar/qatar.webp',
+  './assets/flags-ar/saudi-arabia.webp',
+  './assets/flags-ar/somalia.webp',
+  './assets/flags-ar/syria.webp',
+  './assets/flags-ar/uae.webp',
+  './assets/flags-ar/yemen.webp',
+
+  // أعلام «أعلام العالم» — data/questions-part16.json
+  './assets/flags-world/angola.webp',
+  './assets/flags-world/armenia.webp',
+  './assets/flags-world/china.webp',
+  './assets/flags-world/costa-rica.webp',
+  './assets/flags-world/finland.webp',
+  './assets/flags-world/france.webp',
+  './assets/flags-world/georgia.webp',
+  './assets/flags-world/italy.webp',
+  './assets/flags-world/ivory-coast.webp',
+  './assets/flags-world/japan.webp',
+  './assets/flags-world/kazakhstan.webp',
+  './assets/flags-world/kyrgyzstan.webp',
+  './assets/flags-world/paraguay.webp',
+  './assets/flags-world/russia.webp',
+  './assets/flags-world/united-kingdom.webp',
+  './assets/flags-world/uruguay.webp',
+  './assets/flags-world/usa.webp',
+  './assets/flags-world/vietnam.webp',
+  './assets/flags-world/wales.webp',
+
+  // أعلام «أعلام قديمة» — data/questions-part17.json
+  './assets/flags-old/bani-khalid.webp',
+  './assets/flags-old/germany.webp',
+  './assets/flags-old/iran.webp',
+  './assets/flags-old/iraq.webp',
+  './assets/flags-old/italy.webp',
+  './assets/flags-old/japan.webp',
+  './assets/flags-old/oman.webp',
+  './assets/flags-old/saudi-arabia.webp',
+  './assets/flags-old/soviet-union.webp',
+  './assets/flags-old/sudan.webp',
+  './assets/flags-old/umayyad.webp'
 ];
 
 self.addEventListener('install', (event) => {
