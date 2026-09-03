@@ -15,7 +15,7 @@
 */
 
 // ارفع الرقم عند تغيير قائمة `SHELL` — `activate` يمسح ما سواه فيُعاد التخزين نظيفاً
-const CACHE = 'raja-v21';
+const CACHE = 'raja-v22';
 
 // هيكل التطبيق: ما يكفي لفتح اللعبة والوضع المحلي بلا شبكة
 const SHELL = [
@@ -55,6 +55,7 @@ const SHELL = [
   './data/questions-part16.json',
   './data/questions-part17.json',
   './data/questions-part18.json',
+  './data/questions-part19.json',
   './data/retired-questions.json',
   './data/retired-categories.json',
 
@@ -185,7 +186,14 @@ const SHELL = [
   './assets/flags-old/saudi-arabia.webp',
   './assets/flags-old/soviet-union.webp',
   './assets/flags-old/sudan.webp',
-  './assets/flags-old/umayyad.webp'
+  './assets/flags-old/umayyad.webp',
+
+  // صور «صور قديمة» — الفئة كلها صور، فبدونها تنكسر بلا إنترنت
+  './assets/old-photos/makkah.webp',
+  './assets/old-photos/russia.jpg',
+  './assets/old-photos/abu-dhabi.jpg',
+  './assets/old-photos/hiroshima.jpg',
+  './assets/old-photos/london.jpg'
 ];
 
 self.addEventListener('install', (event) => {
