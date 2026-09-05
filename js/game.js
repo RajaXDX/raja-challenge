@@ -877,6 +877,14 @@ function startFriendCall() {
   الطابع الزمني يجعل الجميع يحسبون من نقطة واحدة.
 */
 const TIMER_CHOICES = [0, 20, 30, 45];   // 0 = مطفأ
+
+/*
+  ⚠️ **فئات التمثيل بلا مؤقّت مهما كان الإعداد** (`isActingCategory`):
+  في «ولا كلمة» يقرأ لاعبٌ الكلمة ويمثّلها بلا كلام وفريقه يخمّن. العدّاد
+  هنا لا يقطع الإجابة بل التمثيل نفسه — والفئة كلها تصير غير قابلة للّعب.
+  نفس القائمة التي تُعفيها من بناء الخيارات (`NO_CHOICE_CATEGORIES`)،
+  فلا تتفرّق القائمتان مع أي فئة تمثيل تُضاف لاحقاً.
+*/
 let questionSeconds = loadJSON('mr_qtimer', 0);
 let questionDeadline = 0;
 let questionTimerId = null;
@@ -1471,9 +1479,27 @@ const SHAPE_FILTERS = [
 
 // اختيار مشتّتات مقاربة في الطول للإجابة الصحيحة — الخيار القصير جداً وسط
 // خيارات طويلة يكشف نفسه
+/*
+  فئات التمثيل: الإجابة **هي المطلوب تمثيله**، فعرضها ضمن أربعة خيارات
+  يُلغي اللعبة — الفريق يقرأ الكلمة من الأزرار بدل أن يخمّنها من الحركة.
+
+  ⚠️ هذا لم يكن ظاهراً قبل اليوم بالمصادفة لا بالتصميم: «ولا كلمة» كانت
+  سؤالاً واحداً لكل مستوى، و`buildChoices` تحتاج ثلاثة مشتّتات فتفشل وتُعيد
+  null — فتُعرض الفئة بلا خيارات. أول ما اكتملت إلى عشرين نجح البناء
+  وانكشفت الإجابة. فالاستثناء صريح هنا لا متروك لعدد الأسئلة.
+*/
+const NO_CHOICE_CATEGORIES = new Set(['ولا كلمة']);
+
+function isActingCategory(name) {
+  // الاسم يحمل إيموجي («ولا كلمة 🤫») وقد يتغيّر، فنطابق النصّ لا الحرف
+  const clean = String(name || '').replace(/[^؀-ۿ\s]/g, '').replace(/\s+/g, ' ').trim();
+  return NO_CHOICE_CATEGORIES.has(clean);
+}
+
 function buildChoices(item, categoryName, diffKey, seed) {
   const correct = String(item?.answer || '').trim();
   if (!correct) return null;
+  if (isActingCategory(categoryName)) return null;
 
   const rand = makeSeededRandom(seed);
 
@@ -1649,7 +1675,8 @@ function openQuestion(ci, slot) {
   // المهلة تُحسب مرة عند الفتح ثم تُبثّ، فيعدّ الجميع من نفس النقطة.
   // إلا سؤالاً مقفولاً خلف مقطعه: مهلته تبدأ عند ظهوره لا عند فتحه
   // (`revealWatchedQuestion`)، وإلا التهم المقطعُ وقتَ الإجابة.
-  questionDeadline = (questionSeconds > 0 && !isQuestionGated(item))
+  // وإلا فئة تمثيل: لا مؤقّت لها مهما كان الإعداد (راجع `TIMER_CHOICES`).
+  questionDeadline = (questionSeconds > 0 && !isQuestionGated(item) && !isActingCategory(cat.name))
     ? Date.now() + questionSeconds * 1000
     : 0;
   questionOpenedAt = Date.now();   // لقياس زمن الإجابة في ملخّص الجولة
@@ -1920,7 +1947,7 @@ function revealWatchedQuestion() {
     مهلة الإجابة كاملة قبل أن يرى اللاعب السؤال أصلاً.
     في الأونلاين يبثّها صاحب القرار وحده فيعدّ الجميع إلى نفس اللحظة.
   */
-  if (questionSeconds > 0 && !questionDeadline) {
+  if (questionSeconds > 0 && !questionDeadline && !isActingCategory(current?.cat?.name)) {
     questionDeadline = Date.now() + questionSeconds * 1000;
     if (isOnlineGame() && !canControlGame()) questionDeadline = 0;
   }
@@ -3110,23 +3137,34 @@ function myBetTeams() {
   return me?.team ? [me.team] : [];
 }
 
-// سؤال صعب من إحدى فئات اللوحة، بترتيب عشوائي حتى نجد فئة فيها سؤال
+/*
+  سؤال صعب من فئة **خارج فئات الجولة**: خاتمة الجلسة يجب أن تفاجئ الفريقين،
+  وفئات اللوحة صاروا عرفوا مزاجها بعد ثمانية عشر سؤالاً.
+  📌 فئات اللوحة تبقى احتياطاً أخيراً: لو ما أسعفت أي فئة خارجية (بنك ناقص،
+  أو كل الفئات مختارة) لا نُسقط المراهنة أصلاً.
+  📌 نتجنّب أسئلة الفيديو والصوت: شاشة المراهنة تعرض النص والصورة فقط،
+  فسؤال مقطعُه هو محتواه يصل بلا محتوى.
+*/
 function pickBetQuestion() {
-  const cats = rounds[activeRound] || [];
-  if (!cats.length) return null;
+  const onBoard = rounds[activeRound] || [];
+  const boardNames = new Set(
+    (rounds || []).flat().map(c => c && c.name).filter(Boolean)
+  );
+  const outside = (CATEGORIES || []).filter(c => c && c.name && !boardNames.has(c.name));
 
-  const order = cats.map((_, i) => i).sort(() => Math.random() - 0.5);
-  for (const i of order) {
-    const cat = cats[i];
-    const q = pickFromBank(cat.name, 2);   // 2 = صعب
-    if (!q) continue;
+  for (const pool of [outside, onBoard]) {
+    const order = pool.slice().sort(() => Math.random() - 0.5);
+    for (const cat of order) {
+      const q = pickFromBank(cat.name, 2);   // 2 = صعب
+      if (!q || q.video || q.audio) continue;
 
-    let item = q;
-    if (isOnlineGame()) {
-      const mc = buildChoices(q, cat.name, 'hard', `${currentRoom.id}-bet-${cat.name}`);
-      if (mc) item = { ...q, choices: mc.choices, correctIndex: mc.correctIndex };
+      let item = q;
+      if (isOnlineGame()) {
+        const mc = buildChoices(q, cat.name, 'hard', `${currentRoom.id}-bet-${cat.name}`);
+        if (mc) item = { ...q, choices: mc.choices, correctIndex: mc.correctIndex };
+      }
+      return { item, catName: `${cat.ic || ''} ${cat.name}`.trim() };
     }
-    return { item, catName: `${cat.ic || ''} ${cat.name}`.trim() };
   }
   return null;
 }
