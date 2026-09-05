@@ -106,6 +106,12 @@ const CELLS_PER_CAT = 3;
 const levelOfSlot = slot => slot;
 
 let stateUsed = {};
+/*
+  خلايا انتهى وقتها بلا إجابة. **ليست** مستهلَكة: تبقى مفتوحة على اللوحة
+  ويُعاد فتحها بنفس السؤال (`questionCache` مفهرَس بالخلية فلا يتغيّر السؤال).
+  نحفظها لنميّزها بصرياً فقط — كي يعرف اللاعبون أنها مُحاولة سابقة لا خلية بكر.
+*/
+let stateExpired = {};
 let questionCache = {};
 let scores = { A: 0, B: 0 };
 let lifelineUsed = { A: [], B: [] };
@@ -316,8 +322,10 @@ function startGame() {
   }
 
   stateUsed = {};
+  stateExpired = {};
   rounds.forEach((r, ri) => {
     stateUsed[ri] = r.map(() => Array(CELLS_PER_CAT).fill(false));
+    stateExpired[ri] = r.map(() => Array(CELLS_PER_CAT).fill(false));
   });
 
   scores = { A: 0, B: 0 };
@@ -669,6 +677,103 @@ function renderLifelineDisplay() {
   });
 }
 
+/* ============================= تعديل النقاط يدوياً ============================= */
+/*
+  حَكَم بشري فوق حساب اللعبة: إجابة تستحق نصف نقاط، مخالفة تستحق خصماً، أو
+  احتساب خاطئ يُصحَّح في ثانية بدل أن تُعاد اللعبة كلّها.
+
+  ⚠️ **المضيف وحده في الأونلاين.** تعديلٌ من جهاز لاعب لن تقبله السحابة أصلاً
+  (`canControlGame` تكذّبه ما لم يكن دوره)، فيرى رقماً يرجع بعد لحظة — لذلك
+  نخفي الزرّ عنه بدل أن نتركه يضغط بلا أثر.
+
+  ⚠️ **لا نزول تحت الصفر**: كما في المراهنة (`applyBetOutcome`)، لا رصيد سالب
+  في هذه اللعبة — الخصم يقف عند الصفر.
+*/
+const ADJUST_STEPS = [50, 100, 250, 400];
+let adjustStep = 100;
+
+function canAdjustScores() {
+  return !isOnlineGame() || isOnlineHost();
+}
+
+function openScoreAdjust() {
+  if (!canAdjustScores()) { uiAlert('المضيف وحده يقدر يعدّل النقاط'); return; }
+
+  const overlay = createElement('div', { class: 'ui-modal-overlay' });
+  const box = createElement('div', { class: 'ui-modal adjust-modal' }, `
+    <div class="ui-modal-msg">⚖️ تعديل نقاط الفريقين</div>
+    <div class="adjust-steps" id="adjustSteps"></div>
+    <div class="adjust-rows" id="adjustRows"></div>
+    <div class="ui-modal-actions">
+      <button class="btn-main btn-primary" data-act="ok">تم</button>
+    </div>
+  `);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
+
+  const close = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 180);
+  };
+  box.querySelector('[data-act="ok"]').onclick = close;
+  overlay.onclick = e => { if (e.target === overlay) close(); };
+
+  renderScoreAdjust(box);
+}
+
+function renderScoreAdjust(box) {
+  const steps = box.querySelector('#adjustSteps');
+  if (steps) {
+    steps.innerHTML = '';
+    ADJUST_STEPS.forEach(v => {
+      const b = createElement('button', {
+        type: 'button',
+        class: `timer-opt${v === adjustStep ? ' active' : ''}`
+      }, String(v));
+      b.onclick = () => { adjustStep = v; Sound.click(); renderScoreAdjust(box); };
+      steps.appendChild(b);
+    });
+  }
+
+  const rows = box.querySelector('#adjustRows');
+  if (!rows) return;
+  rows.innerHTML = '';
+
+  ['A', 'B'].forEach(team => {
+    const row = createElement('div', { class: `adjust-row ${team}` }, `
+      <button type="button" class="adjust-btn plus">+</button>
+      <div class="adjust-team">
+        <div class="adjust-name">${escapeHtml(getTeamName(team))}</div>
+        <div class="adjust-score" data-score="${team}">${Number(scores[team]) || 0}</div>
+      </div>
+      <button type="button" class="adjust-btn minus">−</button>
+    `);
+    row.querySelector('.minus').onclick = () => adjustScore(team, -adjustStep, box);
+    row.querySelector('.plus').onclick  = () => adjustScore(team,  adjustStep, box);
+    rows.appendChild(row);
+  });
+}
+
+function adjustScore(team, delta, box) {
+  if (!canAdjustScores() || !delta) return;
+
+  const before = Number(scores[team]) || 0;
+  const after = Math.max(0, before + delta);
+  if (after === before) { Sound.skip(); return; }   // عند الصفر لا خصم
+
+  scores[team] = after;
+  Sound.click();
+  animateNumber(document.getElementById(`score${team}`), after);
+
+  const el = box?.querySelector(`[data-score="${team}"]`);
+  if (el) el.textContent = after;
+
+  // كل ضغطة تُبثّ فوراً: الرقم على أجهزة اللاعبين يجب ألّا يتأخّر عن الحَكَم
+  if (isOnlineGame()) publishGameState();
+}
+
 /* ============================= LIFELINES ============================= */
 
 // وسيلة المساعدة المفعّلة على السؤال المفتوح حالياً: { team, key }
@@ -861,6 +966,7 @@ function onQuestionTimeout() {
       correct: false,
       timedOut: true
     };
+    // لا نكشف الإجابة: السؤال راجع للوحة، وكشفه الآن يُفرغ إعادة فتحه
     if (isMyTurn()) recordCategoryResult(current.cat?.name, false);
     logRound({ team: lastAnswer.team, playerId: turn?.player_id || 'local',
                name: lastAnswer.byName, correct: false, timedOut: true });
@@ -870,8 +976,8 @@ function onQuestionTimeout() {
     return;
   }
 
-  // محلي: بلا نقاط والدور ينتقل — وهذا معنى المؤقّت
-  award(null);
+  // محلي: بلا نقاط والدور ينتقل — لكن الخلية تبقى مفتوحة بنفس السؤال
+  award(null, { timedOut: true });
 }
 
 function clearActiveLifeline() {
@@ -918,6 +1024,7 @@ async function exitToHomeConfirm() {
   questionCache = {};
   rounds = [];
   stateUsed = {};
+  stateExpired = {};
   scores = { A: 0, B: 0 };
   lifelineUsed = { A: [], B: [] };
   turnOrder = [];
@@ -980,8 +1087,11 @@ function renderBoard() {
 
     for (let slot = 0; slot < CELLS_PER_CAT; slot++) {
       const used = stateUsed[activeRound]?.[ci]?.[slot];
+      // انتهى وقتها ولم تُحسم: تبقى مفتوحة، وتُعلَّم كي يُعرف أنها ستعيد نفس السؤال
+      const expired = !used && stateExpired[activeRound]?.[ci]?.[slot];
       const cell = createElement('div', {
-        class: `cell${used ? ' used' : ''}`
+        class: `cell${used ? ' used' : ''}${expired ? ' expired' : ''}`,
+        title: expired ? 'انتهى وقتها — تفتح بنفس السؤال' : ''
       }, used ? '·' : POINTS[levelOfSlot(slot)]);
 
       if (!used) {
@@ -1991,7 +2101,10 @@ function award(team, opts = {}) {
       recordCategoryResult(current.cat?.name, !!team);
     }
 
-    stateUsed[activeRound][current.ci][current.slot] = true;
+    // انتهاء الوقت بلا إجابة لا يستهلك الخلية: تُعلَّم فقط وتُفتح ثانيةً
+    // بنفس السؤال. أي حسم آخر (نقاط أو «استريح») يستهلكها كالمعتاد.
+    if (opts.timedOut) markSlotExpired();
+    else stateUsed[activeRound][current.ci][current.slot] = true;
     closeQuestion();
     renderBoard();
 
@@ -2010,6 +2123,15 @@ function award(team, opts = {}) {
   } finally {
     answerPublishGrace = false;
   }
+}
+
+// تعليم الخلية المفتوحة بأن وقتها انتهى — بلا استهلاكها
+function markSlotExpired() {
+  if (!current) return;
+  const round = stateExpired[activeRound] ||
+    (stateExpired[activeRound] = (rounds[activeRound] || []).map(() => Array(CELLS_PER_CAT).fill(false)));
+  if (!round[current.ci]) round[current.ci] = Array(CELLS_PER_CAT).fill(false);
+  round[current.ci][current.slot] = true;
 }
 
 function closeQuestion() {
@@ -2062,6 +2184,7 @@ function publishGameState(extra = {}) {
     points: POINTS,
     teamNames: { A: teamSetup.A.name, B: teamSetup.B.name },
     used: stateUsed,
+    expired: stateExpired,   // خلايا انتهى وقتها ولم تُحسم — راجع `markSlotExpired`
     activeRound,
     activeTeam,
     turnOrder,
@@ -2112,6 +2235,7 @@ function applyRemoteGameState(state) {
   // جهاز على نسخة أقدم يبثّ ٣ خلايا لكل فئة — نمدّها إلى ٦ بدل أن تنكسر
   // اللوحة على من حدّث. الخلايا الزائدة تبدأ غير مستخدَمة.
   if (state.used) stateUsed = normalizeUsedState(state.used);
+  if (state.expired) stateExpired = normalizeUsedState(state.expired);
   if (state.scores) scores = state.scores;
   // السجلّ لا ينمو إلا عند من يجيب، فالوارد أحدث دائماً ممّا عند المشاهد
   if (Array.isArray(state.log) && state.log.length >= roundLog.length) roundLog = state.log;
@@ -2206,6 +2330,10 @@ function applyViewerRestrictions() {
 
   const board = document.getElementById('board');
   if (board) board.classList.toggle('viewer-mode', viewer);
+
+  // تعديل النقاط للمضيف وحده — راجع `canAdjustScores`
+  const adjust = document.getElementById('adjustScoresBtn');
+  if (adjust) adjust.style.display = viewer ? 'none' : '';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2817,7 +2945,9 @@ function renderChoices(item) {
       ${item.choices.map((c, i) => {
         let cls = 'choice';
         if (done) {
-          if (i === item.correctIndex) cls += ' correct';
+          // انتهى الوقت: لا كشف للصحيحة — السؤال يرجع للوحة بنفسه
+          if (lastAnswer.timedOut) cls += ' dim';
+          else if (i === item.correctIndex) cls += ' correct';
           else if (i === lastAnswer.pickedIndex) cls += ' wrong';
           else cls += ' dim';
         }
@@ -2831,7 +2961,7 @@ function renderChoices(item) {
         ${lastAnswer.correct
           ? `✅ إجابة صحيحة — ${escapeHtml(lastAnswer.byName)} كسب ${POINTS[current.row]} نقطة`
           : lastAnswer.timedOut
-            ? `⏰ انتهى الوقت على ${escapeHtml(lastAnswer.byName)} — الصحيحة: ${escapeHtml(item.choices[item.correctIndex])}`
+            ? `⏰ انتهى الوقت على ${escapeHtml(lastAnswer.byName)} — السؤال يرجع للوحة`
             : `❌ إجابة خاطئة من ${escapeHtml(lastAnswer.byName)} — الصحيحة: ${escapeHtml(item.choices[item.correctIndex])}`}
       </div>` : ''}
   `;
@@ -2904,7 +3034,9 @@ function finishAnsweredQuestion() {
   answerPublishGrace = hadControl;
 
   try {
-    stateUsed[activeRound][current.ci][current.slot] = true;
+    // انتهاء الوقت أونلاين كذلك: الخلية تبقى وتُفتح بنفس السؤال
+    if (lastAnswer?.timedOut) markSlotExpired();
+    else stateUsed[activeRound][current.ci][current.slot] = true;
     lastAnswer = null;
     closeQuestion();
     renderBoard();

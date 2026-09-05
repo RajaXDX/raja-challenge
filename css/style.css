@@ -1131,6 +1131,25 @@ body[data-screen="screen-game"] .sync-indicator {
   border-color: transparent;
 }
 
+/*
+  خلية انتهى وقتها ولم تُحسم: ما زالت قابلة للفتح — وبنفس السؤال — فتبقى
+  نقاطها ظاهرة. الساعة الصغيرة وحدها تقول إنها مُحاولة سابقة لا خلية بكر.
+*/
+.cell.expired {
+  position: relative;
+  border-color: rgba(196, 141, 58, 0.35);
+  border-style: dashed;
+}
+
+.cell.expired::after {
+  content: '⏱';
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 5px;
+  font-size: 10px;
+  opacity: 0.75;
+}
+
 /* ============================= OVERLAY ============================= */
 .overlay {
   position: fixed;
@@ -4043,3 +4062,82 @@ select {
   .sum-card { min-width: 108px; padding: 9px 6px; }
   .sum-value { font-size: 18px; }
 }
+
+/* ============================= تعديل النقاط يدوياً ============================= */
+/*
+  صندوق الحَكَم: مقدار واحد مختار، وصفّ لكل فريق بزرّي زيادة وخصم. النقاط
+  تتغيّر مع كل ضغطة (لا «حفظ» في النهاية) كي يرى الفريقان الرقم يتحرّك فوراً.
+*/
+.adjust-modal {
+  max-width: 380px;
+}
+
+.adjust-steps {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 10px 0 14px;
+}
+
+.adjust-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adjust-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--panel-2);
+  border: 1px solid rgba(196, 141, 58, 0.25);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.adjust-row.A { border-inline-start: 3px solid var(--teamA); }
+.adjust-row.B { border-inline-start: 3px solid var(--sand); }
+
+.adjust-row.A .adjust-score { color: var(--teamA); }
+.adjust-row.B .adjust-score { color: var(--sand); }
+
+.adjust-team {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.adjust-name {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adjust-score {
+  font-family: 'Cairo';
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--gold-soft);
+}
+
+.adjust-btn {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(196, 141, 58, 0.35);
+  background: var(--surface);
+  color: var(--gold-soft);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.adjust-btn:hover { background: var(--panel); border-color: rgba(196, 141, 58, 0.6); }
+.adjust-btn:active { transform: scale(0.94); }
