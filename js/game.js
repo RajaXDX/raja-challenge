@@ -2399,7 +2399,8 @@ const QBANK_FILES = [
   'data/questions-part17.json',
   'data/questions-part18.json',
   'data/questions-part19.json',
-  'data/questions-part20.json'
+  'data/questions-part20.json',
+  'data/questions-part21.json'
 ];
 
 /*
