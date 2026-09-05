@@ -303,6 +303,17 @@ async function handleRoomLinkOnLoad() {
   const code = takePendingRoomCode();
   if (!code) return false;
 
+  /*
+    ضيف وصله رابط روم: نُعيد الكود إلى مخزنه قبل تحويله لشاشة الدخول، وإلا
+    استهلكناه هنا وضاع — فيدخل بحسابه ثم يجد نفسه في الرئيسية بلا روم.
+    `handleAuthSubmit` يعيد النداء بعد الدخول فيلتقطه عندئذ.
+  */
+  if (REQUIRE_ACCOUNT_FOR_ONLINE && !isSignedIn()) {
+    try { sessionStorage.setItem(PENDING_ROOM_KEY, code); } catch (e) { /* تجاهل */ }
+    requireAccount('وصلك رابط روم — سجّل دخولك وندخّلك عليها مباشرة');
+    return true;
+  }
+
   goToRooms();
   const input = document.getElementById('roomCodeInput');
   if (input) input.value = code.toUpperCase().trim();

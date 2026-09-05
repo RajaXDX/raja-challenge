@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260905b">
-  <link rel="stylesheet" href="css/responsive.css?v=20260905b">
+  <link rel="stylesheet" href="css/style.css?v=20260905c">
+  <link rel="stylesheet" href="css/responsive.css?v=20260905c">
 </head>
 <!-- data-screen يُحدَّث في showScreen؛ القيمة هنا للحظة ما قبل أول استدعاء -->
 <body data-screen="screen-home">
@@ -91,6 +91,11 @@
       <button class="btn-main btn-primary" id="authSubmitBtn" onclick="handleAuthSubmit(currentAuthMode)">دخول</button>
       <p class="auth-note" id="authNote">ما عندك حساب؟ اضغط «حساب جديد» فوق</p>
       <button class="auth-link" id="authForgotBtn" style="display:none;" onclick="switchAuthTab('forgot')">نسيت كلمة المرور؟</button>
+    </div>
+
+    <!-- الشاشة لم تعد بوابة: الضيف يرجع ويلعب محلياً بلا حساب -->
+    <div class="nav-buttons">
+      <button class="btn-main btn-ghost" onclick="goToHome()">← رجوع</button>
     </div>
   </div>
 </div>
@@ -208,12 +213,12 @@
     <button class="mode-btn mode-local" onclick="startLocalMode()">
       <div class="mode-icon">💻</div>
       <div class="mode-name">محلي</div>
-      <div class="mode-desc">لعب على جهاز واحد مع عائلتك</div>
+      <div class="mode-desc">لعب على جهاز واحد مع عائلتك — بلا حساب</div>
     </button>
     <button class="mode-btn mode-online" onclick="goToRooms()">
       <div class="mode-icon">🌐</div>
       <div class="mode-name">أونلاين</div>
-      <div class="mode-desc">لعب مع أصدقائك من أجهزة مختلفة</div>
+      <div class="mode-desc">لعب مع أصدقائك من أجهزة مختلفة — يحتاج حساب</div>
     </button>
   </div>
   <div class="nav-buttons">
@@ -554,17 +559,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260905b"></script>
-<script src="js/utils.js?v=20260905b"></script>
-<script src="js/auth.js?v=20260905b"></script>
-<script src="js/bans.js?v=20260905b"></script>
-<script src="js/friends.js?v=20260905b"></script>
-<script src="js/profile.js?v=20260905b"></script>
-<script src="js/game.js?v=20260905b"></script>
-<script src="js/admin.js?v=20260905b"></script>
-<script src="js/sync.js?v=20260905b"></script>
-<script src="js/rooms.js?v=20260905b"></script>
-<script src="js/chat.js?v=20260905b"></script>
+<script src="js/supabase-config.js?v=20260905c"></script>
+<script src="js/utils.js?v=20260905c"></script>
+<script src="js/auth.js?v=20260905c"></script>
+<script src="js/bans.js?v=20260905c"></script>
+<script src="js/friends.js?v=20260905c"></script>
+<script src="js/profile.js?v=20260905c"></script>
+<script src="js/game.js?v=20260905c"></script>
+<script src="js/admin.js?v=20260905c"></script>
+<script src="js/sync.js?v=20260905c"></script>
+<script src="js/rooms.js?v=20260905c"></script>
+<script src="js/chat.js?v=20260905c"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

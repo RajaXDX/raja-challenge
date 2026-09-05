@@ -127,6 +127,7 @@ async function removeFriendship(rowId, username, isRequest) {
 /* ---- الواجهة ---- */
 
 async function goToFriends() {
+  if (!requireAccount('الأصدقاء يحتاجون حساب — بهم تُرسل الدعوات وتُقبل')) return;
   Sound.click();
   showScreen('screen-friends');
   await renderFriendsScreen();

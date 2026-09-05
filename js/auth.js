@@ -12,13 +12,22 @@
   داخلياً ثابتاً من اسم المستخدم، فيبقى الدخول ممكناً بالاسم وحده.
 */
 
-// بوابة الحساب.
-//
-// مشغّلة: لا لعب بلا حساب. تتطلّب أن يكون الإعداد في Supabase مكتملاً —
-//   1) supabase-accounts.sql مُشغَّل
-//   2) "Confirm email" معطّل في Authentication → Sign In / Providers → Email
-// اجعلها false لو أردت إتاحة اللعب بلا حساب (احتكاك أقل عند النشر).
-const REQUIRE_ACCOUNT = true;
+/*
+  بوابة الحساب — **للأونلاين وحده**.
+
+  ⚠️ اللعب المحلي بلا حساب عمداً: جهاز واحد في مجلس، وفريقان حوله. من يوقف
+  المجلس ليُنشئ بريداً وكلمة مرور؟ والحساب هناك لا يحمي شيئاً ولا يربط بأحد —
+  اللاعبون في نفس الغرفة والنقاط تنتهي بانتهاء الجلسة.
+
+  أما الأونلاين فالحساب فيه هويّة لا زينة: رومات ودعوات وأصدقاء وإحصاءات
+  وحظر يمتدّ من الحساب إلى أجهزته. بلا حساب لا معنى لأيٍّ منها.
+
+  تشغيلها يتطلّب إعداداً مكتملاً في Supabase —
+    1) supabase-accounts.sql مُشغَّل
+    2) "Confirm email" معطّل في Authentication → Sign In / Providers → Email
+  واجعلها false لو أردت فتح الأونلاين كذلك بلا حساب.
+*/
+const REQUIRE_ACCOUNT_FOR_ONLINE = true;
 
 const ACCOUNT_EMAIL_DOMAIN = 'raja-players.com';
 
@@ -156,7 +165,8 @@ async function signOutPlayer() {
   isAdminLoggedIn = false;
   if (typeof leaveRoom === 'function' && currentRoom) await leaveRoom();
   renderAuthState();
-  showScreen('screen-auth');
+  // إلى الرئيسية لا إلى شاشة الدخول: الخروج من الحساب لا يمنع اللعب المحلي
+  goToHome();
 }
 
 /* ---- الملف الشخصي ---- */
@@ -295,13 +305,36 @@ async function checkIsAdmin() {
 
 /* ---- الواجهة ---- */
 
+// شاشة الحساب بطلب اللاعب — لا كبوابة. `reason` يشرح لماذا وصل إليها
+function goToAuth(reason) {
+  showScreen('screen-auth');
+  switchAuthTab('login');
+
+  // بعد `switchAuthTab` لا قبلها: هي تمسح الرسالة عند كل تبديل
+  const msg = document.getElementById('authMessage');
+  if (msg && reason) { msg.textContent = reason; msg.className = 'auth-message'; }
+}
+
+/*
+  بوابة الأونلاين. تُنادى في مدخل كل شاشة تحتاج هويّة (رومات، أصدقاء،
+  إحصاءات) فتُرجع false وتحوّل الضيف إلى شاشة الدخول برسالة تشرح السبب.
+  اللوحة المحلية لا تمرّ من هنا إطلاقاً — راجع `REQUIRE_ACCOUNT_FOR_ONLINE`.
+*/
+function requireAccount(reason) {
+  if (!REQUIRE_ACCOUNT_FOR_ONLINE || isSignedIn()) return true;
+  Sound.click();
+  goToAuth(reason || 'هذي الشاشة تحتاج حساب — واللعب المحلي شغّال بدونه');
+  return false;
+}
+
 function renderAuthState() {
   const box = document.getElementById('authState');
   if (!box) return;
 
+  // الضيف يلعب محلياً بلا حساب، فيبقى له مدخل ظاهر للدخول متى شاء
   if (!isSignedIn()) {
-    box.innerHTML = '';
-    box.style.display = 'none';
+    box.style.display = 'flex';
+    box.innerHTML = `<button class="auth-signin" onclick="goToAuth()">دخول</button>`;
     return;
   }
 
@@ -374,7 +407,6 @@ async function initAuthGate() {
   await loadProfile();
   if (await handleRecoveryLink()) return false;
 
-  if (!REQUIRE_ACCOUNT) return true;
   renderAuthState();
 
   if (isSignedIn()) {
@@ -391,13 +423,12 @@ async function initAuthGate() {
     checkPendingInvites?.();
   }
 
-  if (!isSignedIn()) {
-    showScreen('screen-auth');
-    // لازم تُستدعى هنا: بدونها تظهر الشاشة بحالة HTML الافتراضية،
-    // فيبقى زر «نسيت كلمة المرور؟» ظاهراً رغم إطفائه بالمفتاح
-    switchAuthTab('login');
-    return false;
-  }
+  /*
+    ⚠️ الضيف يُكمل إلى الرئيسية لا إلى شاشة الدخول: اللوحة المحلية حقّه بلا
+    حساب. ما بعده في تسلسل الإقلاع (رابط روم، استعادة جلسة روم) أونلاين
+    كلّه، وكلٌّ منه يسأل `requireAccount` بنفسه.
+  */
+  if (!isSignedIn()) return true;
 
   refreshFriendBadge?.();
   return true;

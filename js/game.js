@@ -2806,6 +2806,8 @@ function startLocalMode() {
 }
 
 function goToRooms() {
+  // الأونلاين يحتاج هويّة: روم ودعوة وأصدقاء وإحصاءات. المحلي لا يمرّ من هنا
+  if (!requireAccount('الأونلاين يحتاج حساب — أو العب «محلي» على هذا الجهاز بلا تسجيل')) return;
   Sound.click();
   showScreen('screen-rooms');
   loadAvailableRooms();

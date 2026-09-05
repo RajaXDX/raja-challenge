@@ -231,10 +231,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const allowed = await initAuthGate();
     if (!allowed) { updateTotalStats(); trackVisitOnce(); return; }
 
-    // رابط روم في العنوان له الأولوية على استعادة الجلسة القديمة
+    // رابط روم في العنوان له الأولوية على استعادة الجلسة القديمة.
+    // والضيف لا تُستعاد له جلسة روم: الأونلاين يحتاج حساباً، وجلسة قديمة
+    // محفوظة من قبل كانت ستسحبه إلى روم بلا هويّة
     try {
       const fromLink = await handleRoomLinkOnLoad();
-      if (!fromLink) await restoreRoomSession();
+      if (!fromLink && (!REQUIRE_ACCOUNT_FOR_ONLINE || isSignedIn())) await restoreRoomSession();
     } catch (e) {
       console.warn('تعذّرت معالجة رابط/جلسة الروم:', e);
     }

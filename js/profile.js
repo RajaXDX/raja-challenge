@@ -208,6 +208,7 @@ async function clearCategoryStats() {
 }
 
 async function goToProfile() {
+  if (!requireAccount('الإحصاءات تُحفظ في حسابك — سجّل الدخول لتشوفها')) return;
   Sound.click();
   showScreen('screen-profile');
   renderPrivacyControl();

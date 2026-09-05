@@ -2839,7 +2839,9 @@ select {
   text-overflow: ellipsis;
 }
 
-.auth-signout {
+/* زرّا الرأس: «خروج» لصاحب الحساب و«دخول» للضيف — نفس القياس فلا تقفز الترويسة */
+.auth-signout,
+.auth-signin {
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(196, 141, 58, 0.35);
   color: var(--gold);
