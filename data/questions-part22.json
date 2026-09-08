@@ -1,0 +1,48 @@
+{
+  "_ملاحظة": "أسئلة «شاهد وأجب 🎬» — كانت في Supabase وحدها ولا نسخة منها في المشروع. نُقلت هنا قبل سحب الفئة (2026-09-08) حتى لا تضيع: الفئة مسحوبة في data/retired-categories.json، وحذف اسمها من هناك يُرجعها كاملة بأسئلتها من هذا الملف. مقاطعها مستضافة في Supabase Storage والروابط مطلقة، فهي تعمل ما بقي الدلو.",
+
+  "شاهد وأجب 🎬": {
+    "easy": [
+      {
+        "question": "وش لون قميص الشارح؟",
+        "answer": "أسود",
+        "video": "https://rqcltlleqpppeywxbkpo.supabase.co/storage/v1/object/public/question-media/videos/1788282736633-qrwglsqr.mp4",
+        "emoji": "🎬"
+      }
+    ],
+    "medium": [
+      {
+        "question": "منهو الشاب الصغير الذي قسم الشرق الأوسط لسنه وشيعة ؟",
+        "answer": "إسماعيل الصوفي",
+        "video": "https://rqcltlleqpppeywxbkpo.supabase.co/storage/v1/object/public/question-media/videos/1788281843877-lbkjm0rt.mp4",
+        "emoji": "🎬"
+      },
+      {
+        "question": "كم مزهرية ظهرت خلف المتحدث ووش لونهما؟",
+        "answer": "اثنتان، كحلية وذهبية.",
+        "video": "https://rqcltlleqpppeywxbkpo.supabase.co/storage/v1/object/public/question-media/videos/1788282690479-75sq1b5t.mp4",
+        "emoji": "🎬"
+      },
+      {
+        "question": "من كم تبدا عروض اليوم الوطني؟",
+        "answer": "96 ريال",
+        "video": "https://rqcltlleqpppeywxbkpo.supabase.co/storage/v1/object/public/question-media/videos/1788283455360-hp999h1t.mp4",
+        "emoji": "🎬"
+      }
+    ],
+    "hard": [
+      {
+        "question": "من الصحابيّان اللذان ذُكرا بالاسم؟",
+        "answer": "أبو لبابة الأنصاري وعلي بن أبي طالب.",
+        "video": "https://rqcltlleqpppeywxbkpo.supabase.co/storage/v1/object/public/question-media/videos/1788282617783-2be37ty6.mp4",
+        "emoji": "🎬"
+      },
+      {
+        "question": "ما أسم اكاديمية مكافحة المخدرات الظاهرة بالمقطع؟",
+        "answer": "الامير نايف بن عبدالعزيز",
+        "video": "https://rqcltlleqpppeywxbkpo.supabase.co/storage/v1/object/public/question-media/videos/1788283320523-7owfufte.mp4",
+        "emoji": "🎬"
+      }
+    ]
+  }
+}
