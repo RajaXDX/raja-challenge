@@ -324,20 +324,8 @@ function goToCategories() {
   showScreen('screen-categories');
 }
 
-function showAbout() {
-  Sound.click();
-
-  let total = 0;
-  Object.values(typeof QBANK !== 'undefined' ? QBANK : {}).forEach(c => {
-    ['easy', 'medium', 'hard'].forEach(k => { total += (c[k] || []).length; });
-  });
-  const cats = Object.keys(typeof QBANK !== 'undefined' ? QBANK : {}).length;
-
-  uiAlert(`تحدي رجا — لعبة أسئلة جماعية
-${total.toLocaleString('ar-EG')} سؤال في ${cats} فئة
-فريقان، ثلاثة مستويات، ووسائل مساعدة
-العبوا من جهاز واحد أو من أجهزتكم بكود روم`);
-}
+// `showAbout` صارت شاشة كاملة في `js/about.js` بدل الرسالة المنبثقة
+// التي كانت هنا. لا تُعرِّفها هنا ثانيةً — الملفان يتحمّلان اسماً واحداً.
 
 /* ---- HTML ESCAPING ---- */
 // تهرّب المحارف الخمسة. النسخة السابقة كانت textContent ثم innerHTML، وهي

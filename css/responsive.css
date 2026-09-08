@@ -733,3 +733,18 @@
     font-size: 13px;
   }
 }
+
+/* ---- شرح اللعبة على الجوال ---- */
+@media (max-width: 768px) {
+  .about-wrap { padding: 0 10px; }
+  .about-tab { font-size: 12px; padding: 8px 12px; }
+  .about-lead { font-size: 14px; padding: 12px 13px; }
+  .about-step, .about-card, .about-block, .lang-row { padding: 13px; }
+  .about-step-head { font-size: 15px; }
+  .about-lifelines, .about-cards { grid-template-columns: 1fr; }
+  .about-stats { grid-template-columns: repeat(2, 1fr); }
+  .as-num { font-size: 22px; }
+  .lang-head { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .about-table { font-size: 12px; }
+  .about-table th, .about-table td { padding: 7px 6px; }
+}
