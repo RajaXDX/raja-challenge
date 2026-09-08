@@ -744,7 +744,8 @@
   .about-lifelines, .about-cards { grid-template-columns: 1fr; }
   .about-stats { grid-template-columns: repeat(2, 1fr); }
   .as-num { font-size: 22px; }
-  .lang-head { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .lang-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .lang-pct { font-size: 16px; }
   .about-table { font-size: 12px; }
   .about-table th, .about-table td { padding: 7px 6px; }
 }

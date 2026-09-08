@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260908a">
-  <link rel="stylesheet" href="css/responsive.css?v=20260908a">
+  <link rel="stylesheet" href="css/style.css?v=20260908b">
+  <link rel="stylesheet" href="css/responsive.css?v=20260908b">
 </head>
 <!-- data-screen يُحدَّث في showScreen؛ القيمة هنا للحظة ما قبل أول استدعاء -->
 <body data-screen="screen-home">
@@ -343,7 +343,7 @@
         <div class="about-card">
           <div class="ac-ic">🗄️</div>
           <div class="ac-name">Supabase</div>
-          <p>قاعدة PostgreSQL و<b>Realtime</b> للمزامنة اللحظية، ومعها الحسابات والأصدقاء والدعوات والحظر ورفع مقاطع الأسئلة. بُنيت كلها بـ<b>أحد عشر سكربت SQL</b>.</p>
+          <p>قاعدة PostgreSQL و<b>Realtime</b> للمزامنة اللحظية، ومعها الحسابات والأصدقاء والدعوات والحظر ورفع مقاطع الأسئلة. بُنيت كلها بـ<b>اثني عشر سكربت SQL</b>.</p>
         </div>
         <div class="about-card">
           <div class="ac-ic">🐙</div>
@@ -374,31 +374,39 @@
     </section>
 
     <!-- ===================== 3 · اللغات البرمجية ===================== -->
+    <!--
+      ⚠️ أرقام هذا القسم وحدها مكتوبة بيدٍ في كل الشاشة (لا يمكن عدّ أسطر
+      المصدر من المتصفح)، ولذلك تُذكر معها تاريخ القياس. **أي تعديل على
+      الكود يُبطلها** — بما فيه التعديل الذي يضيف سطوراً إلى هذه الشاشة
+      نفسها. لإعادة العدّ:
+        wc -l index.html ; wc -l css/*.css ; wc -l js/*.js ; wc -l supabase-*.sql
+      ثم حدّث الأسطر والنسبة وعرض `.lang-bar i` والمجموع في الفقرة أعلاه.
+    -->
     <section class="about-sec" id="about-langs">
       <p class="about-lead">
-        أربع لغات لا خامسة لها. الأرقام أدناه قياس فعلي لعدد الأسطر يوم <b>2026-09-08</b>.
+        أربع لغات لا خامسة لها، ومجموعها <b>17,724 سطراً</b>. النسب والأرقام أدناه قياس فعلي يوم <b>2026-09-08</b>.
       </p>
 
       <div class="about-langs">
         <div class="lang-row">
-          <div class="lang-head"><span class="lang-name">HTML5</span><span class="lang-num">585 سطراً</span></div>
-          <div class="lang-bar"><i style="width:4%"></i></div>
+          <div class="lang-head"><span class="lang-name">HTML5</span><span class="lang-meta"><b class="lang-pct">4.7%</b><span class="lang-num">836 سطراً</span></span></div>
+          <div class="lang-bar"><i style="width:4.7%"></i></div>
           <p class="lang-desc">ملف <code>index.html</code> واحد يحمل كل شاشات اللعبة — الرئيسية والرومات واللوحة ونافذة السؤال ولوحة الإدارة.</p>
         </div>
         <div class="lang-row">
-          <div class="lang-head"><span class="lang-name">CSS3</span><span class="lang-num">4,880 سطراً</span></div>
-          <div class="lang-bar"><i style="width:29%"></i></div>
+          <div class="lang-head"><span class="lang-name">CSS3</span><span class="lang-meta"><b class="lang-pct">30.1%</b><span class="lang-num">5,333 سطراً</span></span></div>
+          <div class="lang-bar"><i style="width:30.1%"></i></div>
           <p class="lang-desc"><code>style.css</code> و<code>responsive.css</code>: لوحة الأسود الدافئ والذهبي، ونقشة السدو المرسومة بـ SVG داخل CSS، واتجاه RTL كامل، وتصميم يتكيّف مع الجوال.</p>
         </div>
         <div class="lang-row">
-          <div class="lang-head"><span class="lang-name">JavaScript (ES6+)</span><span class="lang-num">نحو 9,300 سطر</span></div>
-          <div class="lang-bar"><i style="width:56%"></i></div>
+          <div class="lang-head"><span class="lang-name">JavaScript (ES6+)</span><span class="lang-meta"><b class="lang-pct">52.8%</b><span class="lang-num">9,354 سطراً</span></span></div>
+          <div class="lang-bar"><i style="width:52.8%"></i></div>
           <p class="lang-desc">اثنا عشر ملفاً في <code>js/</code> بلا أي مكتبة — أكبرها <code>game.js</code> (قلب اللعبة) ثم <code>admin.js</code> و<code>rooms.js</code>. الاستثناء الوحيد عميل Supabase الذي يأتي من CDN.</p>
         </div>
         <div class="lang-row">
-          <div class="lang-head"><span class="lang-name">SQL (PostgreSQL)</span><span class="lang-num">2,201 سطراً</span></div>
-          <div class="lang-bar"><i style="width:13%"></i></div>
-          <p class="lang-desc">أحد عشر سكربتاً تبني الجداول وسياسات الحماية (RLS) والدوال: الرومات، الحسابات، الأصدقاء، الدعوات، الحظر، الخصوصية، والتخزين.</p>
+          <div class="lang-head"><span class="lang-name">SQL (PostgreSQL)</span><span class="lang-meta"><b class="lang-pct">12.4%</b><span class="lang-num">2,201 سطراً</span></span></div>
+          <div class="lang-bar"><i style="width:12.4%"></i></div>
+          <p class="lang-desc">اثنا عشر سكربتاً تبني الجداول وسياسات الحماية (RLS) والدوال: الرومات، الحسابات، الأصدقاء، الدعوات، الحظر، الخصوصية، والتخزين.</p>
         </div>
       </div>
 
@@ -809,18 +817,18 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260908a"></script>
-<script src="js/utils.js?v=20260908a"></script>
-<script src="js/auth.js?v=20260908a"></script>
-<script src="js/bans.js?v=20260908a"></script>
-<script src="js/friends.js?v=20260908a"></script>
-<script src="js/profile.js?v=20260908a"></script>
-<script src="js/game.js?v=20260908a"></script>
-<script src="js/admin.js?v=20260908a"></script>
-<script src="js/sync.js?v=20260908a"></script>
-<script src="js/rooms.js?v=20260908a"></script>
-<script src="js/chat.js?v=20260908a"></script>
-<script src="js/about.js?v=20260908a"></script>
+<script src="js/supabase-config.js?v=20260908b"></script>
+<script src="js/utils.js?v=20260908b"></script>
+<script src="js/auth.js?v=20260908b"></script>
+<script src="js/bans.js?v=20260908b"></script>
+<script src="js/friends.js?v=20260908b"></script>
+<script src="js/profile.js?v=20260908b"></script>
+<script src="js/game.js?v=20260908b"></script>
+<script src="js/admin.js?v=20260908b"></script>
+<script src="js/sync.js?v=20260908b"></script>
+<script src="js/rooms.js?v=20260908b"></script>
+<script src="js/chat.js?v=20260908b"></script>
+<script src="js/about.js?v=20260908b"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

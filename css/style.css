@@ -4423,10 +4423,25 @@ select {
   color: var(--sand);
 }
 
-.lang-num {
-  font-weight: 700;
-  font-size: 13px;
+/* النسبة هي البطل هنا لا عدد الأسطر: هي ما يُقارن بين اللغات بنظرة واحدة */
+.lang-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.lang-pct {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 17px;
   color: var(--gold);
+  line-height: 1;
+}
+
+.lang-num {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .lang-bar {
@@ -4437,9 +4452,14 @@ select {
   margin-bottom: 10px;
 }
 
+/*
+  `min-width` لأن أصغر نسبة (HTML بـ 4.7%) تكاد تختفي داخل شريط عرضه
+  بضع مئات من البكسل، فيبدو الصفّ كأنه بلا شريط أصلاً لا كأنه ضئيل.
+*/
 .lang-bar i {
   display: block;
   height: 100%;
+  min-width: 10px;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--gold), var(--gold-soft));
 }
