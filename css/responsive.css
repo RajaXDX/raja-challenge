@@ -749,3 +749,16 @@
   .about-table { font-size: 12px; }
   .about-table th, .about-table td { padding: 7px 6px; }
 }
+
+/* ---- ملاحظات اللاعبين على الجوال ---- */
+@media (max-width: 768px) {
+  /* 44×44 هو الحدّ الذي اعتُمد في البند 7 لكل أهداف اللمس */
+  .q-report { padding: 12px; font-size: 16px; opacity: 0.65; }
+  .report-modal { max-width: 100%; }
+  .report-reason { font-size: 13px; padding: 12px; }
+  .rate-star { font-size: 34px; padding: 6px 4px; }   /* هدف لمس مريح */
+  .promo-cards { grid-template-columns: 1fr; }
+  .end-promo { margin-top: 24px; padding-top: 18px; }
+  .fb-actions { flex-direction: column; }
+  .fb-avg-num { font-size: 32px; }
+}

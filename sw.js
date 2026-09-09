@@ -15,7 +15,7 @@
 */
 
 // ارفع الرقم عند تغيير قائمة `SHELL` — `activate` يمسح ما سواه فيُعاد التخزين نظيفاً
-const CACHE = 'raja-v28';
+const CACHE = 'raja-v29';
 
 // هيكل التطبيق: ما يكفي لفتح اللعبة والوضع المحلي بلا شبكة
 const SHELL = [
@@ -36,6 +36,7 @@ const SHELL = [
   './js/rooms.js',
   './js/chat.js',
   './js/about.js',
+  './js/feedback.js',
   './assets/logo.png',
   './data/questions.json',
   './data/questions-part2.json',

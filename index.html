@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260908c">
-  <link rel="stylesheet" href="css/responsive.css?v=20260908c">
+  <link rel="stylesheet" href="css/style.css?v=20260909a">
+  <link rel="stylesheet" href="css/responsive.css?v=20260909a">
 </head>
 <!-- data-screen يُحدَّث في showScreen؛ القيمة هنا للحظة ما قبل أول استدعاء -->
 <body data-screen="screen-home">
@@ -644,10 +644,43 @@
 
     <div class="end-summary" id="endSummary"></div>
 
+    <!-- تقييم الجولة — يُبنى في js/feedback.js، ويختفي لمن قيّم هذه الجولة -->
+    <div class="end-rating" id="endRating"></div>
+
     <div class="nav-buttons">
       <button class="btn-main btn-ghost" onclick="goToHome()">← الرئيسية</button>
       <button class="btn-main btn-secondary" onclick="shareResult()">📤 شارك النتيجة</button>
       <button class="btn-main btn-primary" onclick="playAgain()">🔄 لعبة جديدة</button>
+    </div>
+
+    <!--
+      إعلان الألعاب الأخرى. **روابط ثابتة في HTML بلا أي JavaScript**: قائمة
+      تُجلب من السحابة كانت ستضيف طلباً وتفشل بلا إنترنت، والألعاب لا تتغيّر
+      كل يوم. موضعه بعد أزرار الجولة عمداً — من يريد لعبة جديدة يجدها أولاً،
+      ومن انتهى فعلاً يجد الإعلان تحتها.
+    -->
+    <div class="end-promo">
+      <div class="promo-title">🎮 جرّب ألعابنا الثانية</div>
+      <div class="promo-cards">
+        <a class="promo-card" href="https://rajaxdx.github.io/huroof-raja/"
+           target="_blank" rel="noopener" onclick="trackEvent('promo_huroof')">
+          <span class="pc-ic">🔤</span>
+          <span class="pc-name">صراع الحروف</span>
+          <span class="pc-desc">خلية حروف بين فريقين — وصّل من طرف لطرف</span>
+          <span class="pc-go">العب الآن ←</span>
+        </a>
+        <a class="promo-card" href="https://rajaxdx.github.io/top-ten/"
+           target="_blank" rel="noopener" onclick="trackEvent('promo_topten')">
+          <span class="pc-ic">🔟</span>
+          <span class="pc-name">توب تن</span>
+          <span class="pc-desc">اذكر ما تقدر من قائمة العشرة — والعاشر أصعبها</span>
+          <span class="pc-go">العب الآن ←</span>
+        </a>
+      </div>
+      <a class="promo-all" href="https://rajaxdx.github.io/next-level/"
+         target="_blank" rel="noopener" onclick="trackEvent('promo_portal')">
+        كل الألعاب في نكست ليفل ←
+      </a>
     </div>
   </div>
 </div>
@@ -665,6 +698,7 @@
     <button class="admin-tab" onclick="switchAdminTab('users')">👥 اللاعبون</button>
     <button class="admin-tab" onclick="switchAdminTab('points')">🏆 النقاط</button>
     <button class="admin-tab" onclick="switchAdminTab('sync')">☁️ المزامنة</button>
+    <button class="admin-tab" onclick="switchAdminTab('feedback')">🚩 الملاحظات</button>
   </div>
 
   <div class="admin-content">
@@ -772,6 +806,23 @@
         <p style="font-size: 12px; color: #999; margin-top: 8px;">يُغلق الرومات القديمة ويُخرج اللاعبين منها. (الحذف النهائي يحتاج صلاحية DELETE في Supabase)</p>
       </div>
     </div>
+
+    <!-- تبويب الملاحظات — بلاغات الأسئلة وتقييمات الجولات -->
+    <div class="admin-section" id="tab-feedback">
+      <h3>🚩 بلاغات الأسئلة</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+        ما يرسله اللاعبون من نافذة السؤال. البنك تجاوز 1,600 سؤال ولا سبيل
+        لمراجعته كله بيدك — هذه هي عين اللاعبين عليه.
+      </p>
+      <div id="reportsBox"><p class="fb-empty">اضغط للتحميل</p></div>
+
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.2);">
+        <h4 style="margin:0 0 12px 0;">⭐ تقييم الجولات</h4>
+        <div id="ratingsSummary"><p class="fb-empty">اضغط للتحميل</p></div>
+      </div>
+
+      <button class="btn btn-ghost" onclick="loadFeedback()" style="width:100%;margin-top:14px;">تحديث الملاحظات</button>
+    </div>
   </div>
 
   <div class="nav-buttons">
@@ -784,7 +835,16 @@
   <div class="qcard">
     <button class="btn-close" onclick="closeQuestion()">✕</button>
     <div class="topline">
-      <div class="qcat" id="qcat"></div>
+      <!--
+        البلاغ ملاصق لاسم الفئة عمداً: وضعُه في طرف الشريط يوقعه فوق زرّ
+        الإغلاق ✕ المطلق في زاوية البطاقة. وهو خارج شريط الحكم كذلك —
+        يجب أن يصل إليه أي لاعب لا المضيف وحده.
+      -->
+      <div class="qcat-wrap">
+        <div class="qcat" id="qcat"></div>
+        <button type="button" class="q-report" onclick="openQuestionReport()"
+                title="بلّغ عن خطأ في هذا السؤال" aria-label="بلّغ عن خطأ في هذا السؤال">🚩</button>
+      </div>
       <div class="qtimer" id="qtimer"></div>
       <div class="qpoints" id="qpoints"></div>
     </div>
@@ -817,18 +877,19 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260908c"></script>
-<script src="js/utils.js?v=20260908c"></script>
-<script src="js/auth.js?v=20260908c"></script>
-<script src="js/bans.js?v=20260908c"></script>
-<script src="js/friends.js?v=20260908c"></script>
-<script src="js/profile.js?v=20260908c"></script>
-<script src="js/game.js?v=20260908c"></script>
-<script src="js/admin.js?v=20260908c"></script>
-<script src="js/sync.js?v=20260908c"></script>
-<script src="js/rooms.js?v=20260908c"></script>
-<script src="js/chat.js?v=20260908c"></script>
-<script src="js/about.js?v=20260908c"></script>
+<script src="js/supabase-config.js?v=20260909a"></script>
+<script src="js/utils.js?v=20260909a"></script>
+<script src="js/auth.js?v=20260909a"></script>
+<script src="js/bans.js?v=20260909a"></script>
+<script src="js/friends.js?v=20260909a"></script>
+<script src="js/profile.js?v=20260909a"></script>
+<script src="js/game.js?v=20260909a"></script>
+<script src="js/admin.js?v=20260909a"></script>
+<script src="js/sync.js?v=20260909a"></script>
+<script src="js/rooms.js?v=20260909a"></script>
+<script src="js/chat.js?v=20260909a"></script>
+<script src="js/about.js?v=20260909a"></script>
+<script src="js/feedback.js?v=20260909a"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

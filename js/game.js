@@ -560,6 +560,9 @@ function showEndScreen() {
   renderEndSummary();
   saveLastGame(a, b, nameA, nameB);
 
+  // التقييم يُبنى قبل عرض الشاشة فلا يقفز أمام اللاعب بعد ظهورها
+  renderEndRating?.();
+
   showScreen('screen-end');
   Sound.award?.();
   trackEvent('game_finished');
@@ -2374,6 +2377,9 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchRetiredQuestions();
   fetchRetiredCategories();
   syncBundledQuestionBank();
+
+  // بلاغات حُفظت أثناء لعب بلا إنترنت — ترتفع الآن بلا أن يشعر أحد
+  flushReportQueue?.();
 });
 
 /* ============================= QUESTION BANK LOADING ============================= */

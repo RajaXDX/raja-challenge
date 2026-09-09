@@ -155,6 +155,8 @@ function switchAdminTab(tabName) {
     // الحظر يُدار من هنا، فقائمة المحظورين تُحمَّل مع التبويب لا بضغطة إضافية
     loadUsers();
     loadBans();
+  } else if (tabName === 'feedback') {
+    loadFeedback();
   }
 }
 
