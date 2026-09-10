@@ -64,6 +64,19 @@ const DEFAULT_CATEGORIES = [
   { name: 'خرائط الدول', ic: '🗺️' },
   // صور قديمة — صور بحتة، أسئلتها في data/questions-part19.json
   { name: 'صور قديمة', ic: '📷' },
+  /*
+    أُضيفت 2026-09-10 بطلب المستخدم **بلا أسئلة بعد**: الأسماء تُحجَز أولاً
+    لتظهر الفئة على كل جهاز، والبنك يُملأ بعدها. حتى ذلك الحين فتح أي خلية
+    فيها يعرض نموذج «إضافة سؤال سريع» (`showQuickAddForm`) لا خطأ — فهي
+    قابلة للاختيار لكنها غير جاهزة للعب.
+  */
+  { name: 'حروف مبعثرة', ic: '🔤' }, { name: 'صحح الخطأ', ic: '✏️' },
+  { name: 'القرآن الكريم', ic: '📗' }, { name: 'شعارات دول', ic: '🛡️' },
+  { name: 'نشيد وطني', ic: '🎼' }, { name: 'معالم السعودية', ic: '🕌' },
+  { name: 'اسم اللاعب الأول', ic: '🪪' }, { name: 'تسريحة لاعب', ic: '💇' },
+  { name: 'كرة قدم', ic: '⚽' }, { name: 'الكرة السعودية', ic: '🏆' },
+  { name: 'شعارات أندية ومنتخبات', ic: '🏟️' },
+  { name: 'ألعاب إلكترونية', ic: '🎮' },
 ];
 
 // متغيرات الحالة
@@ -2689,6 +2702,31 @@ function retireQuestions(bank, texts) {
   return removed;
 }
 
+/*
+  يُنزل فئات المشروع الافتراضية إلى قائمة الجهاز.
+
+  ⚠️ `DEFAULT_CATEGORIES` كانت **أرضيةَ أول تشغيل فقط**: بعدها تُقرأ القائمة
+  من `mr_categories` في localStorage، فأي فئة تُضاف للمشروع لا تصل لجهازٍ لعب
+  مرّة واحدة من قبل. و`syncCategoriesWithBank` لا تُنقذها لأنها تُعيد ما له
+  أسئلة في البنك — والفئة الجديدة قد تُحجَز باسمها قبل أن يُكتب لها سؤال.
+
+  الدمج هنا يجعل ملفات المشروع مصدر الإضافة على كل جهاز وفي كل تحميل. والحذف
+  يبقى بيد `retiredCategoryNames`: تتخطّاها هذه الدالة، و`retireCategories()`
+  تعمل بعدها كطبقة ثانية — فلا تعود فئة مسحوبة من هنا.
+*/
+function mergeDefaultCategories() {
+  let added = 0;
+  DEFAULT_CATEGORIES.forEach(def => {
+    const name = String(def?.name || '').trim();
+    if (!name) return;
+    if (retiredCategoryNames.has(name)) return;
+    if (CATEGORIES.some(c => String(c?.name || '').trim() === name)) return;
+    CATEGORIES.push({ ...def });
+    added++;
+  });
+  return added;
+}
+
 // يضمن أن كل فئة موجودة في البنك تظهر أيضاً في قائمة الفئات
 function syncCategoriesWithBank() {
   let added = 0;
@@ -2722,11 +2760,13 @@ async function syncBundledQuestionBank() {
       fixed += r.fixed;
     });
 
+    const newDefaults = mergeDefaultCategories();
+
     // ⚠️ **بعد** الدمج لا قبله: الدمج هو ما يُعيد زرع الفئة المسحوبة من
     // ملفات المشروع، فالإسقاط قبله لا يُجدي
     const droppedCats = retireCategories();
 
-    const newCats = syncCategoriesWithBank();
+    const newCats = syncCategoriesWithBank() + newDefaults;
 
     if (added > 0 || fixed > 0 || removed > 0 || newCats > 0 || droppedCats > 0) {
       saveJSON('mr_bank', QBANK);
