@@ -2420,7 +2420,10 @@ const QBANK_FILES = [
   'data/questions-part19.json',
   'data/questions-part20.json',
   'data/questions-part21.json',
-  'data/questions-part22.json'
+  'data/questions-part22.json',
+  'data/questions-part23.json',
+  'data/questions-part24.json',
+  'data/questions-part25.json'
 ];
 
 /*
