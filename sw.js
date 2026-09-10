@@ -15,7 +15,7 @@
 */
 
 // ارفع الرقم عند تغيير قائمة `SHELL` — `activate` يمسح ما سواه فيُعاد التخزين نظيفاً
-const CACHE = 'raja-v32';
+const CACHE = 'raja-v33';
 
 // هيكل التطبيق: ما يكفي لفتح اللعبة والوضع المحلي بلا شبكة
 const SHELL = [
@@ -235,8 +235,17 @@ self.addEventListener('fetch', (event) => {
   event.respondWith((async () => {
     try {
       const fresh = await fetch(req);
-      // نخزّن الناجح فقط — وصفحة خطأ مخزّنة أسوأ من لا شيء
-      if (fresh && fresh.ok) {
+      /*
+        نخزّن الكامل الناجح فقط — وصفحة خطأ مخزّنة أسوأ من لا شيء.
+
+        ⚠️ **`status === 200` لا `fresh.ok`**: `ok` تصدُق على كل 2xx
+        ومنها **206** — وهي جواب طلب Range الذي يرسله المتصفح عند سحب
+        شريط الصوت أو الفيديو. و`cache.put` ترفض أي استجابة جزئية
+        (Partial response is unsupported)، فكان كل سحب لشريط مقطع
+        يخلّف رفضاً غير مُلتقَط في سجل عامل الخدمة. ظهر مع فئة
+        «نشيد وطني» الصوتية.
+      */
+      if (fresh && fresh.status === 200) {
         const cache = await caches.open(CACHE);
         cache.put(req, fresh.clone());
       }

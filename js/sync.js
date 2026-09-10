@@ -131,6 +131,8 @@ async function pullFromCloudOnce() {
 
     // الإسقاط بعد كل دمج — الدمج هو ما يُعيد الزرع
     retireCategories();
+    // وكذلك الفئات الصوتية: بنك السحابة قد يحمل أسئلة نصّية قديمة لها
+    enforceAudioOnlyCategories?.();
     saveJSON('mr_bank', QBANK);
     saveJSON('mr_categories', CATEGORIES);
 

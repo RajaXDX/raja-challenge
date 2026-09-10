@@ -77,6 +77,9 @@ const DEFAULT_CATEGORIES = [
   { name: 'كرة قدم', ic: '⚽' }, { name: 'الكرة السعودية', ic: '🏆' },
   { name: 'شعارات أندية ومنتخبات', ic: '🏟️' },
   { name: 'ألعاب إلكترونية', ic: '🎮' },
+  // «نشيد وطني» صوتية بحتة (راجع AUDIO_ONLY_CATEGORIES)، وأسئلتها النصّية
+  // انتقلت إلى فئة مستقلة بدل أن تُرمى
+  { name: 'معلومات الأناشيد', ic: '🎵' },
 ];
 
 // متغيرات الحالة
@@ -2730,6 +2733,41 @@ function mergeDefaultCategories() {
   return added;
 }
 
+/*
+  فئات لا يصحّ فيها إلا سؤال بمقطع صوتي.
+
+  «نشيد وطني» صارت (2026-09-10، بطلب المستخدم) «اسمع المقطع وخمّن الدولة».
+  وأسئلتها النصّية الستون نُقلت إلى «معلومات الأناشيد» بنصوصها كما هي.
+
+  ⚠️ **حذفها من ملفات المشروع وحده لا يكفي**: البنك يعيش في `mr_bank` داخل
+  localStorage وفي `question_bank` في السحابة، والدمج يضيف ولا يحذف — فمن
+  حمّل الصفحة قبل هذا التغيير يبقى عنده الستون داخل «نشيد وطني» إلى الأبد،
+  فتصير الفئة مختلطة عنده وحده. وهو بالضبط ما رفضه المستخدم.
+
+  ⚠️ **ولا تصلح `retired-questions.json` هنا**: إسقاطها بالنصّ يعمل على
+  **كل الفئات**، والنصوص نفسها هي التي انتقلت إلى الفئة الجديدة — فكانت
+  ستُمحى من الاثنتين معاً. القاعدة مربوطة بالفئة لا بالنصّ.
+
+  📌 وأثرها الجانبي مقصود: سؤال يُضاف بنموذج «الإضافة السريعة» في فئة
+  صوتية بلا مقطع يُسقَط عند التحميل التالي — لأن الفئة لا معنى لها بلا صوت.
+*/
+const AUDIO_ONLY_CATEGORIES = new Set(['نشيد وطني']);
+
+function enforceAudioOnlyCategories() {
+  let dropped = 0;
+  AUDIO_ONLY_CATEGORIES.forEach(name => {
+    const cat = QBANK[name];
+    if (!cat) return;
+    ['easy', 'medium', 'hard'].forEach(diff => {
+      if (!Array.isArray(cat[diff])) return;
+      const before = cat[diff].length;
+      cat[diff] = cat[diff].filter(q => q && q.audio);
+      dropped += before - cat[diff].length;
+    });
+  });
+  return dropped;
+}
+
 // يضمن أن كل فئة موجودة في البنك تظهر أيضاً في قائمة الفئات
 function syncCategoriesWithBank() {
   let added = 0;
@@ -2763,6 +2801,7 @@ async function syncBundledQuestionBank() {
       fixed += r.fixed;
     });
 
+    const mutedText = enforceAudioOnlyCategories();
     const newDefaults = mergeDefaultCategories();
 
     // ⚠️ **بعد** الدمج لا قبله: الدمج هو ما يُعيد زرع الفئة المسحوبة من
@@ -2771,7 +2810,7 @@ async function syncBundledQuestionBank() {
 
     const newCats = syncCategoriesWithBank() + newDefaults;
 
-    if (added > 0 || fixed > 0 || removed > 0 || newCats > 0 || droppedCats > 0) {
+    if (added > 0 || fixed > 0 || removed > 0 || newCats > 0 || droppedCats > 0 || mutedText > 0) {
       saveJSON('mr_bank', QBANK);
       saveJSON('mr_categories', CATEGORIES);
     }
