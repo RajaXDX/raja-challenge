@@ -246,18 +246,174 @@ function renderCatGrid() {
     grid.appendChild(makeCatCard(c));
   });
   updateSelStatus();
+  renderHiddenCats();
+  probeAdminOnce();   // بلا انتظار: يعيد الرسم وحده إن ثبت أنه إدمن
+}
+
+/*
+  أدوات الفئات للإدمن وحده.
+
+  لا نعرض زرّ الإخفاء لكل لاعب: `authenticateAdmin()` مع السحابة تمرّ صامتةً
+  لمن هو إدمن فعلاً وترفض غيره برسالة — فزرٌّ يراه الجميع ويُنكر على أكثرهم
+  إزعاجٌ بلا فائدة. نتحقّق مرّة واحدة بلا أي مطالبة (جلسة موجودة + `is_admin`)
+  ثم تظهر الأدوات.
+*/
+let adminUnlocked = false;
+let adminProbePromise = null;
+
+function probeAdminOnce() {
+  if (adminProbePromise) return adminProbePromise;
+
+  adminProbePromise = (async () => {
+    if (!supa || adminUnlocked) return adminUnlocked;
+    try {
+      const { data: { session } } = await supa.auth.getSession();
+      if (!session) return false;
+      if (await checkIsAdmin?.()) {
+        adminUnlocked = true;
+        // الشاشة رُسمت قبل أن يصل الجواب — نعيد رسمها لتظهر الأدوات
+        if (document.querySelector('#screen-categories.active')) renderCatGrid();
+      }
+    } catch (e) {
+      console.warn('تعذّر فحص صلاحية الإدارة:', e);
+    }
+    return adminUnlocked;
+  })();
+
+  return adminProbePromise;
+}
+
+async function ensureAdmin() {
+  const ok = await authenticateAdmin();
+  if (ok) adminUnlocked = true;
+  return ok;
+}
+
+// عدد أسئلة الفئة في البنك — صفرٌ يعني «قريباً»
+function categoryQuestionCount(name) {
+  const cat = QBANK[name];
+  if (!cat) return 0;
+  return ['easy', 'medium', 'hard']
+    .reduce((n, d) => n + (Array.isArray(cat[d]) ? cat[d].length : 0), 0);
+}
+
+/*
+  إخفاء فئة عن كل الأجهزة.
+
+  يستعمل نفس أنبوب `retired_categories` الذي يستعمله الحذف في لوحة الإدارة —
+  لا آلية موازية. والفرق أنه معلن القابلية للتراجع: الاسم يظهر في شريط
+  «المخفية» بزرّ إرجاع.
+
+  ولا تضيع الأسئلة: `retireCategories()` تحذف الفئة من البنك، لكن أسئلتها
+  تعيش في ملفات المشروع (وفي `question_bank` بالسحابة لما أضافه المستخدم
+  يدوياً)، فترجع كاملة عند الإظهار.
+*/
+async function hideCategory(name) {
+  if (!(await ensureAdmin())) return;
+
+  if (!(await uiConfirm(`إخفاء «${name}» عن كل الأجهزة؟\nترجعها متى شئت من شريط «المخفية» تحت الشبكة.`))) return;
+
+  const published = await publishRetiredCategory(name);
+
+  if (!published) {
+    // بلا سحابة لا إخفاء حقيقي: `fetchRetiredCategories` تعيد بناء القائمة عند
+    // كل تحميل من الملف والسحابة، فإخفاء محلي بحت يتبخّر بلا أن يفهم أحد لماذا
+    uiAlert('⚠️ تعذّر الوصول للسحابة — لم تُخفَ الفئة. جرّب لما يرجع الاتصال.');
+    return;
+  }
+
+  retireCategories();
+  selectedCats = selectedCats.filter(c => c.name !== name);
+  saveJSON('mr_categories', CATEGORIES);
+  saveJSON('mr_bank', QBANK);
+  renderCatGrid();
+  Sound.select?.();
+  uiAlert(`🙈 أُخفيت «${name}» عن كل الأجهزة`);
+}
+
+async function restoreCategory(name) {
+  if (!(await ensureAdmin())) return;
+
+  if (!(await unretireCategory(name))) {
+    uiAlert('⚠️ تعذّر الوصول للسحابة — لم تُرجَع الفئة.');
+    return;
+  }
+
+  // تُعاد الفئة وأسئلتها من ملفات المشروع في نفس اللحظة
+  await syncBundledQuestionBank();
+  renderCatGrid();
+  Sound.select?.();
+
+  const n = categoryQuestionCount(name);
+  uiAlert(n > 0
+    ? `✅ رجعت «${name}» ومعها ${n} سؤالاً`
+    : `✅ رجعت «${name}» — وهي بلا أسئلة بعد`);
+}
+
+// شريط المخفيّات: لا يظهر إلا للإدمن، وإلا كان كشفاً لما أُخفي عمداً
+function renderHiddenCats() {
+  const box = document.getElementById('hiddenCats');
+  if (!box) return;
+
+  const names = [...cloudRetiredNames]
+    .map(n => String(n).trim())
+    .filter(n => n && !fileRetiredNames.has(n))   // الدائم لا يُعرض بزرّ إرجاع
+    .filter(n => knownCategoryNames.has(n))       // ولا اسم مهمل لا يقابله فئة
+    .sort();
+
+  if (!adminUnlocked || !names.length) {
+    box.innerHTML = '';
+    box.style.display = 'none';
+    return;
+  }
+
+  box.style.display = 'block';
+  box.innerHTML = `<div class="hidden-title">🙈 فئات مخفية (${names.length}) — اضغط للإرجاع</div>`;
+
+  const row = createElement('div', { class: 'hidden-row' });
+  names.forEach(n => {
+    const chip = createElement('button', { class: 'hidden-chip', type: 'button' },
+                               `${escapeHtml(n)} ↩`);
+    chip.onclick = () => restoreCategory(n);
+    row.appendChild(chip);
+  });
+  box.appendChild(row);
 }
 
 function makeCatCard(c) {
   const sel = selectedCats.some(s => s.name === c.name);
+  const soon = categoryQuestionCount(c.name) === 0;
+
   const card = createElement('div', {
-    class: `cat-pick${sel ? ' sel' : ''}`
+    class: `cat-pick${sel ? ' sel' : ''}${soon ? ' soon' : ''}`
   }, `
     <div class="check">✓</div>
     <span class="ic">${c.ic}</span>
     <div class="nm">${escapeHtml(c.name)}</div>
+    ${soon ? '<div class="soon-tag">قريباً</div>' : ''}
+    ${adminUnlocked ? '<button type="button" class="cat-hide" title="إخفاء الفئة عن كل الأجهزة">✕</button>' : ''}
   `);
-  card.onclick = () => toggleCategory(c, card);
+
+  // `stopPropagation` ضرورية: الزرّ داخل البطاقة، وبدونها يُختار الفئة ويخفيها معاً
+  const hideBtn = card.querySelector('.cat-hide');
+  if (hideBtn) hideBtn.onclick = (e) => { e.stopPropagation(); hideCategory(c.name); };
+
+  card.onclick = () => {
+    /*
+      فئة بلا أسئلة لا تُختار.
+
+      كانت تُختار عادية، فيقع اللاعب وسط الجلسة على نموذج «أضف سؤالاً» بدل
+      سؤال — وهو مخرج المطوّر لا مخرج اللاعب. والفئات الفارغة اليوم أربع
+      (نشيد وطني والثلاث المصوّرة) تنتظر مقاطع المستخدم وصوره.
+    */
+    if (soon) {
+      Sound.skip?.();
+      uiAlert(`«${c.name}» ما فيها أسئلة بعد — قريباً`);
+      return;
+    }
+    toggleCategory(c, card);
+  };
+
   return card;
 }
 
@@ -2511,6 +2667,38 @@ function fetchRetiredQuestions() {
 let retiredCategoriesPromise = null;
 let retiredCategoryNames = new Set();
 
+/*
+  المخفيّ من السحابة وحده — وهو وحده القابل للإرجاع.
+
+  `retiredCategoryNames` تخلط مصدرين: قائمة `data/retired-categories.json`
+  (أرضية ثابتة تُقرأ كل تحميل) وصفّ `retired_categories` في السحابة. لو
+  عرضنا الخلطة في زرّ «إظهار» لوعدنا المستخدم بإرجاع فئة يعيدها الملف
+  إلى الإخفاء عند أول تحميل — وعدٌ كاذب. فنفصل المصدرين.
+*/
+let cloudRetiredNames = new Set();
+
+// وما سُحب في `data/retired-categories.json`: سحبٌ دائم، إرجاعه من الواجهة
+// وعدٌ كاذب لأن الملف يُعيد سحبه عند أول تحميل. فلا يظهر في شريط المخفية.
+let fileRetiredNames = new Set();
+
+/*
+  أسماء الفئات المعروفة فعلاً — من ملفات المشروع ومن بنك السحابة.
+
+  صفّ `retired_categories` في قاعدة المستخدم فيه أسماء مهملة من كتابة
+  خاطئة قديمة ("0".."21" و"h")، وهي بلا أثر على اللعب لأنها تُخفي فئات
+  غير موجودة — لكنها كانت ستملأ شريط «المخفية» بثلاث وعشرين شريحة لا
+  تعني شيئاً. فنعرض ما نعرف أنه فئة، ولا نعدّل بيانات أحد.
+*/
+let knownCategoryNames = new Set();
+
+function rememberKnownCategories(names) {
+  (names || []).forEach(n => {
+    const t = String(n || '').trim();
+    if (t) knownCategoryNames.add(t);
+  });
+  return knownCategoryNames.size;
+}
+
 function fetchRetiredCategories() {
   if (retiredCategoriesPromise) return retiredCategoriesPromise;
 
@@ -2520,6 +2708,7 @@ function fetchRetiredCategories() {
     .catch(() => [])    // غياب الملف ليس خطأً
     .then(list => {
       retiredCategoryNames = new Set(list.map(t => String(t).trim()).filter(Boolean));
+      fileRetiredNames = new Set(retiredCategoryNames);
       return list;
     });
 
@@ -2540,7 +2729,9 @@ function fetchRetiredCategories() {
 function applyCloudRetiredCategories(list) {
   (list || []).forEach(n => {
     const name = String(n || '').trim();
-    if (name) retiredCategoryNames.add(name);
+    if (!name) return;
+    retiredCategoryNames.add(name);
+    cloudRetiredNames.add(name);
   });
   return retiredCategoryNames.size;
 }
@@ -2563,6 +2754,7 @@ async function publishRetiredCategory(name) {
 
     if (error) throw error;
     retiredCategoryNames.add(clean);
+    cloudRetiredNames.add(clean);
     return true;
   } catch (e) {
     console.warn('تعذّر نشر حذف الفئة:', e);
@@ -2576,6 +2768,7 @@ async function unretireCategory(name) {
   if (!clean) return false;
 
   retiredCategoryNames.delete(clean);
+  cloudRetiredNames.delete(clean);
   if (!supa) return true;
 
   try {
@@ -2792,6 +2985,11 @@ async function syncBundledQuestionBank() {
     // الإسقاط قبل الدمج: لو أُعيدت صياغة سؤال، نحذف القديم ثم نضيف الجديد
     const removed = retireQuestions(QBANK, await fetchRetiredQuestions());
     await fetchRetiredCategories();
+
+    // أسماء كل فئات الملفات — تُجمع قبل أي إسقاط
+    rememberKnownCategories(DEFAULT_CATEGORIES.map(c => c.name));
+    files.forEach(data => rememberKnownCategories(
+      Object.keys(data || {}).filter(k => !k.startsWith('_'))));
 
     let added = 0;
     let fixed = 0;

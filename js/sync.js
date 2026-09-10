@@ -126,6 +126,9 @@ async function pullFromCloudOnce() {
     // حتى لا تمحو نسخة سحابية قديمة الأسئلة المحمّلة من ملفات المشروع
     if (!bankError && bankData?.data && Object.keys(bankData.data).length > 0) {
       mergeIntoQuestionBank(QBANK, bankData.data);
+      // فئات المستخدم التي لا وجود لها في ملفات المشروع تُعرف من هنا،
+      // فيقدر شريط «المخفية» أن يعرضها إن أُخفيت
+      rememberKnownCategories?.(Object.keys(bankData.data));
       syncCategoriesWithBank();
     }
 
