@@ -15,7 +15,7 @@
 */
 
 // ارفع الرقم عند تغيير قائمة `SHELL` — `activate` يمسح ما سواه فيُعاد التخزين نظيفاً
-const CACHE = 'raja-v36';
+const CACHE = 'raja-v37';
 
 // هيكل التطبيق: ما يكفي لفتح اللعبة والوضع المحلي بلا شبكة
 const SHELL = [
@@ -64,6 +64,7 @@ const SHELL = [
   './data/questions-part23.json',
   './data/questions-part24.json',
   './data/questions-part25.json',
+  './data/questions-part26.json',
   './data/retired-questions.json',
   './data/retired-categories.json',
 
@@ -102,6 +103,30 @@ const SHELL = [
   './assets/logos/lacoste.jpg',
   './assets/logos/nestle.jpg',
   './assets/logos/nvidia.jpg',
+
+  // «شعارات دول» — الفئة كلها صور، فبدونها تنكسر تماماً بلا إنترنت
+  './assets/country-emblems/argentina.webp',
+  './assets/country-emblems/austria.webp',
+  './assets/country-emblems/brazil.webp',
+  './assets/country-emblems/china.webp',
+  './assets/country-emblems/france.webp',
+  './assets/country-emblems/germany.webp',
+  './assets/country-emblems/greece.webp',
+  './assets/country-emblems/italy.webp',
+  './assets/country-emblems/japan.webp',
+  './assets/country-emblems/kuwait.png',
+  './assets/country-emblems/mexico.webp',
+  './assets/country-emblems/norway.webp',
+  './assets/country-emblems/portugal.webp',
+  './assets/country-emblems/qatar.webp',
+  './assets/country-emblems/russia.webp',
+  './assets/country-emblems/saudi-arabia.webp',
+  './assets/country-emblems/spain.webp',
+  './assets/country-emblems/syria.webp',
+  './assets/country-emblems/turkey.webp',
+  './assets/country-emblems/uae.png',
+  './assets/country-emblems/usa.webp',
+  './assets/country-emblems/vietnam.webp',
 
   // شعارات سعودية بالصور — الفئة صارت صوراً بحتة، فبدونها تنكسر بلا إنترنت
   './assets/sa-logos/aramco.jpg',

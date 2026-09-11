@@ -1,0 +1,121 @@
+{
+  "_ملاحظة": "فئة «شعارات دول» — صور بحتة من مجلّد «contry logos» عند المستخدم، والتقسيم إلى سهل/متوسط/صعب تقسيمه هو (9/6/7). الصور نُسخت إلى assets/country-emblems/ بأسماء لاتينية كما في فئتَي الأعلام، والإجابة العربية هنا لا في اسم الملف. فُحص كل شعار بالعين قبل كتابة إجابته — الـ22 كلها مطابقة. شعار سوريا هو الشعار الجديد (العُقاب الذهبي بثلاث نجوم). ونص كل سؤال مختلف داخل الفئة عمداً: الدمج يطابق بنص السؤال.",
+  "شعارات دول": {
+    "easy": [
+      {
+        "question": "ما اسم الدولة صاحبة هذا الشعار؟",
+        "answer": "السعودية",
+        "image": "assets/country-emblems/saudi-arabia.webp"
+      },
+      {
+        "question": "أي دولة يمثّلها هذا الشعار؟",
+        "answer": "الإمارات",
+        "image": "assets/country-emblems/uae.png"
+      },
+      {
+        "question": "لأي دولة يعود هذا الشعار؟",
+        "answer": "الكويت",
+        "image": "assets/country-emblems/kuwait.png"
+      },
+      {
+        "question": "هذا الشعار لأي دولة؟",
+        "answer": "قطر",
+        "image": "assets/country-emblems/qatar.webp"
+      },
+      {
+        "question": "ما الدولة التي تتّخذ هذا الشعار رمزاً لها؟",
+        "answer": "تركيا",
+        "image": "assets/country-emblems/turkey.webp"
+      },
+      {
+        "question": "يرمز هذا الشعار إلى أي دولة؟",
+        "answer": "الصين",
+        "image": "assets/country-emblems/china.webp"
+      },
+      {
+        "question": "من صاحب هذا الشعار من الدول؟",
+        "answer": "أمريكا",
+        "image": "assets/country-emblems/usa.webp"
+      },
+      {
+        "question": "أي بلد يحمل هذا الشعار؟",
+        "answer": "إسبانيا",
+        "image": "assets/country-emblems/spain.webp"
+      },
+      {
+        "question": "شعار أي دولة هذا؟",
+        "answer": "النمسا",
+        "image": "assets/country-emblems/austria.webp"
+      }
+    ],
+    "medium": [
+      {
+        "question": "ما اسم الدولة التي تحمل هذا الشعار؟",
+        "answer": "الأرجنتين",
+        "image": "assets/country-emblems/argentina.webp"
+      },
+      {
+        "question": "أي دولة تُعرف بهذا الشعار؟",
+        "answer": "البرتغال",
+        "image": "assets/country-emblems/portugal.webp"
+      },
+      {
+        "question": "هذا الشعار يخصّ أي دولة؟",
+        "answer": "ألمانيا",
+        "image": "assets/country-emblems/germany.webp"
+      },
+      {
+        "question": "ما الدولة صاحبة هذا الشعار الوطني؟",
+        "answer": "المكسيك",
+        "image": "assets/country-emblems/mexico.webp"
+      },
+      {
+        "question": "أي دولة تتّخذ هذا الشعار الرسمي؟",
+        "answer": "سوريا",
+        "image": "assets/country-emblems/syria.webp"
+      },
+      {
+        "question": "لأي بلد يعود هذا الشعار؟",
+        "answer": "فيتنام",
+        "image": "assets/country-emblems/vietnam.webp"
+      }
+    ],
+    "hard": [
+      {
+        "question": "ما اسم البلد الذي يتّخذ هذا الشعار؟",
+        "answer": "البرازيل",
+        "image": "assets/country-emblems/brazil.webp"
+      },
+      {
+        "question": "أي بلد يمثّله هذا الشعار؟",
+        "answer": "النرويج",
+        "image": "assets/country-emblems/norway.webp"
+      },
+      {
+        "question": "لأي دولة ينتمي هذا الشعار؟",
+        "answer": "اليابان",
+        "image": "assets/country-emblems/japan.webp"
+      },
+      {
+        "question": "ما البلد صاحب هذا الشعار؟",
+        "answer": "اليونان",
+        "image": "assets/country-emblems/greece.webp"
+      },
+      {
+        "question": "هذا الشعار لأي بلد؟",
+        "answer": "إيطاليا",
+        "image": "assets/country-emblems/italy.webp"
+      },
+      {
+        "question": "أي دولة يخصّها هذا الشعار؟",
+        "answer": "روسيا",
+        "image": "assets/country-emblems/russia.webp"
+      },
+      {
+        "question": "ما الدولة التي يرمز إليها هذا الشعار؟",
+        "answer": "فرنسا",
+        "image": "assets/country-emblems/france.webp"
+      }
+    ]
+  }
+}
