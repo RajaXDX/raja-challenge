@@ -193,3 +193,47 @@ $$;
 
 REVOKE ALL ON FUNCTION admin_set_admin(UUID, BOOLEAN) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION admin_set_admin(UUID, BOOLEAN) TO authenticated;
+
+
+-- ============================================================================
+-- 9) حذف اللاعب لحسابه بنفسه — أُضيف 2026-09-06
+-- ============================================================================
+-- ⚠️ **شرط قبول في App Store، لا ميزة اختيارية.** بند 5.1.1(v) يوجب أن
+-- يستطيع كل من أنشأ حساباً داخل التطبيق أن يحذفه من داخل التطبيق أيضاً —
+-- لا برسالة بريد ولا بنموذج على الويب. وكانت لدينا `admin_delete_player`
+-- للإدارة وحدها، فلا سبيل للاعب أن يحذف حسابه إطلاقاً.
+--
+-- حذف صفّ من auth.users يتطلّب صلاحية عليا لا يجوز أن تصل للمتصفح، فالحذف
+-- يتم هنا داخل القاعدة. الدالة لا تأخذ معرّفاً: تحذف `auth.uid()` وحده،
+-- فلا يمكن استعمالها لحذف حساب غيرك مهما أُرسل لها.
+CREATE OR REPLACE FUNCTION delete_my_account()
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth
+AS $$
+DECLARE
+  me UUID := auth.uid();
+BEGIN
+  IF me IS NULL THEN
+    RAISE EXCEPTION 'غير مسجّل دخول';
+  END IF;
+
+  -- آخر إدمن لا يحذف نفسه، وإلا بقيت اللوحة بلا صاحب ولا سبيل لاستعادتها
+  -- إلا من محرر SQL.
+  IF EXISTS (SELECT 1 FROM admins WHERE user_id = me)
+     AND (SELECT count(*) FROM admins) <= 1 THEN
+    RAISE EXCEPTION 'أنت آخر إدمن — رقِّ غيرك قبل حذف حسابك';
+  END IF;
+
+  -- الصداقات ليست عليها CASCADE من profiles، فنحذفها صراحةً وإلا بقيت
+  -- صفوف تشير إلى حساب لم يعد موجوداً.
+  DELETE FROM friendships WHERE requester_id = me OR addressee_id = me;
+
+  -- profiles تُحذف تلقائياً بالـ CASCADE على auth.users
+  DELETE FROM auth.users WHERE id = me;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION delete_my_account() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION delete_my_account() TO authenticated;
