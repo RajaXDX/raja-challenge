@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تحدي رجا - لعبة أسئلة جماعية</title>
+  <meta name="description" content="لعبة أسئلة جماعية للعائلة والأصدقاء — 36 فئة وأكثر من 2000 سؤال. العبوا من جهاز واحد أو من أجهزتكم بكود روم.">
+
+  <!-- أيقونة الموقع. الأيقونات مولّدة بـ`tools/make-icons.py` من نفس
+       مصدر أيقونة التطبيق، فلا يفترق شكل الموقع عن شكل التطبيق. -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A1A14">
+
+  <!-- معاينة الرابط عند مشاركته في واتساب وتويتر -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="تحدي رجا">
+  <meta property="og:title" content="تحدي رجا — لعبة أسئلة جماعية">
+  <meta property="og:description" content="فريقان، 36 فئة، وأكثر من 2000 سؤال. العبوا مع بعض من جهاز واحد أو من أجهزتكم بكود روم.">
+  <meta property="og:image" content="https://rajaxdx.github.io/raja-challenge/assets/share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="شعار تحدي رجا">
+  <meta property="og:url" content="https://rajaxdx.github.io/raja-challenge/">
+  <meta property="og:locale" content="ar_SA">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="تحدي رجا — لعبة أسئلة جماعية">
+  <meta name="twitter:description" content="فريقان، 36 فئة، وأكثر من 2000 سؤال.">
+  <meta name="twitter:image" content="https://rajaxdx.github.io/raja-challenge/assets/share.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
+  <link rel="stylesheet" href="css/style.css?v=20260906c">
+  <link rel="stylesheet" href="css/responsive.css?v=20260906c">
+</head>
+<body>
+
+<div class="sadu"></div>
+<header>
+  <button class="admin-gear" id="adminGearBtn" onclick="openAdmin()" title="لوحة الإدارة">⚙️</button>
+  <div class="header-corner">
+    <span id="syncStatus" class="sync-indicator">📴 وضع محلي</span>
+    <div class="auth-state" id="authState" style="display:none;"></div>
+  </div>
+  <div class="brand-row">
+    <img src="assets/logo.png" alt="شعار تحدي رجا" class="brand-logo"
+         onerror="this.style.display='none'">
+    <h1 class="brand">تحدي <span>رجا</span></h1>
+  </div>
+  <div class="tag">لعبة أسئلة وأجوبة جماعية ذكية</div>
+</header>
+<div class="sadu-strip"></div>
+
+<!-- شاشة الحساب -->
+<div class="screen" id="screen-auth">
+  <div class="auth-container">
+    <div class="step-title">ادخل بحسابك</div>
+    <div class="step-sub">حسابك يحفظ إحصاءاتك ونتائجك</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">دخول</button>
+      <button class="auth-tab" id="authTabSignup" onclick="switchAuthTab('signup')">حساب جديد</button>
+    </div>
+
+    <div class="auth-form">
+      <div id="authUsernameRow">
+        <label for="authUsername">اسم المستخدم</label>
+        <input type="text" id="authUsername" autocomplete="username" placeholder="مثال: راماح" maxlength="20">
+      </div>
+
+      <div id="authEmailRow" style="display:none;">
+        <label for="authEmail">البريد الإلكتروني</label>
+        <input type="email" id="authEmail" autocomplete="email" placeholder="name@example.com">
+      </div>
+
+      <div id="authPasswordRow">
+        <label for="authPassword">كلمة المرور</label>
+        <input type="password" id="authPassword" autocomplete="current-password" placeholder="6 أحرف على الأقل">
+      </div>
+
+      <div class="auth-message" id="authMessage"></div>
+
+      <button class="btn-main btn-primary" id="authSubmitBtn" onclick="handleAuthSubmit(currentAuthMode)">دخول</button>
+      <p class="auth-note" id="authNote">ما عندك حساب؟ اضغط «حساب جديد» فوق</p>
+      <button class="auth-link" id="authForgotBtn" onclick="switchAuthTab('forgot')">نسيت كلمة المرور؟</button>
+
+      <!--
+        ⚠️ مخرج «بلا حساب» ليس تسهيلاً — هو شرط قبول في App Store:
+        بند 5.1.1(v) يمنع اشتراط الحساب لميزات لا تحتاجه، واللعب المحلي
+        على جهاز واحد لا يحتاج حساباً إطلاقاً. وبدونه يصير التطبيق بلا
+        إنترنت جداراً لا يُتجاوز — والمراجع يختبر بلا شبكة.
+      -->
+      <div class="auth-guest">
+        <button class="auth-link" id="authGuestBtn" onclick="continueWithoutAccount()">
+          العب بلا حساب — على جهاز واحد
+        </button>
+        <p class="auth-note">الأونلاين والإحصاءات والأصدقاء تحتاج حساباً</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- الشاشة الرئيسية -->
+<div class="screen active" id="screen-home">
+  <div class="home-container">
+    <div class="hero-section">
+      <h2 class="hero-title">مرحباً بك في تحدي رجا 🎮</h2>
+      <p class="hero-subtitle">لعبة أسئلة ذكية للعائلة والأصدقاء</p>
+    </div>
+
+    <div class="home-buttons">
+      <button class="btn-main btn-primary" onclick="goToModeSelect()">
+        <span class="btn-icon">🎯</span>
+        <span>لعبة جديدة</span>
+      </button>
+      <button class="btn-main btn-secondary" onclick="goToProfile()">
+        <span class="btn-icon">📊</span>
+        <span>ملفي والإحصائيات</span>
+      </button>
+      <button class="btn-main btn-secondary" id="friendsHomeBtn" onclick="goToFriends()">
+        <span class="btn-icon">🤝</span>
+        <span>الأصدقاء</span>
+      </button>
+      <button class="btn-main btn-secondary" onclick="showAbout()">
+        <span class="btn-icon">ℹ️</span>
+        <span>عن اللعبة</span>
+      </button>
+    </div>
+
+    <div class="home-stats">
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-info">
+          <div class="stat-label">أسئلة متاحة</div>
+          <div class="stat-value" id="totalQuestions">--</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📂</div>
+        <div class="stat-info">
+          <div class="stat-label">فئات</div>
+          <div class="stat-value" id="totalCategories">--</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <div class="stat-label">الفرق</div>
+          <div class="stat-value">فريقان</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- شاشة الأصدقاء -->
+<div class="screen" id="screen-friends">
+  <div class="step-title">🤝 الأصدقاء</div>
+  <div class="step-sub">أضف صديقك باسم المستخدم</div>
+
+  <div class="friends-container">
+    <div class="friend-add">
+      <input type="text" id="friendUsernameInput" placeholder="اسم المستخدم..." maxlength="20"
+             onkeypress="if(event.key==='Enter'){event.preventDefault();submitAddFriend();}">
+      <button class="btn-main btn-primary" id="friendAddBtn" onclick="submitAddFriend()">
+        <span class="btn-icon">➕</span><span>إضافة</span>
+      </button>
+    </div>
+    <div class="auth-message" id="friendAddMessage"></div>
+
+    <div id="friendsBox"></div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn-main btn-ghost" onclick="goToHome()">← رجوع</button>
+  </div>
+</div>
+
+<!-- شاشة الملف الشخصي والإحصائيات -->
+<div class="screen" id="screen-profile">
+  <div class="step-title">📊 ملفي والإحصائيات</div>
+  <div class="step-sub">تحكّم بخصوصيتك وشوف إحصاءات اللاعبين</div>
+
+  <div class="profile-container">
+    <div id="privacyBox" class="privacy-box"></div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">🔍 ابحث عن لاعب</div>
+      <div class="friend-add">
+        <input type="text" id="playerSearchInput" placeholder="اسم المستخدم..." maxlength="20"
+               onkeypress="if(event.key==='Enter'){event.preventDefault();searchPlayerCard();}">
+        <button class="btn-main btn-primary" onclick="searchPlayerCard()">
+          <span class="btn-icon">🔍</span><span>عرض</span>
+        </button>
+      </div>
+      <div id="playerCardBox"></div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">🏅 لوحة الصدارة</div>
+      <div id="leaderboardBox"></div>
+    </div>
+
+    <!--
+      حذف الحساب من داخل التطبيق — شرط قبول في App Store (بند 5.1.1(v)):
+      من أنشأ حساباً داخل التطبيق يجب أن يحذفه من داخله، لا برسالة بريد.
+      يظهر للمسجّلين وحدهم، وفي آخر الشاشة لأنه إجراء لا رجعة فيه.
+    -->
+    <div class="profile-section danger-zone" id="deleteAccountSection" style="display:none;">
+      <div class="profile-section-title">⚠️ حذف الحساب</div>
+      <p class="danger-note">
+        يُحذف حسابك وإحصاءاتك وصداقاتك نهائياً. لا يمكن التراجع.
+      </p>
+      <button class="btn-main btn-danger" onclick="deleteMyAccount()">
+        <span class="btn-icon">🗑️</span><span>حذف حسابي نهائياً</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn-main btn-ghost" onclick="goToHome()">← رجوع</button>
+  </div>
+</div>
+
+<!-- شاشة اختيار المود -->
+<div class="screen" id="screen-mode-select">
+  <div class="step-title">اختر طريقة اللعب</div>
+  <div class="step-sub">اختر بين اللعب محلياً أو أونلاين مع أصدقائك</div>
+  <div class="mode-buttons">
+    <button class="mode-btn mode-local" onclick="startLocalMode()">
+      <div class="mode-icon">💻</div>
+      <div class="mode-name">محلي</div>
+      <div class="mode-desc">لعب على جهاز واحد مع عائلتك</div>
+    </button>
+    <button class="mode-btn mode-online" onclick="goToRooms()">
+      <div class="mode-icon">🌐</div>
+      <div class="mode-name">أونلاين</div>
+      <div class="mode-desc">لعب مع أصدقائك من أجهزة مختلفة</div>
+    </button>
+  </div>
+  <div class="nav-buttons">
+    <button class="btn-main btn-ghost" onclick="goToHome()">← رجوع</button>
+  </div>
+</div>
+
+<!-- شاشة الرومات -->
+<div class="screen" id="screen-rooms">
+  <div class="step-title">الرومات المتاحة</div>
+  <div class="step-sub">إنشاء روم جديدة أو الدخول لروم موجودة</div>
+
+  <div class="rooms-controls">
+    <button class="btn-main btn-primary" onclick="showCreateRoomDialog()">
+      <span class="btn-icon">➕</span>
+      <span>روم جديدة</span>
+    </button>
+    <div class="room-code-join">
+      <input type="text" id="roomCodeInput" placeholder="أدخل كود الروم..." maxlength="6">
+      <input type="text" id="playerNameInput" placeholder="اسمك...">
+      <button class="btn-main btn-primary" onclick="joinRoomByCode()">الدخول</button>
+    </div>
+  </div>
+
+  <div class="rooms-list" id="roomsList">
+    <p style="text-align: center; color: #999;">جاري تحميل الرومات...</p>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn-main btn-ghost" onclick="goToHome()">← رجوع</button>
+  </div>
+</div>
+
+<!-- شاشة إعدادات الروم -->
+<div class="screen" id="screen-room-setup">
+  <div class="step-title">إعدادات الروم</div>
+  <div class="room-info">
+    <div class="room-code-display">
+      <span class="code-label">كود الروم:</span>
+      <span class="code-value" id="roomCodeDisplay">----</span>
+    </div>
+    <div class="room-mode-display">
+      <span id="roomModeDisplay">أونلاين</span>
+    </div>
+  </div>
+
+  <div class="room-share">
+    <div class="room-share-hint">أرسل الرابط لأصحابك — يفتح الروم عندهم مباشرة</div>
+    <div class="room-share-buttons">
+      <button class="btn-main btn-primary" onclick="shareRoomWhatsApp()">
+        <span class="btn-icon">💬</span><span>مشاركة على واتساب</span>
+      </button>
+      <button class="btn-main btn-ghost" id="copyLinkBtn" onclick="copyRoomLink()">
+        <span class="btn-icon">🔗</span><span>نسخ الرابط</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="room-players-section">
+    <h3>🎮 اللاعبون</h3>
+    <div id="teamDistributionUI" style="display:none; margin-bottom: 20px;">
+      <div style="font-size: 12px; color: #999; margin-bottom: 10px;">اختر فريق لكل لاعب:</div>
+      <div class="room-players-list" id="roomPlayersList">
+        <p>جاري تحميل اللاعبين...</p>
+      </div>
+    </div>
+    <div id="playersReadyUI" style="display:none;">
+      <div class="room-players-list" id="roomPlayersList2">
+        <p>جاري تحميل اللاعبين...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn-main btn-ghost" onclick="leaveRoom(); goToHome();">← رجوع</button>
+    <button class="btn-main btn-primary" id="startGameBtn" onclick="startGameOnline()" style="display:none;">ابدأ اللعبة 🎮</button>
+  </div>
+  <div class="start-gate-hint" id="startGateHint"></div>
+  <div style="display:none;">
+  </div>
+</div>
+
+<!-- شاشة الإعداد -->
+<div class="screen" id="screen-setup">
+  <div class="step-title">حدد معلومات الفرق</div>
+  <div class="step-sub">اكتب اسم كل فريق واختر 3 وسائل مساعدة</div>
+  <div class="setup-container">
+    <div class="setup-row" id="teamsSetupContainer"></div>
+  </div>
+  <div class="nav-buttons">
+    <button class="btn-main btn-ghost" onclick="goToHome()">← رجوع</button>
+    <button class="btn-main btn-primary" onclick="goToCategories()" id="nextSetupBtn">التالي →</button>
+  </div>
+</div>
+
+<!-- شاشة اختيار الفئات -->
+<div class="screen" id="screen-categories">
+  <div class="step-title">اختر فئات الجولة</div>
+  <div class="step-sub">كل 6 فئات تكوّن جولة. اختر أي عدد</div>
+  <div class="cat-toolbar" id="customCatToolbar" style="display:none;">
+    <input type="text" class="custom-cat-input" id="customCatName" placeholder="اسم فئة مخصصة...">
+    <button class="add-cat-btn" onclick="addCustomCategory()">+ إضافة فئة</button>
+  </div>
+  <div class="cat-grid" id="catGrid"></div>
+  <div class="selection-status" id="selStatus"></div>
+  <div class="nav-buttons">
+    <button class="btn-main btn-ghost" onclick="backFromCategories()">← رجوع</button>
+    <button class="btn-main btn-primary" id="startBtn" onclick="startGame()" disabled>ابدأ اللعبة 🎮</button>
+  </div>
+</div>
+
+<!-- شاشة اللعبة -->
+<div class="screen" id="screen-game">
+  <div class="game-header">
+    <div class="scoreboard" id="scoreboard">
+      <div class="team-card A" id="teamCardA">
+        <div class="team-name" id="gameNameA">الفريق الأول</div>
+        <div class="team-score" id="scoreA">0</div>
+        <div class="team-lifelines" id="lifeDisplayA"></div>
+      </div>
+      <div class="team-card B" id="teamCardB">
+        <div class="team-name" id="gameNameB">الفريق الثاني</div>
+        <div class="team-score" id="scoreB">0</div>
+        <div class="team-lifelines" id="lifeDisplayB"></div>
+      </div>
+    </div>
+    <div class="turn-banner" id="turnBanner"></div>
+    <button class="reset-btn" onclick="backToSetupConfirm()">↺ لعبة جديدة</button>
+  </div>
+
+  <div class="round-tabs" id="roundTabs"></div>
+  <div class="board-wrap"><div class="board" id="board"></div></div>
+</div>
+
+<!-- شاشة النهاية والفوز -->
+<div class="screen" id="screen-end">
+  <div class="end-wrap">
+    <div class="end-trophy" id="endTrophy">🏆</div>
+    <div class="end-title" id="endTitle">انتهت اللعبة</div>
+    <div class="end-winner" id="endWinner"></div>
+
+    <div class="end-scores" id="endScores"></div>
+
+    <div class="nav-buttons">
+      <button class="btn-main btn-ghost" onclick="goToHome()">← الرئيسية</button>
+      <button class="btn-main btn-secondary" onclick="shareResult()">📤 شارك النتيجة</button>
+      <button class="btn-main btn-primary" onclick="playAgain()">🔄 لعبة جديدة</button>
+    </div>
+  </div>
+</div>
+
+<!-- لوحة التحكم -->
+<div class="screen" id="screen-admin">
+  <div class="admin-header">
+    <div class="step-title">⚙️ لوحة الإدارة</div>
+    <button class="btn-close" onclick="closeAdmin()" title="إغلاق">✕</button>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="switchAdminTab('questions')">📚 الأسئلة</button>
+    <button class="admin-tab" onclick="switchAdminTab('categories')">📂 الفئات</button>
+    <button class="admin-tab" onclick="switchAdminTab('users')">👥 اللاعبون</button>
+    <button class="admin-tab" onclick="switchAdminTab('points')">🏆 النقاط</button>
+    <button class="admin-tab" onclick="switchAdminTab('sync')">☁️ المزامنة</button>
+  </div>
+
+  <div class="admin-content">
+    <!-- تبويب الأسئلة -->
+    <div class="admin-section active" id="tab-questions">
+      <h3>إدارة بنك الأسئلة</h3>
+      <div class="bank-controls">
+        <select id="bankCatSelect"></select>
+        <select id="bankDiffSelect">
+          <option value="easy">سهل (100)</option>
+          <option value="medium">متوسط (250)</option>
+          <option value="hard">صعب (400)</option>
+        </select>
+      </div>
+      <div class="admin-row" style="flex-direction:column; align-items:stretch;">
+        <input type="text" id="newQText" placeholder="نص السؤال">
+        <input type="text" id="newQAnswer" placeholder="الإجابة الصحيحة">
+        <input type="text" id="newQEmoji" placeholder="إيموجي (اختياري)">
+        <button class="btn btn-answer" onclick="addBankQuestion()">+ إضافة سؤال</button>
+      </div>
+      <div class="admin-row" style="flex-direction:column; align-items:stretch; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+        <h4 style="margin: 0 0 12px 0;">📸 استيراد صور</h4>
+        <input type="file" id="imageImportInput" accept="image/*" multiple style="padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.3); color: #fff; border: 1px solid rgba(255,255,255,0.2);">
+        <button class="btn btn-answer" onclick="importImages()">📁 استيراد الصور من الجهاز</button>
+        <div id="imageImportStatus" style="font-size: 12px; margin-top: 8px; color: #FFD700;"></div>
+      </div>
+      <div class="bank-list" id="bankList"></div>
+      <div class="bank-count" id="bankCount"></div>
+    </div>
+
+    <!-- تبويب الفئات -->
+    <div class="admin-section" id="tab-categories">
+      <h3>الفئات المتاحة</h3>
+      <div class="admin-row">
+        <input type="text" id="adminNewCatName" placeholder="اسم فئة جديدة">
+        <button class="btn btn-answer" onclick="adminAddCategory()">+ إضافة فئة</button>
+      </div>
+      <div class="cat-admin-list" id="catAdminList"></div>
+    </div>
+
+    <!-- تبويب النقاط -->
+    <div class="admin-section" id="tab-points">
+      <h3>نقاط الأسئلة</h3>
+      <div class="points-inputs">
+        <label>سهل</label><input type="number" id="ptEasy" value="100">
+        <label>متوسط</label><input type="number" id="ptMed" value="250">
+        <label>صعب</label><input type="number" id="ptHard" value="400">
+        <button class="btn btn-answer" onclick="savePoints()">حفظ النقاط</button>
+      </div>
+    </div>
+
+    <!-- تبويب اللاعبين -->
+    <div class="admin-section" id="tab-users">
+      <h3>👥 حسابات اللاعبين</h3>
+      <p style="font-size:13px;color:#9FB8AB;margin-bottom:12px;">
+        كلمات المرور غير معروضة — تُحفظ مشفّرة في Supabase ولا يمكن لأحد قراءتها، ولا حتى أنت.
+      </p>
+      <div id="usersBox"><p style="color:#999">اضغط للتحميل</p></div>
+      <button class="btn btn-ghost" onclick="loadUsers()" style="width:100%;margin-top:10px;">تحديث القائمة</button>
+    </div>
+
+    <!-- تبويب المزامنة -->
+    <div class="admin-section" id="tab-sync">
+      <h3>حالة المزامنة السحابية</h3>
+      <div id="syncInfo" style="padding: 20px; background: rgba(0,0,0,.2); border-radius: 10px;">
+        <p>جاري التحميل...</p>
+      </div>
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <h4 style="margin: 0 0 12px 0;">📈 الإحصائيات</h4>
+        <div id="analyticsBox"><p style="color:#999">اضغط للتحميل</p></div>
+        <button class="btn btn-ghost" onclick="loadAnalytics()" style="width:100%;margin-top:8px;">تحديث الإحصائيات</button>
+      </div>
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <h4 style="margin: 0 0 12px 0;">📚 بنك الأسئلة</h4>
+        <button class="btn btn-answer" onclick="reloadQuestionBank()" style="width: 100%;">إعادة تحميل الأسئلة من ملفات المشروع</button>
+        <p style="font-size: 12px; color: #999; margin-top: 8px;">يضيف أي أسئلة جديدة بدون حذف الأسئلة المضافة يدوياً</p>
+      </div>
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <h4 style="margin: 0 0 12px 0;">🧹 تنظيف الرومات</h4>
+        <button class="btn btn-skip" onclick="cleanupOldRooms()" style="width: 100%;">إغلاق كل الرومات المفتوحة</button>
+        <p style="font-size: 12px; color: #999; margin-top: 8px;">يُغلق الرومات القديمة ويُخرج اللاعبين منها. (الحذف النهائي يحتاج صلاحية DELETE في Supabase)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn-main btn-ghost" onclick="closeAdmin()">← رجوع للعبة</button>
+  </div>
+</div>
+
+<!-- نافذة الأسئلة -->
+<div class="overlay" id="overlay">
+  <div class="qcard">
+    <button class="btn-close" onclick="closeQuestion()">✕</button>
+    <div class="topline">
+      <div class="qcat" id="qcat"></div>
+      <div class="qpoints" id="qpoints"></div>
+    </div>
+    <div class="lifeline-banner" id="lifelineBanner" style="display:none;"></div>
+    <div id="qbody">
+      <div class="qimg" id="qimg"></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="atext" id="atext"></div>
+    </div>
+    <div class="corners" id="cornersBar">
+      <div class="corner" id="answerCorner">
+        <span class="corner-label">الإجابة</span>
+        <button class="btn btn-answer" id="toggleAnswerBtn" onclick="toggleAnswer()">عرض الإجابة</button>
+      </div>
+      <div class="corner">
+        <span class="corner-label">إعطاء النقاط</span>
+        <div id="awardButtons"></div>
+        <button class="btn btn-skip" onclick="award(null)">بدون نقاط</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>لعبة تحدي رجا - نسخة احترافية متزامنة سحابياً 🚀</p>
+  <p style="font-size: 12px; margin-top: 8px;">بنك الأسئلة: <span id="footerStats">--</span> سؤال</p>
+</footer>
+
+<!--
+  مكتبة Supabase — محزومة محلياً لا من CDN.
+
+  ⚠️ ليس تفضيلاً: بند آبل 2.5.2 يمنع أن ينزّل التطبيق كوداً تنفيذياً من
+  الشبكة ويشغّله. جلبها من jsDelivr وقت التشغيل خطر رفض حقيقي عند مراجعة
+  تطبيق iPhone. ومكسب ثانوي: لا تعتمد الصفحة على بقاء CDN طرف ثالث،
+  ولا على `integrity` غائب كان يعني الوثوق بما يرسله jsDelivr كما هو.
+
+  المسار نسبي لا مطلق: داخل التطبيق الأصل `capacitor://localhost`.
+-->
+<script src="assets/vendor/supabase.js?v=20260906c"></script>
+
+<!-- ملفات JS الرئيسية -->
+<script src="js/supabase-config.js?v=20260906c"></script>
+<script src="js/utils.js?v=20260906c"></script>
+<script src="js/auth.js?v=20260906c"></script>
+<script src="js/friends.js?v=20260906c"></script>
+<script src="js/profile.js?v=20260906c"></script>
+<script src="js/game.js?v=20260906c"></script>
+<script src="js/admin.js?v=20260906c"></script>
+<script src="js/sync.js?v=20260906c"></script>
+<script src="js/room-net.js?v=20260906c"></script>
+<script src="js/rooms.js?v=20260906c"></script>
+<script src="js/chat.js?v=20260906c"></script>
+
+</body>
+</html>

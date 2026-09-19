@@ -1,0 +1,2831 @@
+/* ============================= ROOT VARIABLES ============================= */
+:root {
+  --night: #0A1A14;
+  --night-2: #0F2A20;
+  --panel: #12382A;
+  --panel-2: #173F2F;
+  --gold: #D4AF37;
+  --gold-soft: #C9A24B;
+  --sand: #EFE3C6;
+  --clay: #B85C38;
+  --teamA: #3FA796;
+  --teamB: #C9A24B;
+  --used: #0C2218;
+  --text: #EFE3C6;
+  --muted: #9FB8AB;
+  --error: #E74C3C;
+  --success: #27AE60;
+}
+
+/* ============================= RESET ============================= */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: radial-gradient(1200px 700px at 50% -10%, #173F2F 0%, var(--night) 55%, #060F0B 100%);
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================= DECORATIVE ============================= */
+.sadu {
+  height: 14px;
+  width: 100%;
+  background:
+    repeating-linear-gradient(135deg, var(--gold) 0 7px, transparent 7px 14px),
+    repeating-linear-gradient(45deg, var(--gold) 0 7px, transparent 7px 14px);
+  background-blend-mode: screen;
+  opacity: 0.85;
+  mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+}
+
+.sadu-strip {
+  height: 10px;
+  background-image:
+    repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 5px, transparent 5px, transparent 10px),
+    repeating-linear-gradient(-45deg, var(--clay) 0, var(--clay) 5px, transparent 5px, transparent 10px);
+  background-size: 20px 20px, 20px 20px;
+  opacity: 0.5;
+}
+
+/* ============================= HEADER ============================= */
+header {
+  text-align: center;
+  padding: 26px 16px 8px;
+  position: relative;
+}
+
+.admin-gear {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--gold);
+  font-size: 18px;
+  border-radius: 10px;
+  padding: 8px 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-gear:hover {
+  background: rgba(212, 175, 55, 0.15);
+  transform: scale(1.05);
+}
+
+.sync-indicator {
+  position: absolute;
+  top: 24px;
+  right: 20px;
+  font-size: 12px;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 16px);
+  flex-wrap: nowrap;
+}
+
+.brand-logo {
+  height: clamp(72px, 14vw, 122px);
+  width: auto;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.35));
+}
+
+.brand {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: clamp(30px, 6vw, 52px);
+  letter-spacing: 1px;
+  color: var(--gold);
+  text-shadow: 0 0 18px rgba(212, 175, 55, 0.35), 0 2px 0 rgba(0, 0, 0, 0.4);
+  margin: 0;
+}
+
+.brand span {
+  color: var(--sand);
+}
+
+.tag {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+/* ============================= SCREENS ============================= */
+.screen {
+  display: none;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================= HOME SCREEN ============================= */
+.home-container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero-section {
+  margin: 40px 0;
+}
+
+.hero-title {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: clamp(28px, 5vw, 42px);
+  color: var(--sand);
+  margin: 20px 0 10px;
+}
+
+.hero-subtitle {
+  color: var(--muted);
+  font-size: 16px;
+  margin: 0;
+}
+
+.home-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 30px 0;
+}
+
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.stat-card {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-icon {
+  font-size: 28px;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.stat-value {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--gold);
+}
+
+/* ============================= STEPS ============================= */
+.step-title {
+  font-family: 'Cairo';
+  font-weight: 800;
+  font-size: clamp(20px, 3vw, 28px);
+  text-align: center;
+  color: var(--sand);
+  margin: 18px 0 6px;
+}
+
+.step-sub {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 22px;
+}
+
+/* ============================= SETUP SCREEN ============================= */
+.setup-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.setup-row {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.team-setup {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  width: 340px;
+  max-width: 92vw;
+}
+
+.team-setup.A {
+  border-color: rgba(63, 167, 150, 0.5);
+}
+
+.team-setup.B {
+  border-color: rgba(201, 162, 75, 0.5);
+}
+
+.team-setup label {
+  font-family: 'Cairo';
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.team-setup input[type="text"] {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(239, 227, 198, 0.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: 'Cairo';
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.lifelines-label {
+  font-family: 'Cairo';
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.lifelines {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lifeline-chip {
+  flex: 1;
+  min-width: 58px;
+  text-align: center;
+  padding: 10px 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 227, 198, 0.25);
+  background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.lifeline-chip:hover {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.lifeline-chip .ic {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.lifeline-chip.sel {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--sand);
+}
+
+.lifeline-count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ============================= CATEGORIES ============================= */
+.cat-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.custom-cat-input {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(239, 227, 198, 0.3);
+  border-radius: 999px;
+  padding: 8px 16px;
+  color: var(--text);
+  font-family: 'Tajawal';
+  font-size: 13px;
+  width: 220px;
+  max-width: 100%;
+}
+
+.add-cat-btn {
+  background: var(--gold);
+  color: #1A1306;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: 'Cairo';
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.add-cat-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cat-pick {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 2px solid rgba(212, 175, 55, 0.18);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  padding: 14px 4px 10px;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.cat-pick:hover {
+  transform: translateY(-2px);
+}
+
+.cat-pick.sel {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, #1c4a35, #143527);
+}
+
+.cat-pick .ic {
+  font-size: 30px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.cat-pick .nm {
+  font-family: 'Cairo';
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--sand);
+  line-height: 1.3;
+}
+
+.cat-pick .check {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #1A1306;
+  font-size: 12px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.cat-pick.sel .check {
+  display: flex;
+}
+
+.selection-status {
+  text-align: center;
+  font-family: 'Cairo';
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+.selection-status b {
+  color: var(--gold);
+}
+
+/* ============================= BUTTONS ============================= */
+.nav-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.btn-main {
+  font-family: 'Cairo';
+  font-weight: 800;
+  border-radius: 12px;
+  padding: 13px 30px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: #1A1306;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--panel);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--sand);
+}
+
+.btn-secondary:hover {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(239, 227, 198, 0.35);
+  color: var(--sand);
+}
+
+.btn-ghost:hover {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.btn {
+  font-family: 'Cairo';
+  font-weight: 800;
+  border-radius: 10px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-answer {
+  background: var(--gold);
+  color: #1A1306;
+}
+
+.btn-answer:hover {
+  filter: brightness(1.08);
+}
+
+.btn-skip {
+  background: transparent;
+  border: 1px solid rgba(239, 227, 198, 0.3);
+  color: var(--muted);
+}
+
+.btn-skip:hover {
+  border-color: var(--gold);
+  color: var(--sand);
+}
+
+.btn-close {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  color: var(--sand);
+  transform: scale(1.1);
+}
+
+/* ============================= GAME SCREEN ============================= */
+.game-header {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 10px auto;
+  flex-wrap: wrap;
+}
+
+.team-card {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 14px;
+  padding: 12px 20px;
+  min-width: 210px;
+  text-align: center;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+}
+
+.team-card.A {
+  border-color: rgba(63, 167, 150, 0.55);
+}
+
+.team-card.B {
+  border-color: rgba(201, 162, 75, 0.55);
+}
+
+.team-name {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.team-score {
+  font-family: 'Cairo';
+  font-weight: 900;
+  font-size: 32px;
+  margin-top: 2px;
+}
+
+.team-card.A .team-score {
+  color: var(--teamA);
+}
+
+.team-card.B .team-score {
+  color: var(--teamB);
+}
+
+.team-lifelines {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.team-lifelines .ic {
+  font-size: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 4px 6px;
+  cursor: pointer;
+  border: 1px solid rgba(239, 227, 198, 0.2);
+  transition: all 0.2s;
+}
+
+.team-lifelines .ic:hover {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.team-lifelines .ic.used {
+  opacity: 0.25;
+  text-decoration: line-through;
+  cursor: default;
+}
+
+.reset-btn {
+  display: block;
+  margin: 10px auto 0;
+  background: none;
+  border: 1px solid rgba(239, 227, 198, 0.3);
+  color: var(--muted);
+  border-radius: 20px;
+  padding: 5px 16px;
+  font-family: 'Tajawal';
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reset-btn:hover {
+  color: var(--sand);
+  border-color: var(--gold);
+}
+
+.round-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0 6px;
+  flex-wrap: wrap;
+}
+
+.round-tab {
+  font-family: 'Cairo';
+  font-weight: 700;
+  background: var(--panel);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: var(--muted);
+  padding: 8px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.round-tab:hover {
+  border-color: var(--gold);
+}
+
+.round-tab.active {
+  background: var(--gold);
+  color: #1A1306;
+  border-color: var(--gold);
+}
+
+.board-wrap {
+  max-width: 1180px;
+  margin: 14px auto 60px;
+  padding: 0 16px;
+}
+
+.board {
+  display: grid;
+  gap: 10px;
+}
+
+.cat-header {
+  font-family: 'Cairo';
+  font-weight: 800;
+  font-size: clamp(11px, 1.4vw, 14px);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 10px 10px 4px 4px;
+  text-align: center;
+  padding: 12px 4px;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-direction: column;
+  color: var(--sand);
+  line-height: 1.25;
+}
+
+.cat-header .ic {
+  font-size: 18px;
+}
+
+.cell {
+  background: linear-gradient(180deg, #0E2B20, #0A2118);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: 8px;
+  font-family: 'Cairo';
+  font-weight: 900;
+  font-size: clamp(16px, 2.2vw, 24px);
+  color: var(--gold-soft);
+  text-align: center;
+  padding: 16px 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(212, 175, 55, 0.18);
+  background: linear-gradient(180deg, #123726, #0D2B1F);
+}
+
+.cell.used {
+  background: var(--used);
+  color: #2C4A3D;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+.cell.used:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================= OVERLAY ============================= */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 10, 7, 0.92);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+
+.overlay.show {
+  display: flex;
+}
+
+.qcard {
+  width: min(900px, 96vw);
+  background: linear-gradient(180deg, var(--panel-2), var(--night-2));
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 20px;
+  padding: 30px 30px 18px;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  max-height: 92vh;
+  overflow: auto;
+}
+
+.qcard .topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.qcat {
+  font-family: 'Cairo';
+  font-weight: 800;
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.qpoints {
+  font-family: 'Cairo';
+  font-weight: 900;
+  color: var(--sand);
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 15px;
+}
+
+.qimg {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  margin: 10px 0 18px;
+  min-height: 100px;
+}
+
+.qimg img {
+  max-width: 100%;
+  max-height: 260px;
+  border-radius: 10px;
+}
+
+.qtext {
+  font-family: 'Cairo';
+  font-weight: 700;
+  font-size: clamp(18px, 2.5vw, 25px);
+  text-align: center;
+  color: var(--sand);
+  line-height: 1.6;
+  padding: 6px 4px 18px;
+  min-height: 30px;
+}
+
+.qtext.hide {
+  display: none;
+}
+
+.atext {
+  display: none;
+  font-family: 'Cairo';
+  font-weight: 800;
+  font-size: clamp(17px, 2.3vw, 23px);
+  text-align: center;
+  color: var(--teamA);
+  background: rgba(63, 167, 150, 0.1);
+  border: 1px dashed rgba(63, 167, 150, 0.5);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 0 18px;
+}
+
+.atext.show {
+  display: block;
+}
+
+.loadbox {
+  text-align: center;
+  color: var(--muted);
+  font-family: 'Cairo';
+  font-weight: 700;
+  padding: 30px 0;
+}
+
+.errbox {
+  text-align: center;
+  color: var(--clay);
+  font-family: 'Cairo';
+  font-weight: 700;
+  padding: 14px 0;
+}
+
+.corners {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  padding-top: 16px;
+}
+
+.corner {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 200px;
+}
+
+.corner-label {
+  font-size: 12px;
+  color: var(--muted);
+  width: 100%;
+}
+
+/* ============================= ADMIN PANEL ============================= */
+#screen-admin {
+  position: relative;
+}
+
+.admin-header {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-tab {
+  font-family: 'Cairo';
+  font-weight: 700;
+  background: var(--panel);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: var(--muted);
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.admin-tab:hover {
+  border-color: var(--gold);
+}
+
+.admin-tab.active {
+  background: var(--gold);
+  color: #1A1306;
+  border-color: var(--gold);
+}
+
+.admin-content {
+  position: relative;
+  min-height: 300px;
+}
+
+.admin-section {
+  display: none;
+}
+
+.admin-section.active {
+  display: block;
+}
+
+.admin-section h3 {
+  font-family: 'Cairo';
+  font-weight: 800;
+  color: var(--gold);
+  font-size: 18px;
+  margin: 0 0 16px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 12px;
+}
+
+.admin-section {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.admin-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.admin-row input[type="text"],
+.admin-row input[type="number"],
+.admin-row select,
+.admin-row textarea {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(239, 227, 198, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-family: 'Tajawal';
+  font-size: 13px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.admin-row textarea {
+  width: 100%;
+  min-height: 56px;
+  resize: vertical;
+  font-family: 'Tajawal';
+}
+
+.points-inputs {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.points-inputs input {
+  width: 80px;
+}
+
+.points-inputs label {
+  font-family: 'Cairo';
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.cat-admin-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.cat-admin-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.cat-admin-chip .del {
+  cursor: pointer;
+  color: var(--clay);
+  font-weight: 900;
+}
+
+.cat-admin-chip .del:hover {
+  color: var(--error);
+}
+
+.bank-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.bank-controls select {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(239, 227, 198, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-family: 'Tajawal';
+  font-size: 13px;
+}
+
+.bank-list {
+  max-height: 350px;
+  overflow: auto;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  margin-top: 10px;
+}
+
+.bank-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 4px;
+  border-bottom: 1px solid rgba(239, 227, 198, 0.08);
+  font-size: 13px;
+}
+
+.bank-item .bq {
+  color: var(--sand);
+  font-weight: 700;
+  font-family: 'Cairo';
+  flex: 1;
+}
+
+.bank-item .ba {
+  color: var(--teamA);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.bank-item .del-q {
+  background: none;
+  border: none;
+  color: var(--clay);
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 4px;
+}
+
+.bank-item .del-q:hover {
+  color: var(--error);
+}
+
+.bank-count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ============================= FOOTER ============================= */
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 20px;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  margin-top: 40px;
+}
+
+footer p {
+  margin: 0;
+}
+
+/* ============================= SCROLLBAR ============================= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.6);
+}
+
+/* ============================= ONLINE MODE ============================= */
+
+.mode-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.mode-btn {
+  padding: 30px 20px;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(212, 175, 55, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text);
+  text-align: center;
+}
+
+.mode-btn:hover {
+  background: rgba(212, 175, 55, 0.15);
+  transform: translateY(-2px);
+}
+
+.mode-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.mode-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.mode-desc {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ============================= ROOMS ============================= */
+
+.rooms-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.room-code-join {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.room-code-join input {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.rooms-list {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.room-card {
+  padding: 15px;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.room-name {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.room-code {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.room-mode {
+  font-size: 12px;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.room-card .btn {
+  width: 100%;
+}
+
+/* ============================= ROOM SETUP ============================= */
+
+.room-info {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(212, 175, 55, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.room-code-display,
+.room-mode-display {
+  text-align: center;
+}
+
+.code-label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.code-value {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--gold);
+  font-family: monospace;
+  letter-spacing: 3px;
+}
+
+.room-players-section {
+  margin: 20px 0;
+}
+
+.room-players-section h3 {
+  color: var(--gold);
+  margin-bottom: 15px;
+}
+
+.room-players-list {
+  display: grid;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.player-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border-left: 3px solid var(--gold);
+}
+
+.player-name {
+  font-weight: bold;
+  flex: 1;
+}
+
+.player-team {
+  padding: 4px 12px;
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 4px;
+  font-size: 12px;
+  margin: 0 10px;
+}
+
+.player-score {
+  font-weight: bold;
+  color: var(--gold);
+  min-width: 40px;
+  text-align: right;
+}
+
+.team-buttons {
+  display: flex;
+  gap: 8px;
+  margin: 0 10px;
+}
+
+.team-btn {
+  padding: 6px 12px;
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.team-btn:hover {
+  background: rgba(212, 175, 55, 0.4);
+}
+
+.team-btn.selected {
+  background: var(--gold);
+  color: var(--night);
+  font-weight: bold;
+}
+
+/* ============================= CHAT ============================= */
+
+.chat-panel {
+  position: fixed;
+  bottom: -400px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background: var(--night-2);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  transition: bottom 0.3s ease;
+}
+
+.chat-panel.open {
+  bottom: 20px;
+}
+
+.chat-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 10px 10px 0 0;
+  flex: 0 0 auto;
+}
+
+/* زر طرد لاعب من الروم (يظهر لصاحب الروم فقط) */
+.kick-btn {
+  padding: 6px 10px;
+  background: rgba(200, 60, 60, 0.15);
+  border: 1px solid rgba(220, 80, 80, 0.6);
+  border-radius: 6px;
+  color: #ff8a8a;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.kick-btn:hover {
+  background: rgba(220, 60, 60, 0.35);
+  color: #fff;
+}
+
+/* اللاعبون غير المضيف يشاهدون اللوحة بدون إمكانية فتح الأسئلة */
+.board.viewer-mode .cell {
+  cursor: default;
+  opacity: 0.92;
+}
+
+/* الزر العائم لفتح الشات */
+.chat-fab {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: var(--night-2);
+  color: var(--gold);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 99;
+}
+
+.chat-fab.hidden {
+  display: none !important;
+}
+
+.chat-panel h3 {
+  margin: 0;
+  color: var(--gold);
+  font-size: 16px;
+}
+
+.chat-close {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-message {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  border-radius: 6px;
+  border-left: 2px solid var(--gold);
+}
+
+.chat-msg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.chat-sender {
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.chat-time {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.chat-text {
+  font-size: 13px;
+  word-wrap: break-word;
+}
+
+.chat-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.reaction-btn {
+  padding: 2px 6px;
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text);
+  transition: background 0.2s;
+}
+
+.reaction-btn:hover {
+  background: rgba(212, 175, 55, 0.4);
+}
+
+.reaction-btn span {
+  margin-left: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  border-top: 1px solid var(--gold);
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.chat-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.chat-send-btn {
+  padding: 8px 12px;
+  background: var(--gold);
+  border: none;
+  border-radius: 4px;
+  color: var(--night);
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.chat-send-btn:hover {
+  opacity: 0.8;
+}
+
+.emoji-picker {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  padding: 8px;
+  background: var(--night-2);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  z-index: 99;
+}
+
+.emoji-picker button {
+  padding: 8px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.2s;
+}
+
+.emoji-picker button:hover {
+  background: rgba(212, 175, 55, 0.3);
+}
+
+/* ============================= RESPONSIVE ============================= */
+
+@media (max-width: 768px) {
+  .mode-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .room-info {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* الشات على الجوال: لوحة سفلية (bottom sheet) بعرض الشاشة كامل */
+  .chat-panel {
+    width: 100%;
+    right: 0;
+    left: 0;
+    height: 60vh;
+    max-height: 60vh;
+    bottom: -100vh;
+    border-width: 2px 0 0 0;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .chat-panel.open {
+    bottom: 0;
+  }
+
+  .chat-panel-header {
+    border-radius: 12px 12px 0 0;
+  }
+
+  .chat-fab {
+    bottom: 16px;
+    left: 16px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .room-code-join {
+    flex-direction: column;
+  }
+
+  .room-code-join input {
+    width: 100%;
+  }
+
+  .room-players-list {
+    max-height: 400px;
+  }
+
+  .player-item {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .team-buttons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .team-btn {
+    flex: 1;
+    min-width: 60px;
+  }
+
+  .room-code-display,
+  .room-mode-display {
+    flex: 1;
+  }
+
+  .rooms-controls {
+    flex-direction: column;
+  }
+
+  .room-code-join {
+    width: 100%;
+  }
+
+  /* الحقل والزر بجانب بعض حتى لا يأخذان مساحة عمودية زائدة */
+  .chat-input-area {
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .chat-input {
+    flex: 1;
+    min-width: 0;
+    font-size: 16px; /* يمنع iOS من تكبير الصفحة عند التركيز */
+  }
+
+  .chat-send-btn {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 10px 16px;
+  }
+
+  .chat-messages {
+    flex: 1;
+    max-height: none;
+  }
+}
+
+/* ============================= TURN INDICATOR ============================= */
+
+.turn-banner {
+  text-align: center;
+  margin: 8px auto 4px;
+  font-size: 15px;
+  color: var(--text);
+  min-height: 22px;
+}
+
+.turn-banner .turn-label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.team-card.active-turn {
+  box-shadow: 0 0 0 2px var(--gold), 0 0 18px rgba(212, 175, 55, 0.35);
+  transform: translateY(-2px);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+/* إعلان الفريق الذي يبدأ */
+.start-toast {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: max-content;
+  height: max-content;
+  padding: 26px 40px;
+  background: rgba(8, 30, 24, 0.96);
+  border: 2px solid var(--gold);
+  border-radius: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 300;
+  text-align: center;
+  animation: startPop 0.35s ease;
+}
+
+.start-toast.fade-out {
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+
+.start-toast-label {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.start-toast-team {
+  color: var(--gold);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: clamp(22px, 6vw, 34px);
+}
+
+@keyframes startPop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ============================= END / WINNER SCREEN ============================= */
+
+.end-wrap {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+.end-trophy {
+  font-size: clamp(56px, 16vw, 96px);
+  line-height: 1;
+  animation: trophyPop 0.5s ease;
+}
+
+@keyframes trophyPop {
+  0%   { transform: scale(0.4) rotate(-12deg); opacity: 0; }
+  70%  { transform: scale(1.12) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.end-title {
+  color: var(--muted);
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+.end-winner {
+  margin: 10px auto 24px;
+}
+
+.winner-name {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: clamp(26px, 7vw, 44px);
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+.winner-margin,
+.tie-text {
+  color: var(--muted);
+  font-size: 15px;
+  margin-top: 6px;
+}
+
+.end-scores {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.end-score-card {
+  min-width: 150px;
+  padding: 16px 22px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.end-score-card.lead {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.12);
+}
+
+.end-team-name {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.end-team-score {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 34px;
+  color: var(--gold);
+}
+
+/* اللاعبون المشاهدون: الخلايا غير قابلة للضغط */
+.board.viewer-mode .cell:not(.used) {
+  cursor: default;
+  opacity: 0.92;
+}
+
+@media (max-width: 768px) {
+  .end-scores { gap: 10px; }
+  .end-score-card { min-width: 130px; padding: 12px 16px; }
+  .end-team-score { font-size: 28px; }
+  .turn-banner { font-size: 14px; }
+}
+
+/* ============================= ROOM SHARING ============================= */
+
+.room-share {
+  margin: 16px auto 22px;
+  padding: 16px;
+  background: rgba(212, 175, 55, 0.07);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.room-share-hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.room-share-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.room-share-buttons .btn-main {
+  flex: 0 1 auto;
+  min-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .room-share-buttons { flex-direction: column; }
+  .room-share-buttons .btn-main { width: 100%; min-width: 0; }
+}
+
+/* ============================= TOUCH TARGETS & LEGIBILITY ============================= */
+/* الحد الموصى به عالمياً لمساحة اللمس 44×44 بكسل */
+
+.btn-close,
+.chat-close {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kick-btn,
+.team-btn,
+.reaction-btn {
+  min-height: 38px;
+}
+
+@media (max-width: 768px) {
+  /* رفع أصغر الخطوط لحد مقروء على الجوال */
+  .step-sub,
+  .lifeline-count,
+  .stat-label,
+  .chat-text,
+  .chat-time,
+  .room-share-hint,
+  .sync-indicator {
+    font-size: 13px;
+  }
+
+  .lifeline-chip { font-size: 12px; }
+  .chat-input, .chat-send-btn { font-size: 15px; }
+
+  /* لوحة اللعب: تمرير أفقي بدل ضغط 6 أعمدة في شاشة ضيقة */
+  .board-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 12px 8px;
+  }
+
+  .board {
+    min-width: 560px;   /* ~93px لكل عمود عند 6 أعمدة */
+    gap: 8px;
+  }
+
+  .cell {
+    min-height: 62px;
+    font-size: 16px;
+    padding: 10px 4px;
+  }
+
+  .cat-header {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+}
+
+/* ============================= LIFELINE BANNER ============================= */
+
+.lifeline-banner {
+  margin: 10px auto 4px;
+  padding: 10px 14px;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.lifeline-banner .ll-ic {
+  font-size: 20px;
+  margin-inline-end: 4px;
+}
+
+.lifeline-banner .ll-desc {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.lifeline-banner .ll-timer {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--gold);
+  margin-top: 6px;
+}
+
+.lifeline-banner .ll-timer:empty { display: none; }
+
+/* زر الفريق المحجوب بـ«الحفرة» */
+.btn-award.blocked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+
+/* وسيلة المساعدة المتاحة في لوحة النتائج: نوضّح أنها قابلة للضغط */
+.team-lifelines .ic:not(.used) {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.team-lifelines .ic:not(.used):hover {
+  transform: scale(1.15);
+}
+
+/* ============================= UI MODALS & TOASTS ============================= */
+
+.ui-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 500;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.ui-modal-overlay.show { opacity: 1; }
+
+.ui-modal {
+  width: min(420px, 100%);
+  background: var(--night-2);
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+  transform: scale(0.94);
+  transition: transform 0.18s ease;
+}
+
+.ui-modal-overlay.show .ui-modal { transform: scale(1); }
+
+.ui-modal-msg {
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.7;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.ui-modal-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.ui-modal-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.35);
+}
+
+.ui-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.ui-modal-actions .btn-main {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 16px;
+}
+
+/* الإشعارات */
+.ui-toasts {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 600;
+  pointer-events: none;
+  width: min(440px, calc(100% - 32px));
+}
+
+.ui-toast {
+  background: var(--night-2);
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.ui-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .ui-modal { padding: 18px; }
+  .ui-modal-msg { font-size: 15px; }
+  .ui-modal-actions { flex-direction: column-reverse; }
+}
+
+/* ============================= TOUCH TARGET FLOOR ============================= */
+/* 44×44 هو الحد الموصى به عالمياً لمساحة اللمس. الأزرار والحقول كانت 38-41px. */
+
+.btn-main,
+.btn,
+.mode-btn,
+.round-tab,
+.admin-tab,
+.reset-btn,
+input[type="text"],
+input[type="number"],
+input[type="password"],
+input[type="file"],
+select {
+  min-height: 44px;
+}
+
+.btn-main,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* الحقول تحتاج حشوة رأسية لا flex */
+input[type="text"],
+input[type="number"],
+input[type="password"],
+select {
+  padding-block: 11px;
+}
+
+.lifeline-chip,
+.cat-pick {
+  min-height: 44px;
+}
+
+.team-lifelines .ic {
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================= AUTH ============================= */
+
+/* المؤشران كانا كلاهما absolute في نفس الزاوية فيتراكبان.
+   الآن في عمود واحد: حالة المزامنة فوق، والحساب تحتها. */
+.header-corner {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 5;
+}
+
+.header-corner .sync-indicator {
+  position: static;
+  top: auto;
+  right: auto;
+}
+
+.auth-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 999px;
+  padding: 4px 6px 4px 12px;
+  white-space: nowrap;
+}
+
+.auth-user {
+  color: var(--sand);
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.auth-signout {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--gold);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.auth-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.auth-tab {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+  color: var(--muted);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-tab.active {
+  background: rgba(212, 175, 55, 0.16);
+  border-color: var(--gold);
+  color: var(--sand);
+}
+
+.auth-form {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.auth-form label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(239, 227, 198, 0.25);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 16px;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.auth-form .btn-main { width: 100%; }
+
+.auth-message {
+  min-height: 20px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.auth-message.error { color: var(--error); }
+
+.auth-note {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  margin: 12px 0 0;
+}
+
+/* ============================= ADMIN USERS LIST ============================= */
+
+.users-list { display: flex; flex-direction: column; gap: 8px; }
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+.user-main { flex: 1; min-width: 140px; }
+.user-name { font-weight: 700; color: var(--sand); font-size: 14px; }
+.user-meta { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+.user-stats {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  flex-wrap: wrap;
+}
+
+.user-del { min-height: 40px; }
+
+@media (max-width: 768px) {
+  .header-corner {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 10px auto 0;
+  }
+  .auth-user { max-width: 90px; }
+  .user-row { flex-direction: column; align-items: stretch; }
+  .user-del { width: 100%; }
+}
+
+/* أزرار صف اللاعب */
+.user-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.user-actions .btn { min-height: 40px; }
+
+.user-row.is-admin {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.admin-badge {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--night);
+  background: var(--gold);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-inline-end: 4px;
+}
+
+@media (max-width: 768px) {
+  .user-actions { width: 100%; }
+  .user-actions .btn { flex: 1; }
+}
+
+/* سبب تعطيل زر بدء اللعبة */
+.start-gate-hint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+  min-height: 18px;
+}
+
+.btn-main:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* غلاف الزر: هو الحاوية الموضعية للشارة، لأن <button> لا يصلح لذلك */
+.chat-fab-wrap {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: none;
+  z-index: 99;
+}
+
+.chat-fab-wrap.hidden { display: none !important; }
+
+.chat-fab-wrap .chat-fab {
+  position: static;
+  display: flex;
+}
+
+.chat-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--error);
+  color: #fff;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 22px;
+  text-align: center;
+  border: 2px solid var(--night-2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  animation: badgePop 0.28s ease;
+}
+
+@keyframes badgePop {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* مؤشر الدور: اسم اللاعب وفريقه */
+.turn-banner .turn-team {
+  color: var(--muted);
+  font-size: 13px;
+  margin-inline-start: 6px;
+}
+
+.turn-banner .turn-you {
+  display: inline-block;
+  margin-inline-start: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--night);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.turn-banner.my-turn {
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+
+/* ============================= MULTIPLE CHOICE ============================= */
+
+.choice-hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin: 10px 0 14px;
+  min-height: 20px;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 12px 14px;
+  text-align: right;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.choice:not(:disabled):hover {
+  background: rgba(212, 175, 55, 0.14);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.choice:disabled { cursor: default; }
+
+.choice-letter {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.choice-text { flex: 1; }
+
+.choice.correct {
+  background: rgba(39, 174, 96, 0.22);
+  border-color: var(--success);
+}
+
+.choice.correct .choice-letter { background: var(--success); color: #fff; }
+
+.choice.wrong {
+  background: rgba(231, 76, 60, 0.2);
+  border-color: var(--error);
+}
+
+.choice.wrong .choice-letter { background: var(--error); color: #fff; }
+
+.choice.dim { opacity: 0.45; }
+
+.answer-result {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 15px;
+}
+
+.answer-result.ok { background: rgba(39, 174, 96, 0.15); color: var(--success); }
+.answer-result.no { background: rgba(231, 76, 60, 0.15); color: var(--error); }
+
+@media (max-width: 768px) {
+  .choices { grid-template-columns: 1fr; }
+  .choice { min-height: 52px; font-size: 15px; }
+}
+
+.auth-link {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  min-height: 44px;
+}
+
+/* مخرج «بلا حساب». مفصول بخطّ لأنه ليس بديلاً عن الدخول بل طريق آخر —
+   ولو جاور الأزرار بلا فصل لبدا خياراً رابعاً في نفس النموذج. */
+.auth-guest {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-guest .auth-link {
+  color: var(--muted);
+  margin-top: 0;
+}
+
+.auth-guest .auth-note {
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+/* ============================= FRIENDS ============================= */
+
+.friends-container {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.friend-add {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.friend-add input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(239, 227, 198, 0.25);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 16px;
+}
+
+.friend-add input:focus { outline: none; border-color: var(--gold); }
+.friend-add .btn-main { flex: 0 0 auto; }
+
+.friends-section { margin-top: 18px; }
+
+.friends-section h4 {
+  margin: 0 0 10px;
+  color: var(--sand);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.friends-count {
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 13px;
+}
+
+.friend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+.friend-main { flex: 1; min-width: 130px; }
+.friend-name { color: var(--sand); font-weight: 700; font-size: 15px; }
+.friend-meta { color: var(--muted); font-size: 13px; margin-top: 3px; }
+
+.friend-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.friend-actions .btn { min-height: 40px; }
+
+.friend-pending { color: var(--muted); font-size: 13px; }
+
+.friends-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.9;
+  padding: 26px 10px;
+}
+
+/* شارة الطلبات على زر الأصدقاء */
+.home-buttons .btn-main { position: relative; }
+
+.home-badge {
+  position: absolute;
+  top: -6px;
+  inset-inline-end: -6px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--error);
+  color: #fff;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 24px;
+  text-align: center;
+  border: 2px solid var(--night);
+}
+
+@media (max-width: 768px) {
+  .friend-add { flex-direction: column; }
+  .friend-add .btn-main { width: 100%; }
+  .friend-row { flex-direction: column; align-items: stretch; }
+  .friend-actions { width: 100%; }
+  .friend-actions .btn { flex: 1; }
+}
+
+/* ============================= PROFILE & PRIVACY ============================= */
+
+.profile-container { max-width: 620px; margin: 0 auto; }
+
+.privacy-box,
+.profile-section {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.privacy-title,
+.profile-section-title {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--sand);
+  margin-bottom: 12px;
+}
+
+.privacy-options { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.privacy-btn {
+  flex: 1;
+  min-width: 90px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 6px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 10px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  transition: all 0.2s;
+}
+
+.privacy-btn.active {
+  background: rgba(212, 175, 55, 0.16);
+  border-color: var(--gold);
+  color: var(--sand);
+}
+
+.privacy-ic { font-size: 22px; }
+.privacy-name { font-size: 13px; font-weight: 700; }
+
+.privacy-desc {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* بطاقة اللاعب */
+.player-card {
+  margin-top: 12px;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 12px;
+}
+
+.pc-name {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--sand);
+  margin-bottom: 12px;
+}
+
+.pc-rel { font-size: 13px; color: var(--gold); font-weight: 400; }
+
+.pc-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.pc-stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  background: rgba(212, 175, 55, 0.08);
+  border-radius: 8px;
+}
+
+.pc-stats span { font-size: 18px; }
+.pc-stats b { font-family: 'Cairo', sans-serif; font-size: 17px; color: var(--gold); }
+.pc-stats small { font-size: 13px; color: var(--muted); }
+
+.pc-private {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 10px;
+}
+
+.pc-loading, .pc-error { color: var(--muted); font-size: 13px; text-align: center; }
+.pc-error { color: var(--error); }
+
+/* لوحة الصدارة */
+.lb-list { display: flex; flex-direction: column; gap: 6px; }
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.lb-row.me { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); }
+.lb-rank { min-width: 28px; font-size: 17px; text-align: center; }
+.lb-name { flex: 1; color: var(--sand); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-score, .lb-wins { color: var(--gold); font-size: 13px; white-space: nowrap; }
+
+.lb-note { font-size: 13px; color: var(--muted); text-align: center; margin-top: 10px; }
+
+@media (max-width: 768px) {
+  .pc-stats { grid-template-columns: repeat(2, 1fr); }
+  .privacy-btn { min-width: 0; }
+}
+
+/* ============================= DANGER ZONE ============================= */
+/* حذف الحساب. مفصول بلون ونبرة مختلفين عمداً: هو الإجراء الوحيد في
+   الشاشة الذي لا رجعة فيه، وتمييزه بصرياً يقلّل الضغط بالخطأ. */
+
+.danger-zone {
+  border: 1px solid rgba(231, 76, 60, .35);
+  background: rgba(231, 76, 60, .06);
+}
+
+.danger-zone .profile-section-title {
+  color: var(--error);
+}
+
+.danger-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 12px;
+  line-height: 1.7;
+}
+
+.btn-danger {
+  background: linear-gradient(180deg, #C0392B, #96281B);
+  color: #fff;
+  border: 1px solid rgba(231, 76, 60, .5);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(180deg, #D14536, #A62D1E);
+}

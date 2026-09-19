@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سياسة الخصوصية — تحدي رجا</title>
+  <meta name="description" content="سياسة الخصوصية للعبة تحدي رجا: ما نجمعه، ولماذا، وكيف تحذفه.">
+  <meta name="theme-color" content="#0A1A14">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --night: #0A1A14; --night-2: #0F2A20; --panel: #12382A; --panel-2: #173F2F;
+      --gold: #D4AF37; --sand: #EFE3C6; --muted: #9FB8AB; --faint: #7C9488;
+      --line: rgba(212,175,55,.20);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: radial-gradient(120% 80% at 50% 0%, var(--panel) 0%, var(--night-2) 48%, var(--night) 100%);
+      background-attachment: fixed;
+      color: var(--sand); font-family: 'Tajawal', system-ui, sans-serif;
+      line-height: 1.9;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 48px 22px 80px; }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+    .brand img { width: 52px; height: 52px; border-radius: 12px; }
+    .brand-name { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 19px; color: #fff; }
+    .brand-tag { font-size: 12px; color: var(--muted); }
+    h1 { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 32px; color: #fff; margin: 0 0 8px; }
+    .updated { font-size: 13px; color: var(--faint); margin-bottom: 34px; }
+    h2 { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 19px; color: var(--gold); margin: 34px 0 10px; }
+    p { margin: 0 0 14px; }
+    ul { margin: 0 0 14px; padding-inline-start: 22px; }
+    li { margin-bottom: 8px; }
+    .card {
+      padding: 22px 24px; border-radius: 20px; margin: 28px 0;
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--line);
+    }
+    .lead { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 18px; color: #fff; margin: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 0 0 14px; font-size: 14px; }
+    th, td { text-align: start; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--gold); font-family: 'Cairo', sans-serif; font-weight: 700; }
+    a { color: var(--gold); }
+    footer { margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 13px; color: var(--faint); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <img src="assets/icons/icon-192.png" alt="شعار تحدي رجا">
+    <div>
+      <div class="brand-name">تحدي رجا</div>
+      <div class="brand-tag">لعبة أسئلة جماعية</div>
+    </div>
+  </div>
+
+  <h1>سياسة الخصوصية</h1>
+  <div class="updated">آخر تحديث: ٦ سبتمبر ٢٠٢٦</div>
+
+  <div class="card">
+    <p class="lead">
+      اللعب على جهاز واحد لا يحتاج حساباً ولا إنترنت، ولا يخرج منه شيء.
+      أما اللعب أونلاين مع أصدقائك فيحتاج حساباً، وما نحفظه له مذكور
+      كاملاً في هذه الصفحة — ولا شيء غيره.
+    </p>
+  </div>
+
+  <h2>١. ما نجمعه ولماذا</h2>
+
+  <table>
+    <tr><th>البيانات</th><th>لماذا</th><th>متى</th></tr>
+    <tr>
+      <td>اسم المستخدم</td>
+      <td>ليعرفك أصدقاؤك في الروم وقائمة الأصدقاء</td>
+      <td>عند إنشاء حساب</td>
+    </tr>
+    <tr>
+      <td>البريد الإلكتروني</td>
+      <td>لاستعادة كلمة المرور وحدها. لا نرسل إعلانات ولا نشرات.</td>
+      <td>عند إنشاء حساب</td>
+    </tr>
+    <tr>
+      <td>كلمة المرور</td>
+      <td>
+        تُحفظ <strong>مشفّرة</strong> (bcrypt) لدى Supabase Auth.
+        لا نراها ولا نستطيع عرضها — ولا الإدارة تستطيع.
+      </td>
+      <td>عند إنشاء حساب</td>
+    </tr>
+    <tr>
+      <td>إحصاءاتك (جولات، فوز، نقاط)</td>
+      <td>لعرض ملفك ولوحة الصدارة</td>
+      <td>أثناء اللعب</td>
+    </tr>
+    <tr>
+      <td>رسائل الشات داخل الروم</td>
+      <td>لتصل لبقية اللاعبين في نفس الروم</td>
+      <td>أثناء اللعب أونلاين</td>
+    </tr>
+    <tr>
+      <td>معرّف عشوائي للجهاز</td>
+      <td>
+        ليعيدك لمقعدك وفريقك بعد انقطاع الشبكة أو تحديث الصفحة.
+        رقم عشوائي يولّده جهازك، لا يُشتقّ من أي معرّف للجهاز نفسه
+        ولا يتتبّعك خارج اللعبة.
+      </td>
+      <td>عند دخول روم</td>
+    </tr>
+  </table>
+
+  <h2>٢. ما لا نجمعه</h2>
+  <ul>
+    <li>لا نطلب الموقع الجغرافي ولا جهات الاتصال ولا الصور ولا الكاميرا ولا الميكروفون.</li>
+    <li>لا نستعمل أي أداة تتبّع إعلانية ولا معرّف إعلانات (IDFA).</li>
+    <li>لا نعرض إعلانات، ولا نبيع بياناتك ولا نشاركها مع أي جهة تسويق.</li>
+    <li>لا نجمع شيئاً إطلاقاً في وضع اللعب على جهاز واحد بلا حساب.</li>
+  </ul>
+
+  <h2>٣. أين تُحفظ</h2>
+  <p>
+    على <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase</a>،
+    وهو مزوّد قاعدة البيانات الذي نستعمله. الوصول محكوم بصلاحيات على مستوى
+    الصفّ: لا يقرأ أحد رسائل روم ليس فيها، ولا يرى إحصاءاتك من منعتَه.
+  </p>
+
+  <h2>٤. الخصوصية بين اللاعبين</h2>
+  <p>
+    من إعدادات ملفك تختار من يرى إحصاءاتك: <strong>الجميع</strong> أو
+    <strong>أصدقائي</strong> أو <strong>لا أحد</strong>. اسم المستخدم يبقى
+    قابلاً للبحث دائماً — وإلا تعذّرت إضافتك صديقاً.
+  </p>
+
+  <h2>٥. حذف حسابك</h2>
+  <p>
+    من داخل التطبيق: <strong>ملفي ← حذف الحساب</strong>. يُحذف الحساب
+    وإحصاءاته وصداقاته نهائياً وبلا رجعة. أو راسلنا على البريد أدناه
+    وننفّذها خلال سبعة أيام.
+  </p>
+  <p>
+    رسائل الشات تُحذف مع الروم نفسها، والرومات تُحذف تلقائياً بعد
+    أربع وعشرين ساعة من إنشائها.
+  </p>
+
+  <h2>٦. الأطفال</h2>
+  <p>
+    اللعبة مناسبة لكل الأعمار ولا تحوي محتوى للبالغين. لا نجمع بيانات
+    عن عمر المستخدم. الشات نصّي بين لاعبين في روم واحدة يدخلونها بكود
+    يتشاركونه بينهم، وننصح الأهل بالانتباه له كأي شات.
+  </p>
+
+  <h2>٧. التغييرات</h2>
+  <p>
+    أي تعديل على هذه السياسة يظهر هنا مع تاريخه. التعديلات الجوهرية
+    تُعلَن داخل التطبيق.
+  </p>
+
+  <h2>٨. التواصل</h2>
+  <p>
+    لأي سؤال أو طلب حذف: <a href="mailto:ramahasheer@gmail.com">ramahasheer@gmail.com</a>
+  </p>
+
+  <footer>
+    تحدي رجا — لعبة أسئلة جماعية عربية.
+  </footer>
+
+</div>
+</body>
+</html>

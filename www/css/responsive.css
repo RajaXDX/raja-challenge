@@ -1,0 +1,758 @@
+/* ============================= TABLET (768px - 1024px) ============================= */
+@media (max-width: 1024px) {
+  .cat-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .team-setup {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .setup-row {
+    flex-direction: column;
+  }
+
+  .qcard {
+    margin: 20px;
+  }
+
+  .board-wrap {
+    padding: 0 12px;
+  }
+}
+
+/* ============================= MOBILE (< 768px) ============================= */
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px;
+  }
+
+  .admin-gear {
+    top: 12px;
+    left: 12px;
+    padding: 6px 9px;
+    font-size: 16px;
+  }
+
+  .sync-indicator {
+    top: 14px;
+    right: 12px;
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  .brand {
+    font-size: clamp(24px, 5vw, 36px);
+  }
+
+  .tag {
+    font-size: 12px;
+  }
+
+  /* Home Screen */
+  .hero-title {
+    font-size: clamp(24px, 4vw, 32px);
+    margin: 15px 0 8px;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+  }
+
+  .home-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-icon {
+    font-size: 24px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  /* Setup */
+  .setup-row {
+    flex-direction: column;
+  }
+
+  .team-setup {
+    width: 100%;
+    margin: 0;
+  }
+
+  /* Categories */
+  .cat-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .cat-pick {
+    padding: 12px 4px 8px;
+  }
+
+  .cat-pick .ic {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+
+  .cat-pick .nm {
+    font-size: 12px;
+  }
+
+  /* Buttons */
+  .btn-main {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .nav-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav-buttons .btn-main {
+    width: 100%;
+  }
+
+  /* Game Screen */
+  .scoreboard {
+    gap: 12px;
+  }
+
+  .team-card {
+    min-width: 160px;
+    padding: 10px 16px;
+  }
+
+  .team-name {
+    font-size: 13px;
+  }
+
+  .team-score {
+    font-size: 28px;
+  }
+
+  .round-tabs {
+    margin: 12px 0 4px;
+  }
+
+  .round-tab {
+    padding: 6px 16px;
+    font-size: 12px;
+  }
+
+  .board-wrap {
+    margin: 12px auto 40px;
+    padding: 0 8px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* لا نضغط 6 أعمدة في شاشة ضيقة — نسمح بالتمرير الأفقي بدلاً من ذلك */
+  .board {
+    min-width: 560px;
+  }
+
+  .cat-header {
+    padding: 8px 4px;
+    min-height: 50px;
+    font-size: 12px;
+  }
+
+  .cat-header .ic {
+    font-size: 16px;
+  }
+
+  .cell {
+    padding: 10px 4px;
+    min-height: 62px;
+    font-size: 16px;
+  }
+
+  /* Admin */
+  .admin-tabs {
+    gap: 8px;
+  }
+
+  .admin-tab {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .admin-section {
+    padding: 16px;
+  }
+
+  .admin-section h3 {
+    font-size: 16px;
+  }
+
+  .admin-row {
+    gap: 8px;
+  }
+
+  .admin-row input[type="text"],
+  .admin-row input[type="number"],
+  .admin-row select {
+    min-width: 100%;
+    flex-basis: 100%;
+  }
+
+  .points-inputs {
+    flex-direction: column;
+  }
+
+  .points-inputs input {
+    width: 100%;
+  }
+
+  /* Question Card */
+  .qcard {
+    padding: 20px 16px 14px;
+  }
+
+  .qcard .topline {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .qcat, .qpoints {
+    text-align: center;
+  }
+
+  .qtext {
+    font-size: clamp(16px, 2vw, 20px);
+  }
+
+  .atext {
+    font-size: clamp(14px, 2vw, 18px);
+  }
+
+  .corners {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .corner {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  #awardButtons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  #awardButtons .btn {
+    width: 100%;
+  }
+}
+
+/* ============================= SMALL MOBILE (< 480px) ============================= */
+@media (max-width: 480px) {
+  :root {
+    font-size: 13px;
+  }
+
+  .admin-gear {
+    top: 10px;
+    left: 10px;
+    padding: 5px 7px;
+    font-size: 14px;
+  }
+
+  .sync-indicator {
+    top: 12px;
+    right: 10px;
+    font-size: 12px;
+    padding: 3px 6px;
+  }
+
+  .brand {
+    font-size: clamp(20px, 4vw, 28px);
+  }
+
+  .tag {
+    font-size: 12px;
+  }
+
+  header {
+    padding: 16px 12px 4px;
+  }
+
+  /* Home */
+  .hero-section {
+    margin: 20px 0;
+  }
+
+  .hero-title {
+    font-size: clamp(20px, 3vw, 26px);
+    margin: 10px 0 6px;
+  }
+
+  .hero-subtitle {
+    font-size: 12px;
+  }
+
+  .home-buttons {
+    gap: 10px;
+  }
+
+  .home-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 10px;
+  }
+
+  .stat-icon {
+    font-size: 20px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+
+  /* Step */
+  .step-title {
+    font-size: clamp(18px, 2.5vw, 22px);
+    margin: 12px 0 4px;
+  }
+
+  .step-sub {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  /* Setup */
+  .team-setup {
+    padding: 16px;
+  }
+
+  .team-setup label {
+    font-size: 12px;
+  }
+
+  .team-setup input[type="text"] {
+    padding: 8px 10px;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .lifelines-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .lifeline-chip {
+    padding: 8px 2px;
+    font-size: 12px;
+  }
+
+  .lifeline-chip .ic {
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+
+  .lifeline-count {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  /* Categories */
+  .cat-toolbar {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .custom-cat-input {
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .add-cat-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .cat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .cat-pick {
+    padding: 10px 2px 6px;
+  }
+
+  .cat-pick .ic {
+    font-size: 20px;
+    margin-bottom: 3px;
+  }
+
+  .cat-pick .nm {
+    font-size: 12px;
+  }
+
+  .selection-status {
+    font-size: 12px;
+    margin-bottom: 14px;
+  }
+
+  /* Buttons */
+  .btn-main {
+    padding: 8px 12px;
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .nav-buttons {
+    gap: 8px;
+  }
+
+  /* Screen Padding */
+  .screen {
+    padding: 12px 8px 40px;
+  }
+
+  /* Game */
+  .game-header {
+    margin-bottom: 12px;
+  }
+
+  .scoreboard {
+    gap: 10px;
+    margin: 8px auto;
+  }
+
+  .team-card {
+    min-width: 140px;
+    padding: 8px 12px;
+  }
+
+  .team-name {
+    font-size: 12px;
+  }
+
+  .team-score {
+    font-size: 24px;
+    margin-top: 1px;
+  }
+
+  .team-lifelines {
+    gap: 4px;
+    margin-top: 6px;
+  }
+
+  .team-lifelines .ic {
+    font-size: 14px;
+    padding: 3px 4px;
+  }
+
+  .reset-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    margin: 8px auto 0;
+  }
+
+  .round-tabs {
+    gap: 8px;
+    margin: 10px 0 2px;
+  }
+
+  .round-tab {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+
+  .board-wrap {
+    margin: 10px auto 30px;
+    padding: 0 4px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .board {
+    min-width: 520px;
+  }
+
+  .cat-header {
+    padding: 8px 4px;
+    min-height: 46px;
+    font-size: 12px;
+  }
+
+  .cat-header .ic {
+    font-size: 14px;
+  }
+
+  .cell {
+    padding: 10px 4px;
+    min-height: 58px;
+    font-size: 15px;
+  }
+
+  /* Admin */
+  .admin-header {
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  .btn-close {
+    top: 8px;
+    left: 8px;
+    font-size: 18px;
+  }
+
+  .admin-tabs {
+    gap: 6px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .admin-tab {
+    padding: 6px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .admin-section {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .admin-section h3 {
+    font-size: 14px;
+    margin: 0 0 12px;
+  }
+
+  .admin-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .admin-row input,
+  .admin-row select {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .points-inputs {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .points-inputs label {
+    font-size: 12px;
+  }
+
+  .points-inputs input {
+    width: 100%;
+    padding: 6px 8px;
+  }
+
+  .cat-admin-list {
+    gap: 6px;
+  }
+
+  .cat-admin-chip {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .bank-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .bank-controls select {
+    width: 100%;
+    padding: 6px 8px;
+  }
+
+  .bank-list {
+    max-height: 300px;
+    margin-top: 8px;
+  }
+
+  .bank-item {
+    padding: 8px 2px;
+    font-size: 12px;
+  }
+
+  .bank-item .bq {
+    font-size: 12px;
+  }
+
+  .bank-item .ba {
+    font-size: 12px;
+  }
+
+  .bank-item .del-q {
+    font-size: 14px;
+  }
+
+  .bank-count {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  /* Question Card */
+  .qcard {
+    padding: 16px 12px 12px;
+    border-radius: 16px;
+  }
+
+  .qcard .topline {
+    gap: 6px;
+  }
+
+  .qcat {
+    font-size: 13px;
+  }
+
+  .qpoints {
+    font-size: 13px;
+    padding: 3px 10px;
+  }
+
+  .qimg {
+    margin: 8px 0 12px;
+    min-height: 80px;
+    font-size: 48px;
+  }
+
+  .qtext {
+    font-size: clamp(14px, 2vw, 18px);
+    padding: 4px 2px 12px;
+  }
+
+  .atext {
+    font-size: clamp(12px, 2vw, 16px);
+    padding: 12px;
+    margin: 0 0 12px;
+  }
+
+  .corners {
+    gap: 8px;
+  }
+
+  .corner {
+    flex-direction: column;
+  }
+
+  .corner-label {
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .btn-skip {
+    font-size: 12px;
+  }
+
+  #awardButtons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 6px;
+  }
+
+  #awardButtons .btn {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  /* Footer */
+  footer {
+    padding: 12px 8px;
+    font-size: 12px;
+  }
+
+  footer p {
+    margin: 4px 0;
+  }
+
+  /* Overlay */
+  .overlay {
+    padding: 12px;
+  }
+}
+
+/* ============================= PRINT ============================= */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .sadu, .sadu-strip, .admin-gear, .sync-indicator {
+    display: none;
+  }
+
+  .screen {
+    page-break-inside: avoid;
+  }
+}
+
+/* ============================= MOBILE LEGIBILITY FLOOR ============================= */
+/* حد أدنى 13px على الجوال — 12px مقروء على الكمبيوتر لكنه صغير على شاشة اليد */
+@media (max-width: 768px) {
+  .stat-label, .step-sub, .lifeline-count, .lifeline-chip,
+  .chat-time, .chat-text, .room-share-hint, .sync-indicator,
+  .code-label, .player-team, .player-score, .corner-label,
+  .cat-admin-chip, .admin-hint, .ll-desc, .end-team-name,
+  .winner-margin, .tie-text, .qcat, .qpoints {
+    font-size: 13px;
+  }
+}
+
+/* أرضية 13px شاملة على الجوال — تغطي الأزرار والتبويبات والتذييل والفقرات */
+@media (max-width: 768px) {
+  .tag, .admin-tab, .btn, .btn-main, .round-tab,
+  footer, footer p, footer span,
+  .screen p, .screen span:not(.ic):not(.btn-icon) {
+    font-size: 13px;
+  }
+
+  /* الأيقونات تبقى بحجمها */
+  .btn-icon, .stat-icon, .mode-icon, .ic { font-size: inherit; }
+}
+
+@media (max-width: 768px) {
+  .mode-desc, .lifelines-label, .cat-pick .nm,
+  .selection-status, .team-setup label, .screen label {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cat-pick .check, .team-name, .reset-btn, .cat-header {
+    font-size: 13px;
+  }
+}
