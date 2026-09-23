@@ -1,0 +1,159 @@
+{
+  "category": "📱 تطبيقات ومنصات",
+  "questions": [
+    {
+      "id": 1,
+      "difficulty": "easy",
+      "points": 100,
+      "question": "ما التطبيق الذي يتميز بشعار على شكل شبح أبيض؟",
+      "answer": "سناب شات"
+    },
+    {
+      "id": 2,
+      "difficulty": "easy",
+      "points": 100,
+      "question": "ما اسم منصة مشاهدة الفيديوهات التابعة لشركة Google؟",
+      "answer": "يوتيوب"
+    },
+    {
+      "id": 3,
+      "difficulty": "medium",
+      "points": 250,
+      "question": "ما المنصة الأشهر لتحميل وشراء ألعاب الكمبيوتر والتي طورتها شركة Valve؟",
+      "answer": "Steam"
+    },
+    {
+      "id": 4,
+      "difficulty": "medium",
+      "points": 250,
+      "question": "ما التطبيق الذي يُستخدم لعقد الاجتماعات ومكالمات الفيديو عبر الإنترنت؟",
+      "answer": "Zoom"
+    },
+    {
+      "id": 5,
+      "difficulty": "medium",
+      "points": 250,
+      "question": "ما التطبيق الموسيقي الذي يتميز بشعار أخضر بداخله ثلاثة خطوط منحنية؟",
+      "answer": "Spotify"
+    },
+    {
+      "id": 6,
+      "difficulty": "medium",
+      "points": 250,
+      "question": "ما اسم الشركة التي طورت تطبيق ChatGPT؟",
+      "answer": "OpenAI"
+    },
+    {
+      "id": 7,
+      "difficulty": "easy",
+      "points": 100,
+      "question": "ما المنصة التي تُستخدم للتواصل بين اللاعبين عبر المحادثات النصية والصوتية؟",
+      "answer": "Discord"
+    },
+    {
+      "id": 8,
+      "difficulty": "easy",
+      "points": 100,
+      "question": "ما التطبيق الذي يتيح طلب سيارات للتنقل من مكان إلى آخر؟",
+      "answer": "Uber"
+    },
+    {
+      "id": 9,
+      "difficulty": "medium",
+      "points": 250,
+      "question": "ما المنصة التي كانت تُعرف سابقًا باسم Musical.ly؟",
+      "answer": "TikTok"
+    },
+    {
+      "id": 10,
+      "difficulty": "medium",
+      "points": 250,
+      "question": "ما المنصة التي طورتها شركة Microsoft وتُستخدم للمحادثات والاجتماعات والعمل الجماعي؟",
+      "answer": "Microsoft Teams"
+    },
+    {
+      "id": 11,
+      "difficulty": "hard",
+      "points": 400,
+      "question": "ما اسم المنصة التي اشترتها Google عام 2006 مقابل 1.65 مليار دولار؟",
+      "answer": "YouTube"
+    },
+    {
+      "id": 12,
+      "difficulty": "hard",
+      "points": 400,
+      "question": "ما اسم الشركة التي طورت تطبيق Claude للذكاء الاصطناعي؟",
+      "answer": "Anthropic"
+    },
+    {
+      "id": 13,
+      "difficulty": "hard",
+      "points": 400,
+      "question": "ما اسم المنصة التي أطلقتها Valve عام 2003؟",
+      "answer": "Steam"
+    },
+    {
+      "id": 14,
+      "difficulty": "easy",
+      "points": 100,
+      "question": "ما التطبيق الذي يتيح مشاركة الصور والفيديوهات ويتميز بشعار الكاميرا؟",
+      "answer": "Instagram"
+    },
+    {
+      "id": 15,
+      "difficulty": "medium",
+      "points": 250,
+      "question": "ما الخدمة السحابية التابعة لشركة Microsoft لتخزين الملفات؟",
+      "answer": "OneDrive"
+    },
+    {
+      "id": 16,
+      "difficulty": "medium",
+      "points": 250,
+      "question": "ما التطبيق الذي اشترته شركة Facebook عام 2014 مقابل نحو 19 مليار دولار؟",
+      "answer": "WhatsApp"
+    },
+    {
+      "id": 17,
+      "difficulty": "hard",
+      "points": 400,
+      "question": "ما اسم المنصة التي اشترتها Microsoft عام 2016 وأصبحت من أشهر منصات المجتمعات المهنية؟",
+      "answer": "LinkedIn"
+    },
+    {
+      "id": 18,
+      "difficulty": "easy",
+      "points": 100,
+      "question": "في واتساب، ماذا يعني ظهور علامتي صح باللون الأزرق أسفل الرسالة؟",
+      "answer": "أن الرسالة تمت قراءتها"
+    },
+    {
+      "id": 19,
+      "difficulty": "easy",
+      "points": 100,
+      "question": "في إنستغرام، ماذا تسمى المنشورات التي تختفي عادةً بعد 24 ساعة؟",
+      "answer": "القصص (Stories)"
+    },
+    {
+      "id": 20,
+      "difficulty": "hard",
+      "points": 400,
+      "question": "في Discord، ما الفرق الأساسي بين السيرفر والقناة؟",
+      "answer": "السيرفر مجتمع كامل، والقناة مساحة داخله للمحادثة أو الصوت أو غيرها"
+    },
+    {
+      "id": 21,
+      "difficulty": "hard",
+      "points": 400,
+      "question": "في تطبيقات التواصل الاجتماعي، ما المقصود بمصطلح DM؟",
+      "answer": "رسالة خاصة (Direct Message)"
+    },
+    {
+      "id": 22,
+      "difficulty": "hard",
+      "points": 400,
+      "question": "ما اسم التقنية التي تضيف طبقة حماية إضافية للحساب من خلال طلب رمز أو وسيلة تحقق ثانية بعد كلمة المرور؟",
+      "answer": "المصادقة الثنائية (2FA)"
+    }
+  ]
+}

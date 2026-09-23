@@ -1,0 +1,19 @@
+{
+  "name": "تحدي رجا",
+  "short_name": "تحدي رجا",
+  "description": "لعبة أسئلة جماعية للعائلة والأصدقاء — 36 فئة وأكثر من 2800 سؤال. العبوا من جهاز واحد أو من أجهزتكم بكود روم.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0A1A14",
+  "theme_color": "#0A1A14",
+  "categories": ["games", "education", "entertainment"],
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

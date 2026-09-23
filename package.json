@@ -1,0 +1,21 @@
+{
+  "name": "tahadi-raja",
+  "version": "1.0.0",
+  "description": "تحدي رجا — لعبة أسئلة جماعية بفريقين",
+  "private": true,
+  "scripts": {
+    "build": "python tools/build-www.py",
+    "icons": "python tools/make-icons.py",
+    "sync": "npm run build && cap sync ios",
+    "open:ios": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/splash-screen": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}
