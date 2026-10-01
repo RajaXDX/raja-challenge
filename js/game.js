@@ -1501,29 +1501,66 @@ function stripTrailingNote(text) {
 
 // إجابة رقمية → مشتّتات رقمية قريبة، مع الحفاظ على وحدة القياس.
 // «206 عظمة» تنافسها «198 عظمة» لا «الرياض».
-function numericDistractors(correct, rand) {
+function numericDistractors(correct, rand, kind, yearStep = 1) {
   const text = String(correct);
 
-  // ⚠️ النِّسَب والمجالات لا تُبدَّل بتغيير رقم واحد: «من 1:15 إلى 1:18»
-  // كان يصير «من 3:15 إلى 1:18» — تركيب لا معنى له، والجزء الثابت يبقى
-  // شاهداً على الصحيح. ندعها لمشتّتات الفئة.
-  if (/\d\s*[:：/–—-]\s*\d/.test(text)) return null;
+  // ⚠️ النِّسَب لا تُبدَّل بتغيير رقم واحد: «من 1:15 إلى 1:18» كان يصير
+  // «من 3:15 إلى 1:18» — تركيب لا معنى له. ندعها لمشتّتات الفئة.
+  if (/\d\s*[:：/]\s*\d/.test(text)) return null;
+
+  // المجال «حوالي 35-37 مليون» يُزاح طرفاه معاً بنفس المقدار. تبديل طرف
+  // واحد كان يُبقي الآخر شاهداً على الصحيح (لذلك كانت المجالات كلها تسقط
+  // لمشتّتات الفئة فتنافس «حوالي 40-50%» إجاباتٌ مثل «حوالي 600 متر»).
+  const range = text.match(/(\d+)\s*[–—-]\s*(\d+)/);
+  if (range) {
+    const lo = parseInt(range[1], 10), hi = parseInt(range[2], 10);
+    if (!(hi > lo) || text.match(/\d+/g).length !== 2) return null;
+    const width = Math.max(1, hi - lo);
+    const out = new Set();
+    let guard = 0;
+    while (out.size < 5 && guard++ < 40) {
+      const shift = (Math.floor(rand() * 3) + 1) * width * (rand() < 0.5 ? -1 : 1);
+      if (lo + shift > 0) out.add(shift);
+    }
+    if (out.size < 3) return null;
+    // نبني المجال من جديد لا باستبدال نصّي: «300-350» مُزاحاً بـ50 كان يصير
+    // «350-350» ثم يُستبدل أول «350» فيخرج «400-350»
+    return [...out].map(s => text.replace(range[0], `${lo + s}-${hi + s}`));
+  }
 
   const m = text.match(/(\d[\d,]*)/);
   if (!m) return null;
+
+  /*
+    ⚠️ **الرقم قد يكون جزءاً من اسم لا كمّية.** «دوتا 2 في بطولة ذي إنترناشيونال»
+    كانت خياراتها «دوتا 1» و«دوتا 4» و«دوتا 5» — ألعاب لا وجود لها. نبدّل
+    الرقم فقط إن كان السؤال عن عدد أو زمن، أو كان الرقم أول الإجابة، أو
+    سبقته كلمة كمّية («حوالي 120 متراً»، «عام 1932»، «بـ20 لقباً»).
+  */
+  const before = text.slice(0, m.index).trim();
+  const quantityLead = !before
+    || /(حوالي|حوالى|نحو|قرابة|تقريباً|أكثر من|أقل من|عام|سنة|نسخة|موسم|بـ|بعد|قبل|منذ|من|إلى)$/.test(before);
+  if (kind !== 'count' && kind !== 'time' && !quantityLead) return null;
 
   const raw = m[1].replace(/,/g, '');
   const n = parseInt(raw, 10);
   if (!Number.isFinite(n) || n === 0) return null;
 
   const isYear = n >= 1000 && n <= 2100;
+  // سنة مشتّتة في المستقبل تفضح نفسها: «أول منتخب أفريقي يصل نصف النهائي
+  // — المغرب عام 2031»
+  const maxYear = new Date().getFullYear();
   const out = new Set();
   let guard = 0;
 
-  while (out.size < 3 && guard++ < 40) {
+  while (out.size < 5 && guard++ < 60) {
     let v;
     if (isYear) {
-      v = n + Math.floor(rand() * 21) - 10;
+      // كأس العالم والأولمبياد كل أربع سنوات: «المغرب عام 2023» يُستبعد فوراً
+      v = yearStep > 1
+        ? n + (Math.floor(rand() * 9) - 4) * yearStep
+        : n + Math.floor(rand() * 21) - 10;
+      if (v > maxYear && n <= maxYear) continue;
     } else if (n <= 12) {
       v = n + Math.floor(rand() * 7) - 3;
     } else {
@@ -1535,6 +1572,47 @@ function numericDistractors(correct, rand) {
 
   if (out.size < 3) return null;
   return [...out].map(v => correct.replace(m[1], String(v)));
+}
+
+/*
+  العدد المكتوب بالحروف: «سبعة أشواط»، «ست أرجل»، «ثلاث حجرات».
+
+  كانت هذه كلها تسقط لمشتّتات الفئة، فتنافس «ست أرجل» أسماءُ حيوانات
+  («البطريق | الزرافة»)، و«سبعة أشواط» تنافسها «حوالي مليوني حاج».
+  نبدّل العدد ونحفظ صيغته: المذكّر بالتاء («سبعة أشواط» ← «خمسة أشواط»)
+  والمؤنث بدونها («ست أرجل» ← «ثماني أرجل»). نقتصر على 3–10 لأن ما دونها
+  يغيّر صيغة المعدود نفسه (مفرد ومثنّى)، وما فوقها مركّب («خمسة عشر بحراً»).
+*/
+const NUMBER_WORDS = [
+  // [بلا تاء (للمؤنث), بالتاء (للمذكّر)]
+  [3, 'ثلاث', 'ثلاثة'], [4, 'أربع', 'أربعة'], [5, 'خمس', 'خمسة'],
+  [6, 'ست', 'ستة'], [7, 'سبع', 'سبعة'], [8, 'ثماني', 'ثمانية'],
+  [9, 'تسع', 'تسعة'], [10, 'عشر', 'عشرة'],
+];
+
+function wordNumberDistractors(correct, rand) {
+  const text = String(correct).trim();
+  const m = text.match(/^((?:حوالي|نحو|قرابة)\s+)?(\S+)(\s+\S+)?/);
+  if (!m) return null;
+  const word = m[2].replace(/:$/, '');
+  let form = -1, value = 0;
+  NUMBER_WORDS.forEach(([v, bare, withTa]) => {
+    if (word === withTa) { form = 2; value = v; }
+    else if (word === bare || (v === 8 && word === 'ثمان')) { form = 1; value = v; }
+  });
+  if (form < 0) return null;
+  // «خمسة عشر» مركّب، و«خمس: الفاتحة والأنعام…» تعدادٌ يذكر الصحيح بعدها
+  if (/^\s+(عشر|عشرة|و)/.test(m[3] || '') || /[:：]/.test(text)) return null;
+
+  const others = NUMBER_WORDS.filter(([v]) => v !== value)
+    .sort((a, b) => Math.abs(a[0] - value) - Math.abs(b[0] - value))
+    .slice(0, 5);
+  const picked = [];
+  while (others.length) {
+    picked.push(others.splice(Math.floor(rand() * others.length), 1)[0]);
+  }
+  const lead = m[1] || '';
+  return picked.map(row => lead + row[form] + text.slice(lead.length + word.length));
 }
 
 /*
@@ -1640,6 +1718,104 @@ function leadWord(text) {
   return contentWords(text)[0] || '';
 }
 
+/*
+  هل الخيار مذكور في نصّ السؤال نفسه؟
+
+  ⚠️ «صحح الخطأ: عدد أيام الأسبوع ستة أيام» كانت خياراتها تضمّ «ستة أيام» —
+  الكلمة الخاطئة المعلنة في السؤال — و«أكبر كوكب هو زُحل» تضمّ «زحل».
+  خيار مذكور في السؤال يُستبعد بلا تفكير، وكذلك «الأرض» في سؤال «ما أقرب
+  كوكب إلى الأرض؟». نطابق كلماتٍ كاملة بعد التطبيع، لا أي احتواء.
+*/
+function wordsOf(text) {
+  return normalizeAnswer(text)
+    .replace(/[؟?.,،!:؛()«»"'\-–—]/g, ' ')
+    .split(/\s+/).filter(Boolean)
+    .map(w => w.replace(/^ال/, ''));
+}
+
+function mentionedIn(question) {
+  const hay = ` ${wordsOf(question).join(' ')} `;
+  return (text) => {
+    const t = wordsOf(stripTrailingNote(text)).join(' ');
+    return !!t && hay.includes(` ${t} `);
+  };
+}
+
+/*
+  نوع الإجابة التي يطلبها السؤال — من صيغة السؤال نفسه.
+
+  ⚠️ هذا ما كان ناقصاً في الملاذ الأخير: كلمات الاستفهام («من»، «كم»، «متى»)
+  في `STOP_WORDS` فلا يراها `questionOverlap` أبداً، فكان سؤال «من مؤلف
+  مقدمة ابن خلدون؟» تنافسه «السنة الثامنة للهجرة»، وسؤال «ما اسم محافظة…؟»
+  تنافسه «الفوسفات» و«قاموس اليعقوبي». المشتّت الذي يخالف نوع السؤال
+  يُستبعد بلا تفكير فتصير الخيارات اثنين أو واحداً.
+
+  `kind`: person / count / time / place / other.
+  `head`: الاسم المطلوب بعينه («محافظة»، «معركة»، «جبل») — أدقّ من النوع.
+*/
+const PERSON_NOUNS = new Set([
+  'شاعر','كاتب','مؤلف','عالم','ملك','امير','خليفه','لاعب','مدرب','رئيس','مؤسس',
+  'نبي','صحابي','صحابيه','قائد','فنان','فنانه','مغني','مطرب','ممثل','ممثله','مخترع',
+  'مكتشف','رحاله','شخص','شخصيه','حارس','هداف','ملحن','مستكشف','فيلسوف','طبيب',
+  'مخرج','امام','سلطان','حاكم','وزير','اديب','اديبه','روائي','مغنيه','رسام','مهندس'
+]);
+// «من أول منتخب…؟» لا يُسأل بها عن شخص
+const NON_PERSON_NOUNS = new Set([
+  'منتخب','نادي','ناد','فريق','دوله','شركه','مدينه','جهه','بلد','دول','منظمه'
+]);
+const HEAD_SKIP = new Set([
+  'اسم','اشهر','اكبر','اصغر','اطول','اقصر','اقدم','اول','اخر','اعلي','اكثر','اهم',
+  'اعمق','احدث','اسرع','ابرز','افضل','ثاني','هذا','هذه','هذي','ذلك','تلك','هو','هي',
+  'الذي','التي','يسمي','تسمي','يعرف','تعرف','يطلق','المعروف','المعروفه','الشهير','الشهيره'
+]);
+const MEASURE_NOUNS = new Set([
+  'نسبه','عدد','مساحه','طول','عمق','ارتفاع','وزن','مسافه','سرعه','عمر','مده','حجم'
+]);
+const PLACE_NOUNS = new Set([
+  'مدينه','دوله','منطقه','بلد','قاره','محافظه','مكان','عاصمه','جزيره','قريه','حي','ولايه'
+]);
+
+function questionKind(question) {
+  const t = String(question || '').trim().replace(/^[«"(]+/, '');
+  const words = normalizeAnswer(t).replace(/[؟?.,،!:؛()«»"']/g, ' ').split(/\s+/).filter(Boolean);
+  const first = words[0] || '';
+  const rest = words.slice(1)
+    .map(w => w.replace(/^ال/, ''))
+    .filter(w => w.length > 1 && !HEAD_SKIP.has(w) && !STOP_WORDS.has(w));
+  const head = rest[0] || '';
+
+  // «ما نسبة…؟» و«ما مساحة…؟» تطلب مقداراً كما تطلبه «كم»
+  if (first === 'كم' || MEASURE_NOUNS.has(head)) return { kind: 'count', head };
+  if (first === 'متي') return { kind: 'time', head };
+  if ((first === 'في' || first === 'فى') && /^ا?ي$/.test(words[1] || '')) {
+    const noun = (words[2] || '').replace(/^ال/, '');
+    if (/^(عام|سنه|قرن|عقد|يوم|شهر|تاريخ)$/.test(noun)) return { kind: 'time', head: noun };
+    if (PLACE_NOUNS.has(noun)) return { kind: 'place', head: noun };
+    return { kind: 'other', head: noun };
+  }
+  if (first === 'اين') return { kind: 'place', head };
+  if (first === 'من' && !/^(اي|اين)$/.test(words[1] || '')) {
+    return NON_PERSON_NOUNS.has(head) ? { kind: 'other', head } : { kind: 'person', head };
+  }
+  if (PERSON_NOUNS.has(head)) return { kind: 'person', head };
+  if (head === 'عاصمه' || PLACE_NOUNS.has(head)) return { kind: 'place', head };
+  return { kind: 'other', head };
+}
+
+// «رتّب الحروف لتكوّن …: ب - ج - ل» — الحروف معروضة في السؤال نفسه،
+// فالمشتّت الذي يخالفها عدداً يُستبعد بالعدّ لا بالتفكير
+function scrambledLetterCount(question) {
+  const t = String(question || '');
+  if (!/رت[ّ]?ب\s+الحروف/.test(t)) return 0;
+  const tail = t.slice(t.lastIndexOf(':') + 1);
+  const letters = tail.split(/[\s\-–—،,]+/).filter(x => /^[ء-ي]$/.test(x));
+  return letters.length;
+}
+
+function letterCount(text) {
+  return (String(text || '').match(/[ء-ي]/g) || []).length;
+}
+
 // مرشّحات متدرّجة: نبدأ بالأصرم، وننزل درجة فقط إذا لم نجد ثلاثة مرشّحين.
 // هكذا لا نُرجع null أبداً، ولا نقبل خياراً فاضحاً ما دام هناك أفضل منه.
 const SHAPE_FILTERS = [
@@ -1677,23 +1853,51 @@ function buildChoices(item, categoryName, diffKey, seed) {
   if (isActingCategory(categoryName)) return null;
 
   const rand = makeSeededRandom(seed);
+  const { kind, head: qHead } = questionKind(item?.question);
+  const scrambled = scrambledLetterCount(item?.question);
+  const mentioned = mentionedIn(item?.question);
+  // نقدّم ما لم يُذكر في السؤال، ولا نُفشل البناء إن لم يبقَ غيره
+  const unmentioned = (list) => {
+    const ok = list.filter(x => !mentioned(x));
+    return ok.length >= 3 ? ok : list;
+  };
 
-  // 1) مجموعة من نفس النوع — أفضل جودة
-  const typed = findAnswerPool(correct);
+  /*
+    ⚠️ «رتّب الحروف» تتخطّى المجموعات والأرقام: «ذهب» كانت تنافسها «الرصاص»
+    و«التيتانيوم» من مجموعة المعادن — تُستبعد بعدّ الحروف قبل قراءتها.
+    مشتّتاتها من الفئة نفسها وبنفس عدد الحروف (راجع الملاذ الأخير).
+  */
+  // 1) مجموعة من نفس النوع — أفضل جودة.
+  // «في مصر» و«من الشرق» (فئة «صحح الخطأ»): حرف الجر يمنع المطابقة، فنطابق
+  // ما بعده ونُلحقه بالمشتّتات كما نُلحق اللقب
+  let prefix = '';
+  let typed = scrambled ? null : findAnswerPool(correct);
+  if (!typed && !scrambled) {
+    const pm = correct.match(/^(في|من)\s+(.+)$/);
+    const inner = pm && findAnswerPool(pm[2]);
+    if (inner) { typed = inner; prefix = pm[1] + ' '; }
+  }
   if (typed) {
-    const c = normalizeAnswer(correct);
-    const suffix = answerSuffix(correct, typed.matchedLength);
+    const bare = prefix ? correct.slice(prefix.length) : correct;
+    const c = normalizeAnswer(bare);
+    const suffix = answerSuffix(bare, typed.matchedLength);
+
+    // «ذهب» بلا «ال» أمام «الحديد» و«الفضة» تتميّز بشكلها. نُسقط «ال» من
+    // المشتّتات فقط حين تحملها المجموعة كلها — «الرياض» في مجموعة فيها
+    // «جدة» اسمٌ لا يصحّ بلا «ال»
+    const dropAl = !/^ال/.test(bare) && typed.pool.every(x => /^ال/.test(x));
 
     // نستبعد الصيغ الإملائية الأخرى للاسم نفسه («داود» أمام «داوود»)
     const others = typed.pool.filter(x => {
       const n = normalizeAnswer(x);
       return n !== c && !c.includes(n) && !n.includes(c);
-    });
+    }).map(x => prefix + (dropAl ? x.replace(/^ال/, '') : x));
+    const fresh = unmentioned(others);
 
-    if (others.length >= 3) {
+    if (fresh.length >= 3) {
       const picked = [];
       const seen = new Set();
-      const avail = others.slice();
+      const avail = fresh.slice();
       while (picked.length < 3 && avail.length) {
         const one = avail.splice(Math.floor(rand() * avail.length), 1)[0];
         // ⚠️ المجموعة تحوي صيغاً إملائية متعددة للاسم الواحد («آدم» و«ادم»)،
@@ -1714,8 +1918,11 @@ function buildChoices(item, categoryName, diffKey, seed) {
   // نبني الخيارات على الإجابة **بلا شرحها**: الشرح يتكرّر حرفياً في الأربعة
   // ويذكر الرقم الصحيح، فيفضحه (راجع `stripTrailingNote`).
   const head = stripTrailingNote(correct);
-  const nums = numericDistractors(head, rand);
-  if (nums) return shuffleChoices(head, nums, rand);
+  if (!scrambled) {
+    const yearStep = /كأس العالم|مونديال|الأولمبياد|أولمبي/.test(item?.question || '') ? 4 : 1;
+    const nums = numericDistractors(head, rand, kind, yearStep) || wordNumberDistractors(head, rand);
+    if (nums) return shuffleChoices(head, unmentioned(nums).slice(0, 3), rand);
+  }
 
   // 3) الملاذ الأخير: إجابات أخرى من نفس الفئة.
   // الترتيب: تشابه السؤال أولاً ثم قرب الطول — الاعتماد على الطول وحده
@@ -1732,13 +1939,25 @@ function buildChoices(item, categoryName, diffKey, seed) {
   const myShape = answerShape(head);
   const myLead = leadWord(head);
 
-  const scored = pool.map(c => ({
-    answer: c.answer,
-    shape: answerShape(c.answer),
-    sameLead: !!myLead && leadWord(c.answer) === myLead,
-    overlap: questionOverlap(myWords, c.question),
-    lenDiff: Math.abs(c.answer.length - head.length)
-  }));
+  const myLetters = letterCount(head);
+
+  const fresh = new Set(unmentioned(pool.map(c => c.answer)));
+  const scored = pool.filter(c => fresh.has(c.answer)).map(c => {
+    const qk = questionKind(c.question);
+    const aLead = leadWord(c.answer).replace(/^ال/, '');
+    return {
+      answer: c.answer,
+      shape: answerShape(c.answer),
+      sameKind: qk.kind === kind,
+      // «ما اسم محافظة…» يلتقي بـ«ما اسم محافظة…» أخرى، أو بإجابة تبدأ بالاسم
+      // نفسه («في أي جبل…» ← «جبل النور» أمام «جبل ثور»)
+      sameHead: !!qHead && (qk.head === qHead || aLead === qHead),
+      sameLead: !!myLead && leadWord(c.answer) === myLead,
+      overlap: questionOverlap(myWords, c.question),
+      letterDiff: Math.abs(letterCount(c.answer) - myLetters),
+      lenDiff: Math.abs(c.answer.length - head.length)
+    };
+  });
 
   /*
     أول مرشّح يترك ثلاثة على الأقل هو المعتمد.
@@ -1750,14 +1969,27 @@ function buildChoices(item, categoryName, diffKey, seed) {
     والمعنى انهار، واللاعب يستبعدها بالسخف بدل أن يستبعدها بالشكل. الفئة
     الواحدة سقفٌ مقصود.
   */
+  /*
+    نوع السؤال يسبق الشكل: مشتّت «من» بين إجابات «من» ولو اختلف طوله، أولى
+    من مشتّت يشبه الإجابة شكلاً وهو مكان أو سنة. فنجرّب مرشّحات الشكل داخل
+    نفس النوع أولاً، ولا نخرج عنه إلا إن لم يبقَ فيه ثلاثة.
+  */
   let kept = [];
-  for (const pass of SHAPE_FILTERS) {
-    kept = scored.filter(c => pass(c.shape, myShape));
-    if (kept.length >= 3) break;
+  const base = scrambled
+    // «رتّب الحروف»: نفس عدد الحروف شرطٌ لا تفضيل، ثم ±1 إن لم يكفِ
+    ? [scored.filter(c => c.letterDiff === 0), scored.filter(c => c.letterDiff <= 1), scored]
+    : [scored.filter(c => c.sameKind), scored];
+  outer:
+  for (const group of base) {
+    for (const pass of SHAPE_FILTERS) {
+      kept = group.filter(c => pass(c.shape, myShape));
+      if (kept.length >= 3) break outer;
+    }
   }
   if (kept.length < 3) kept = scored;
 
   kept.sort((x, y) =>
+    (Number(y.sameHead) - Number(x.sameHead)) ||
     (Number(y.sameLead) - Number(x.sameLead)) ||
     (y.overlap - x.overlap) ||
     (x.lenDiff - y.lenDiff));
