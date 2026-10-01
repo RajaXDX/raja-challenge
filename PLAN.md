@@ -569,8 +569,11 @@ supabase-feedback.sql       question_reports + game_ratings  ⚠️ لم يُش�
   ينادي دالة Supabase `supabase/functions/generate-questions` (Claude Opus 5.5).
   المفتاح سرّ على السيرفر، والدالة ترفض غير الإدمن عبر `is_admin()`.
   الأسئلة لا تدخل البنك إلا بعد المراجعة وضغط «أضف المختار».
-  **باقي:** `supabase secrets set ANTHROPIC_API_KEY=...` ثم
-  `supabase functions deploy generate-questions`، وتجربة حقيقية.
+  ✅ نُشرت الدالة 2026-10-01 (`npx.cmd supabase functions deploy generate-questions
+  --project-ref rqcltlleqpppeywxbkpo --use-api`)، ونداء غير الإدمن يرجع 403 كما يجب.
+  **معلّق 2026-10-01:** المستخدم لا يريد الدفع، فأُخفي زر التبويب (`style="display:none"`
+  في `index.html`) والكود والدالة باقيان. لتفعيله: `ANTHROPIC_API_KEY` في أسرار
+  Supabase ثم احذف الـ style. البديل الحالي: توليد الأسئلة عبر Claude Code في ملفات `data/`.
 
 - [ ] **نطاق قصير** — `rajaxdx.github.io/raja-challenge` صعب النطق (~50 ريال/سنة).
   **صار شرطاً لا تحسيناً:** بدونه لا يمكن توثيق نطاق في Resend، فاستعادة
