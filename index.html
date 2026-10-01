@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20260910h">
-  <link rel="stylesheet" href="css/responsive.css?v=20260910h">
+  <link rel="stylesheet" href="css/style.css?v=20261001a">
+  <link rel="stylesheet" href="css/responsive.css?v=20261001a">
 </head>
 <!-- data-screen يُحدَّث في showScreen؛ القيمة هنا للحظة ما قبل أول استدعاء -->
 <body data-screen="screen-home">
@@ -695,6 +695,7 @@
 
   <div class="admin-tabs">
     <button class="admin-tab active" onclick="switchAdminTab('questions')">📚 الأسئلة</button>
+    <button class="admin-tab" onclick="switchAdminTab('ai')">🤖 مولّد الأسئلة</button>
     <button class="admin-tab" onclick="switchAdminTab('categories')">📂 الفئات</button>
     <button class="admin-tab" onclick="switchAdminTab('users')">👥 اللاعبون</button>
     <button class="admin-tab" onclick="switchAdminTab('points')">🏆 النقاط</button>
@@ -742,6 +743,38 @@
       </div>
       <div class="bank-list" id="bankList"></div>
       <div class="bank-count" id="bankCount"></div>
+    </div>
+
+    <!-- تبويب مولّد الأسئلة بالذكاء الاصطناعي -->
+    <div class="admin-section" id="tab-ai">
+      <h3>🤖 مولّد الأسئلة بالذكاء الاصطناعي</h3>
+      <div class="admin-hint">
+        اكتب الموضوع، والذكاء الاصطناعي يكتب الأسئلة. تراجعها، تعدّل اللي تبي، وتضيف المختار للبنك مباشرة.
+      </div>
+      <div class="admin-row" style="flex-direction:column; align-items:stretch;">
+        <select id="aiCatSelect"></select>
+        <input type="text" id="aiNewCat" placeholder="أو اكتب اسم فئة جديدة (تنضاف تلقائياً)">
+        <textarea id="aiTopic" placeholder="تفاصيل الموضوع (اختياري) — مثلاً: لاعبين الهلال في التسعينات، أو أسئلة عن مسلسل طاش ما طاش"></textarea>
+      </div>
+      <div class="admin-row">
+        <select id="aiDiffSelect">
+          <option value="easy">سهل (100)</option>
+          <option value="medium" selected>متوسط (250)</option>
+          <option value="hard">صعب (400)</option>
+        </select>
+        <select id="aiCount">
+          <option value="5">5 أسئلة</option>
+          <option value="10" selected>10 أسئلة</option>
+          <option value="20">20 سؤال</option>
+        </select>
+      </div>
+      <button class="btn btn-answer" id="aiGenerateBtn" onclick="aiGenerate()">✨ ولّد الأسئلة</button>
+      <div id="aiStatus" class="admin-hint" style="margin-top:10px;"></div>
+      <div id="aiResults" class="bank-list"></div>
+      <div id="aiActions" class="admin-row" style="display:none; margin-top:10px;">
+        <button class="btn btn-answer" onclick="aiAddSelected()">✅ أضف المختار للبنك</button>
+        <button class="btn" onclick="aiGenerate()">🔁 ولّد غيرها</button>
+      </div>
     </div>
 
     <!-- تبويب الفئات -->
@@ -878,19 +911,19 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ملفات JS الرئيسية -->
-<script src="js/supabase-config.js?v=20260910h"></script>
-<script src="js/utils.js?v=20260910h"></script>
-<script src="js/auth.js?v=20260910h"></script>
-<script src="js/bans.js?v=20260910h"></script>
-<script src="js/friends.js?v=20260910h"></script>
-<script src="js/profile.js?v=20260910h"></script>
-<script src="js/game.js?v=20260910h"></script>
-<script src="js/admin.js?v=20260910h"></script>
-<script src="js/sync.js?v=20260910h"></script>
-<script src="js/rooms.js?v=20260910h"></script>
-<script src="js/chat.js?v=20260910h"></script>
-<script src="js/about.js?v=20260910h"></script>
-<script src="js/feedback.js?v=20260910h"></script>
+<script src="js/supabase-config.js?v=20261001a"></script>
+<script src="js/utils.js?v=20261001a"></script>
+<script src="js/auth.js?v=20261001a"></script>
+<script src="js/bans.js?v=20261001a"></script>
+<script src="js/friends.js?v=20261001a"></script>
+<script src="js/profile.js?v=20261001a"></script>
+<script src="js/game.js?v=20261001a"></script>
+<script src="js/admin.js?v=20261001a"></script>
+<script src="js/sync.js?v=20261001a"></script>
+<script src="js/rooms.js?v=20261001a"></script>
+<script src="js/chat.js?v=20261001a"></script>
+<script src="js/about.js?v=20261001a"></script>
+<script src="js/feedback.js?v=20261001a"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

@@ -121,6 +121,7 @@ function initializeAdminPanel() {
   document.getElementById('ptHard').value = POINTS[2];
   renderAdminCategories();
   populateBankCatSelect();
+  populateAiCatSelect();
   renderBankList();
   renderImageLibrary();
   updateSyncInfo();
@@ -1248,4 +1249,165 @@ async function setPlayerAdmin(userId, username, makeAdmin) {
   } catch (e) {
     uiAlert(`❌ ${e.message || 'تعذّرت العملية'}`);
   }
+}
+
+/* ============================= AI QUESTION GENERATOR ============================= */
+
+/*
+  يكتب الأسئلة عبر دالة Supabase «generate-questions» (supabase/functions/).
+  مفتاح Claude سرّ على السيرفر — لا يمرّ بالمتصفح أبداً — والدالة نفسها
+  ترفض أي حساب ليس إدمن، فلا يكفي إخفاء التبويب هنا.
+  الأسئلة لا تدخل البنك إلا بعد مراجعة الإدمن وضغطه «أضف المختار».
+*/
+let aiDraft = [];
+
+function populateAiCatSelect() {
+  const sel = document.getElementById('aiCatSelect');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '';
+  CATEGORIES.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.name;
+    opt.textContent = `${c.ic} ${c.name}`;
+    sel.appendChild(opt);
+  });
+  if (current && CATEGORIES.some(c => c.name === current)) sel.value = current;
+}
+
+function aiTargetCategory() {
+  return trimArabic(document.getElementById('aiNewCat').value) ||
+         document.getElementById('aiCatSelect').value;
+}
+
+async function aiGenerate() {
+  if (!isAdminLoggedIn) { uiAlert('❌ يجب تسجيل الدخول كإدمن أولاً'); return; }
+  if (!supa) { uiAlert('❌ المولّد يحتاج اتصال بالسحابة (Supabase)'); return; }
+
+  const category = aiTargetCategory();
+  const difficulty = document.getElementById('aiDiffSelect').value;
+  const count = Number(document.getElementById('aiCount').value);
+  const topic = document.getElementById('aiTopic').value.trim();
+  if (!category) { uiAlert('❌ اختر فئة أو اكتب اسم فئة جديدة'); return; }
+
+  // نرسل الأسئلة الموجودة حتى لا يكررها
+  const existing = ['easy', 'medium', 'hard']
+    .flatMap(k => (QBANK[category]?.[k] || []).map(q => q.question))
+    .slice(-400);
+
+  const btn = document.getElementById('aiGenerateBtn');
+  const status = document.getElementById('aiStatus');
+  btn.disabled = true;
+  status.textContent = '⏳ جاري كتابة الأسئلة… (ممكن تاخذ دقيقة)';
+  document.getElementById('aiResults').innerHTML = '';
+  document.getElementById('aiActions').style.display = 'none';
+
+  try {
+    const { data, error } = await supa.functions.invoke('generate-questions', {
+      body: { category, topic, difficulty, count, existing }
+    });
+    if (error) {
+      let msg = error.message;
+      try { msg = (await error.context.json()).error || msg; } catch (e) {}
+      throw new Error(msg);
+    }
+
+    const seen = new Set(existing.map(normQ));
+    aiDraft = (data.questions || [])
+      .filter(q => !seen.has(normQ(q.question)))
+      .map(q => ({ ...q, selected: true }));
+
+    if (!aiDraft.length) {
+      status.textContent = '⚠️ ما طلعت أسئلة جديدة — جرّب تفاصيل موضوع مختلفة';
+      return;
+    }
+    status.textContent = `✅ ${aiDraft.length} سؤال جاهز لفئة «${category}» — راجعها وعدّل اللي تبي`;
+    renderAiDraft();
+  } catch (e) {
+    status.textContent = '❌ ' + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function normQ(s) {
+  return trimArabic(String(s || '')).replace(/[؟?!.،,\s]+/g, ' ').trim();
+}
+
+function renderAiDraft() {
+  const wrap = document.getElementById('aiResults');
+  wrap.innerHTML = '';
+  aiDraft.forEach((q, i) => {
+    const row = createElement('div', { class: 'bank-item' });
+    row.innerHTML = `
+      <div class="bank-main" style="flex:1; align-items:flex-start;">
+        <input type="checkbox" ${q.selected ? 'checked' : ''} style="margin-top:6px;">
+        <input type="text" class="ai-emoji" value="${escapeHtml(q.emoji)}" style="width:42px; text-align:center;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+          <textarea class="ai-q" rows="2">${escapeHtml(q.question)}</textarea>
+          <input type="text" class="ai-a" value="${escapeHtml(q.answer)}">
+        </div>
+      </div>`;
+    row.querySelectorAll('input[type=text], textarea').forEach(el => {
+      el.style.cssText += 'background:rgba(0,0,0,.25);border:1px solid rgba(240,233,223,.25);border-radius:8px;padding:6px 8px;color:var(--text);font-family:Cairo;font-size:13px;';
+    });
+    row.querySelector('input[type=checkbox]').onchange = e => { aiDraft[i].selected = e.target.checked; };
+    row.querySelector('.ai-q').oninput = e => { aiDraft[i].question = e.target.value; };
+    row.querySelector('.ai-a').oninput = e => { aiDraft[i].answer = e.target.value; };
+    row.querySelector('.ai-emoji').oninput = e => { aiDraft[i].emoji = e.target.value; };
+    wrap.appendChild(row);
+  });
+  document.getElementById('aiActions').style.display = aiDraft.length ? 'flex' : 'none';
+}
+
+async function aiAddSelected() {
+  if (!isAdminLoggedIn) { uiAlert('❌ يجب تسجيل الدخول كإدمن أولاً'); return; }
+
+  const cat = aiTargetCategory();
+  const diffKey = document.getElementById('aiDiffSelect').value;
+  const picked = aiDraft
+    .filter(q => q.selected)
+    .map(q => ({
+      question: trimArabic(q.question),
+      answer: trimArabic(q.answer),
+      emoji: (q.emoji || '').trim() || '❓',
+      needsImage: false,
+      imageQuery: ''
+    }))
+    .filter(q => q.question && q.answer);
+  if (!picked.length) { uiAlert('❌ ما اخترت ولا سؤال'); return; }
+
+  // فئة جديدة: نفس مسار «إضافة فئة» حتى لا تختفي عند أول دمج
+  const isNewCat = !CATEGORIES.some(c => c.name === cat);
+  if (isNewCat) {
+    await unretireCategory(cat);
+    CATEGORIES.push({ name: cat, ic: '✨' });
+    saveJSON('mr_categories', CATEGORIES);
+  }
+
+  if (!QBANK[cat]) QBANK[cat] = { easy: [], medium: [], hard: [] };
+  if (!QBANK[cat][diffKey]) QBANK[cat][diffKey] = [];
+  const before = QBANK[cat][diffKey].length;
+  QBANK[cat][diffKey].push(...picked);
+
+  if (!saveBankWithImages()) {
+    QBANK[cat][diffKey].length = before;
+    return;
+  }
+  await pushToCloud();
+
+  aiDraft = [];
+  document.getElementById('aiResults').innerHTML = '';
+  document.getElementById('aiActions').style.display = 'none';
+  document.getElementById('aiNewCat').value = '';
+  document.getElementById('aiStatus').textContent =
+    `✅ انضاف ${picked.length} سؤال لفئة «${cat}» — صار فيها ${QBANK[cat][diffKey].length} سؤال بهالمستوى`;
+
+  if (isNewCat) { renderAdminCategories(); populateBankCatSelect(); }
+  populateAiCatSelect();
+  document.getElementById('aiCatSelect').value = cat;
+  renderBankList();
+  updateTotalStats();
+  Sound.award();
+  log(`✅ المولّد أضاف ${picked.length} سؤال في ${cat}`, 'success');
 }

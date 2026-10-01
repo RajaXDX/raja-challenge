@@ -564,6 +564,14 @@ supabase-feedback.sql       question_reports + game_ratings  ⚠️ لم يُش�
   `email rate limit exceeded`). الحل: Resend أو Brevo مجاناً، ثم
   Supabase → Settings → Authentication → SMTP Settings. ~10 دقائق.
 
+- [ ] **مولّد الأسئلة بالذكاء الاصطناعي** — الكود جاهز 2026-10-01، **ينتظر النشر**.
+  تبويب «🤖 مولّد الأسئلة» في لوحة الإدارة (`js/admin.js` → `aiGenerate`)
+  ينادي دالة Supabase `supabase/functions/generate-questions` (Claude Opus 5.5).
+  المفتاح سرّ على السيرفر، والدالة ترفض غير الإدمن عبر `is_admin()`.
+  الأسئلة لا تدخل البنك إلا بعد المراجعة وضغط «أضف المختار».
+  **باقي:** `supabase secrets set ANTHROPIC_API_KEY=...` ثم
+  `supabase functions deploy generate-questions`، وتجربة حقيقية.
+
 - [ ] **نطاق قصير** — `rajaxdx.github.io/raja-challenge` صعب النطق (~50 ريال/سنة).
   **صار شرطاً لا تحسيناً:** بدونه لا يمكن توثيق نطاق في Resend، فاستعادة
   كلمة المرور لن تصل لأي لاعب غيرك، والزر يبقى مخفياً.
