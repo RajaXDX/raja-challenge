@@ -231,11 +231,15 @@ function renderAdminCategories() {
   CATEGORIES.forEach(c => {
     const chip = createElement('div', { class: 'cat-admin-chip' }, `
       <span>${escapeHtml(c.ic)} ${escapeHtml(c.name)}</span>
+      <span class="hide" title="إخفاء عن كل الأجهزة (قابل للإرجاع)">🙈</span>
       <span class="del" title="حذف">✕</span>
     `);
+    chip.querySelector('.hide').onclick = () => hideCategory(c.name);
     chip.querySelector('.del').onclick = () => deleteCategory(c.name);
     wrap.appendChild(chip);
   });
+
+  renderHiddenCats();
 }
 
 async function adminAddCategory() {

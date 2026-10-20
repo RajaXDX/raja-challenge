@@ -246,47 +246,16 @@ function renderCatGrid() {
     grid.appendChild(makeCatCard(c));
   });
   updateSelStatus();
-  renderHiddenCats();
-  probeAdminOnce();   // بلا انتظار: يعيد الرسم وحده إن ثبت أنه إدمن
 }
 
 /*
-  أدوات الفئات للإدمن وحده.
+  الإخفاء والإرجاع من لوحة الإدارة وحدها (تبويب الفئات).
 
-  لا نعرض زرّ الإخفاء لكل لاعب: `authenticateAdmin()` مع السحابة تمرّ صامتةً
-  لمن هو إدمن فعلاً وترفض غيره برسالة — فزرٌّ يراه الجميع ويُنكر على أكثرهم
-  إزعاجٌ بلا فائدة. نتحقّق مرّة واحدة بلا أي مطالبة (جلسة موجودة + `is_admin`)
-  ثم تظهر الأدوات.
+  كان على كل بطاقة في شاشة اختيار الفئات زرّ ✕ يظهر لمن هو إدمن، فيُخفي
+  الفئة بضغطة وسط اللعب أمام اللاعبين. الآن شاشة الاختيار للاختيار فقط.
 */
-let adminUnlocked = false;
-let adminProbePromise = null;
-
-function probeAdminOnce() {
-  if (adminProbePromise) return adminProbePromise;
-
-  adminProbePromise = (async () => {
-    if (!supa || adminUnlocked) return adminUnlocked;
-    try {
-      const { data: { session } } = await supa.auth.getSession();
-      if (!session) return false;
-      if (await checkIsAdmin?.()) {
-        adminUnlocked = true;
-        // الشاشة رُسمت قبل أن يصل الجواب — نعيد رسمها لتظهر الأدوات
-        if (document.querySelector('#screen-categories.active')) renderCatGrid();
-      }
-    } catch (e) {
-      console.warn('تعذّر فحص صلاحية الإدارة:', e);
-    }
-    return adminUnlocked;
-  })();
-
-  return adminProbePromise;
-}
-
 async function ensureAdmin() {
-  const ok = await authenticateAdmin();
-  if (ok) adminUnlocked = true;
-  return ok;
+  return authenticateAdmin();
 }
 
 // عدد أسئلة الفئة في البنك — صفرٌ يعني «قريباً»
@@ -311,7 +280,7 @@ function categoryQuestionCount(name) {
 async function hideCategory(name) {
   if (!(await ensureAdmin())) return;
 
-  if (!(await uiConfirm(`إخفاء «${name}» عن كل الأجهزة؟\nترجعها متى شئت من شريط «المخفية» تحت الشبكة.`))) return;
+  if (!(await uiConfirm(`إخفاء «${name}» عن كل الأجهزة؟\nترجعها متى شئت من «فئات مخفية» في تبويب الفئات.`))) return;
 
   const published = await publishRetiredCategory(name);
 
@@ -327,6 +296,7 @@ async function hideCategory(name) {
   saveJSON('mr_categories', CATEGORIES);
   saveJSON('mr_bank', QBANK);
   renderCatGrid();
+  renderAdminCategories();
   Sound.select?.();
   uiAlert(`🙈 أُخفيت «${name}» عن كل الأجهزة`);
 }
@@ -342,6 +312,7 @@ async function restoreCategory(name) {
   // تُعاد الفئة وأسئلتها من ملفات المشروع في نفس اللحظة
   await syncBundledQuestionBank();
   renderCatGrid();
+  renderAdminCategories();
   Sound.select?.();
 
   const n = categoryQuestionCount(name);
@@ -350,7 +321,7 @@ async function restoreCategory(name) {
     : `✅ رجعت «${name}» — وهي بلا أسئلة بعد`);
 }
 
-// شريط المخفيّات: لا يظهر إلا للإدمن، وإلا كان كشفاً لما أُخفي عمداً
+// شريط المخفيّات: داخل لوحة الإدارة وحدها، وإلا كان كشفاً لما أُخفي عمداً
 function renderHiddenCats() {
   const box = document.getElementById('hiddenCats');
   if (!box) return;
@@ -361,7 +332,7 @@ function renderHiddenCats() {
     .filter(n => knownCategoryNames.has(n))       // ولا اسم مهمل لا يقابله فئة
     .sort();
 
-  if (!adminUnlocked || !names.length) {
+  if (!names.length) {
     box.innerHTML = '';
     box.style.display = 'none';
     return;
@@ -391,12 +362,7 @@ function makeCatCard(c) {
     <span class="ic">${c.ic}</span>
     <div class="nm">${escapeHtml(c.name)}</div>
     ${soon ? '<div class="soon-tag">قريباً</div>' : ''}
-    ${adminUnlocked ? '<button type="button" class="cat-hide" title="إخفاء الفئة عن كل الأجهزة">✕</button>' : ''}
   `);
-
-  // `stopPropagation` ضرورية: الزرّ داخل البطاقة، وبدونها يُختار الفئة ويخفيها معاً
-  const hideBtn = card.querySelector('.cat-hide');
-  if (hideBtn) hideBtn.onclick = (e) => { e.stopPropagation(); hideCategory(c.name); };
 
   card.onclick = () => {
     /*
