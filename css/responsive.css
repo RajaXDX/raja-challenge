@@ -127,9 +127,12 @@
     gap: 12px;
   }
 
+  /* ⚠️ بلا min-width: الفريقان وشارة الدور في صفّ واحد (تصميم 3a)، وحدّ
+     140‑160px الموروث من البطاقات القديمة جعل الصفّ أعرض من الجوال فانزاحت
+     الصفحة كلها جانبياً (440px صارت 517). */
   .team-card {
-    min-width: 160px;
-    padding: 10px 16px;
+    min-width: 0;
+    padding: 0;
   }
 
   .team-name {
@@ -434,8 +437,8 @@
   }
 
   .team-card {
-    min-width: 140px;
-    padding: 8px 12px;
+    min-width: 0;
+    padding: 0;
   }
 
   .team-name {
