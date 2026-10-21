@@ -1,0 +1,65 @@
+<!doctype html>
+<!--
+  مصدر شعار «تحدي رجا» المتجهي: مكعّب بحرف «ت» و«ر» و«؟» على وجوهه.
+  أعاد رسمه Claude من تصميم صاحب المشروع (2026-10-21) بدقّة كاملة.
+  يُصدَّر إلى PNG بـ tools/logo/render.sh — لا تعدّل الـPNG يدوياً.
+
+  ?v=icon   1024×1024 على كحلي — أيقونة التطبيق (بلا شفافية)
+  ?v=mark   1024×1024 شفاف — الشعار داخل اللعبة بجانب العنوان
+  ?v=share  1200×630 — صورة المشاركة (og:image)
+-->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@900&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:transparent}svg{display:block}</style></head><body>
+<script>
+const V = new URLSearchParams(location.search).get('v') || 'icon';
+const C = { navy:'#1D2D3D', navy2:'#15212E', blue:'#8DB2DA', blueDeep:'#5980A6', white:'#F7F7F5', ink:'#14202C' };
+
+// مكعّب متساوي القياس: s ضلع الوجه، (cx,cy) مركز المكعّب
+function cube(cx, cy, s) {
+  const w = s * 0.866, h = s;
+  const N=[cx,cy-h], E=[cx+w,cy-h/2], O=[cx,cy], W=[cx-w,cy-h/2], S=[cx,cy+h], SE=[cx+w,cy+h/2], SW=[cx-w,cy+h/2];
+  const P = (...p) => p.map(q => q.join(',')).join(' ');
+  const k = s / 300;               // الحروف مرسومة على وجه 300 ثم تُحجَّم
+  const font = `font-family="Cairo" font-weight="900" text-anchor="middle"`;
+  const sw = 9 * k;
+  return `
+  <g stroke="${C.ink}" stroke-width="${sw}" stroke-linejoin="round">
+    <polygon points="${P(N,E,O,W)}"   fill="${C.white}"/>
+    <polygon points="${P(W,O,S,SW)}"  fill="${C.blue}"/>
+    <polygon points="${P(O,E,SE,S)}"  fill="${C.white}"/>
+  </g>
+  <!-- الأعلى: «؟» مستلقية على الوجه -->
+  <g transform="matrix(${.866*k} ${-.5*k} ${.866*k} ${.5*k} ${cx} ${cy-h/2})">
+    <text x="0" y="78" ${font} font-size="250" fill="${C.blueDeep}">؟</text>
+  </g>
+  <!-- اليسار: «ر» -->
+  <g transform="matrix(${.866*k} ${.5*k} 0 ${k} ${cx-w/2} ${cy+h/4})">
+    <text x="8" y="40" ${font} font-size="230" fill="${C.white}" stroke="${C.ink}" stroke-width="7" paint-order="stroke">ر</text>
+  </g>
+  <!-- اليمين: «ت» -->
+  <g transform="matrix(${.866*k} ${-.5*k} 0 ${k} ${cx+w/2} ${cy+h/4})">
+    <text x="0" y="62" ${font} font-size="210" fill="${C.ink}">ت</text>
+  </g>`;
+}
+function plus(x, y, r, col) {
+  return `<path d="M${x-r} ${y}H${x+r}M${x} ${y-r}V${y+r}" stroke="${col}" stroke-width="${r/4}" stroke-linecap="round"/>`;
+}
+const BG = (w,h) => `<defs><radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#26394D"/><stop offset="1" stop-color="${C.navy2}"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#bg)"/>`;
+
+let svg;
+if (V === 'icon') {
+  svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024">${BG(1024,1024)}${cube(512,512,315)}</svg>`;
+} else if (V === 'mark') {
+  svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024">${cube(512,512,340)}</svg>`;
+} else {
+  const p = '#5E7FA3';
+  svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">${BG(1200,630)}
+    ${cube(880,315,165)}
+    ${plus(705,110,18,p)}${plus(1055,110,18,p)}${plus(705,520,18,p)}${plus(1055,520,18,p)}
+    <text x="650" y="320" direction="rtl" text-anchor="start" font-family="Cairo" font-weight="900" font-size="122" fill="${C.white}">تحدي رجا</text>
+    <text x="650" y="420" text-anchor="end" font-family="Cairo" font-weight="900" font-size="30" letter-spacing="12" fill="${C.blue}">RAJA CHALLENGE</text>
+  </svg>`;
+}
+document.body.innerHTML = svg;
+</script></body></html>

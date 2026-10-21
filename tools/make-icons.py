@@ -48,9 +48,10 @@ SHARE_SRC = ROOT / 'assets' / 'share.png'
 # حتى لا يلامس الشعارُ الحافّةَ — آبل تقصّ زوايا الأيقونة بنفسها.
 SHARE_CROP = (380, 60, 840, 520)
 
-# ألوان الهوية — من :root في css/style.css
-NIGHT = (10, 26, 20)      # --night
-PANEL = (18, 56, 42)      # --panel
+# ألوان الهوية — كحلي شعار المكعّب (tools/logo/logo.html)، لا ألوان
+# واجهة اللعبة: خلفية شاشة البداية يجب أن تطابق خلفية الأيقونة.
+NIGHT = (21, 33, 46)      # C.navy2
+PANEL = (38, 57, 77)      # مركز التدرّج
 GOLD = (212, 175, 55)     # --gold
 
 # نسبة الشعار من ضلع الأيقونة. أقلّ من الملء الكامل عمداً: آبل تقصّ
@@ -107,9 +108,21 @@ def build(size, logo_ratio=LOGO_RATIO):
     return img
 
 
+MARK = ROOT / 'assets' / 'logo-mark.png'
+
+
 def splash(w, h):
-    """شاشة بداية: الشعار في الوسط على خلفية سادة تملأ أي مقاس شاشة."""
+    """شاشة بداية: الشعار في الوسط على خلفية سادة تملأ أي مقاس شاشة.
+
+    ⚠️ نلصق المكعّب الشفاف لا الأيقونة: الأيقونة تحمل خلفيتها المتدرّجة،
+    فتظهر حوافّ مربّعها فوق الخلفية السادة كإطار واضح."""
     img = Image.new('RGB', (w, h), NIGHT)
+    if MARK.exists():
+        mark = Image.open(MARK).convert('RGBA')
+        mh = int(min(w, h) * 0.22)
+        mark = mark.resize((round(mark.width * mh / mark.height), mh), Image.LANCZOS)
+        img.paste(mark, ((w - mark.width) // 2, (h - mh) // 2), mark)
+        return img
     side = int(min(w, h) * 0.28)
     logo = build(side).convert('RGB')
     img.paste(logo, ((w - side) // 2, (h - side) // 2))
