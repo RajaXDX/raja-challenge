@@ -7,3 +7,11 @@ Thumbs.db
 
 # نسخة مؤقتة من ملف التصميم للمعاينة المحلية — لا تُرفع
 __design_preview.html
+
+# ملفات توقيع آبل — مفاتيح خاصة لا تُرفع أبداً
+apple-signing/
+*.p12
+*.p8
+*.mobileprovision
+*.cer
+*.certSigningRequest
