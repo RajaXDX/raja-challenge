@@ -37,7 +37,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- ?v= رقم الإصدار: غيّره عند أي تعديل حتى تصل النسخة الجديدة للمتصفحات بدون Ctrl+Shift+R -->
-  <link rel="stylesheet" href="css/style.css?v=20261020a">
+  <link rel="stylesheet" href="css/style.css?v=20261021a">
   <link rel="stylesheet" href="css/responsive.css?v=20261021a">
 </head>
 <!-- data-screen يُحدَّث في showScreen؛ القيمة هنا للحظة ما قبل أول استدعاء -->
@@ -197,6 +197,13 @@
     <div class="profile-section">
       <div class="profile-section-title">🏅 لوحة الصدارة</div>
       <div id="leaderboardBox"></div>
+    </div>
+
+    <!-- شرط App Store (5.1.1): حذف الحساب من داخل التطبيق -->
+    <div class="profile-section danger-zone">
+      <div class="profile-section-title">⚠️ الحساب</div>
+      <p class="danger-note">حذف الحساب يمسح إحصاءاتك وأصدقاءك نهائياً ولا يمكن استرجاعه.</p>
+      <button class="btn-main btn-danger" onclick="deleteMyAccount()">🗑️ حذف حسابي نهائياً</button>
     </div>
   </div>
 
@@ -917,14 +924,14 @@
 <script src="js/auth.js?v=20261020a"></script>
 <script src="js/bans.js?v=20261020a"></script>
 <script src="js/friends.js?v=20261020a"></script>
-<script src="js/profile.js?v=20261020a"></script>
+<script src="js/profile.js?v=20261021a"></script>
 <script src="js/game.js?v=20261020a"></script>
 <script src="js/admin.js?v=20261020a"></script>
 <script src="js/sync.js?v=20261020a"></script>
 <script src="js/rooms.js?v=20261020a"></script>
-<script src="js/chat.js?v=20261020a"></script>
+<script src="js/chat.js?v=20261021a"></script>
 <script src="js/about.js?v=20261020a"></script>
-<script src="js/feedback.js?v=20261020a"></script>
+<script src="js/feedback.js?v=20261021a"></script>
 
 <!-- التثبيت والعمل بلا إنترنت. الفشل هنا لا يمنع اللعب إطلاقاً -->
 <script>

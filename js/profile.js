@@ -219,3 +219,33 @@ async function goToProfile() {
 
   showLeaderboard();
 }
+
+/* ============================= حذف الحساب ============================= */
+/*
+  شرط App Store (بند 5.1.1(v)): من أنشأ حساباً داخل التطبيق يحذفه من داخله.
+  الحذف كله في `delete_my_account()` (الدفعة 9 من supabase-accounts.sql):
+  تحذف `auth.uid()` وحده فلا تصلح لحذف حساب غيرك، ومعه الإحصاءات والصداقات.
+*/
+async function deleteMyAccount() {
+  if (!isSignedIn() || !supa) return;
+  const name = getPlayerDisplayName();
+  if (!await uiConfirm(
+    `حذف حسابك «${name}» نهائياً؟
+
+تُحذف إحصاءاتك وأصدقاؤك ولا يمكن التراجع. اللعب على جهاز واحد يبقى متاحاً بلا حساب.`,
+    'احذف نهائياً', 'إلغاء')) return;
+
+  try {
+    const { error } = await supa.rpc('delete_my_account');
+    if (error) throw error;
+  } catch (e) {
+    console.error('deleteMyAccount', e);
+    uiAlert(`❌ تعذّر حذف الحساب: ${e.message || e}`);
+    return;
+  }
+
+  trackEvent?.('account_deleted');
+  // الجلسة صارت لحساب غير موجود: نخرج منها وننظّف كل ما يخصّه على الجهاز
+  await signOutPlayer();
+  uiAlert('✅ حُذف حسابك وكل بياناته نهائياً');
+}

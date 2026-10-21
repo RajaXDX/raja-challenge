@@ -30,6 +30,7 @@ function renderUnreadBadge() {
 function noteIncomingMessage(message) {
   if (chatOpen) return;
   if (message?.player_id && message.player_id === currentPlayer?.player_id) return;
+  if (isChatBlocked(message)) return;
   unreadCount++;
   renderUnreadBadge();
 }
@@ -37,6 +38,98 @@ function noteIncomingMessage(message) {
 function clearUnread() {
   unreadCount = 0;
   renderUnreadBadge();
+}
+
+/* ============================= الإشراف: بلاغ وحظر وتنقية ============================= */
+/*
+  شرط App Store (بند 1.2) لأي تطبيق فيه نص يكتبه المستخدمون لغيرهم:
+  تنقية الألفاظ، وبلاغ عن المحتوى، وحظر المسيء — والثلاثة بيد اللاعب نفسه.
+
+  الحظر **محلي على الجهاز**: يُخفي رسائل اللاعب عن صاحب الجهاز وحده، فلا
+  يحتاج جدولاً ولا صلاحيات، ولا يكشف للمحظور أنه حُظر. والحظر الفعلي من
+  الخدمة يبقى للإدارة عبر `bans.js`.
+
+  البلاغ يُكتب في `question_reports` نفسه بفئة `CHAT_REPORT_CATEGORY`، فيظهر
+  في تبويب البلاغات بلوحة الإدارة بلا جدول ولا سكربت SQL جديد.
+*/
+const CHAT_BLOCK_KEY = 'mr_chat_blocked';
+const CHAT_REPORT_CATEGORY = '💬 بلاغ شات';
+
+function chatBlockedList() {
+  const list = loadJSON(CHAT_BLOCK_KEY, []);
+  return Array.isArray(list) ? list : [];
+}
+
+function isChatBlocked(msg) {
+  return !!msg?.player_id && chatBlockedList().some(b => b.id === msg.player_id);
+}
+
+// ألفاظ بذيئة شائعة. القصيرة تُطابق كلمةً كاملة فقط حتى لا تُشوَّه كلمات
+// بريئة تحتويها؛ والطويلة المميّزة تُطابق أينما وردت (تلتقط التصاريف).
+const CHAT_BAD_WHOLE = ['زب', 'كس', 'طيز', 'خرا', 'نيك', 'تفو', 'dick', 'shit', 'cunt', 'fuck'];
+const CHAT_BAD_ANY = ['قحب', 'شرموط', 'منيوك', 'منيك', 'متناك', 'كسمك', 'كس امك', 'يلعن', 'fuck', 'bitch', 'pussy', 'asshole'];
+// ⚠️ بلا lookbehind `(?<!…)`: لا يعمل في سفاري قبل iOS 16.4 والتطبيق يدعم
+// iOS 14 — والخطأ هنا خطأ تحليل يُسقط chat.js كاملاً. الحرف السابق يُلتقط
+// في مجموعة ويُعاد كما هو.
+const CHAT_BAD_RE = new RegExp(
+  `(${CHAT_BAD_ANY.join('|')})|(^|[^\\p{L}])(${CHAT_BAD_WHOLE.join('|')})(?![\\p{L}])`, 'giu');
+
+const maskWord = w => '•'.repeat([...w].length);
+
+function cleanChatText(text) {
+  return String(text || '').replace(CHAT_BAD_RE,
+    (m, any, pre, whole) => any ? maskWord(any) : pre + maskWord(whole));
+}
+
+async function reportChatMessage(msgId) {
+  const msg = roomChatMessages.find(m => String(m.id) === String(msgId));
+  if (!msg) return;
+  if (!await uiConfirm(`إبلاغ الإدارة عن رسالة «${msg.player_name}»؟`, 'أبلغ', 'إلغاء')) return;
+
+  const row = {
+    category: CHAT_REPORT_CATEGORY,
+    question: String(msg.message || '').slice(0, 600),
+    answer: String(msg.player_name || '').slice(0, 600),
+    reason: 'رسالة مسيئة في الشات',
+    note: `روم ${currentRoom?.code || '—'} · معرّف المرسل ${msg.player_id || '—'}`.slice(0, 400),
+  };
+  // نفس مسار بلاغات الأسئلة: يُطمئن فوراً ويحفظ محلياً لو تعذّر الرفع
+  await sendQuestionReport(row);
+
+  if (await uiConfirm(`تبي تحظر «${msg.player_name}» بعد؟ ما راح تشوف رسائله.`, 'احظره', 'لا')) {
+    blockChatSender(msg, true);
+  }
+}
+
+async function blockChatSender(msgOrId, skipConfirm = false) {
+  const msg = typeof msgOrId === 'object' ? msgOrId
+    : roomChatMessages.find(m => String(m.id) === String(msgOrId));
+  if (!msg?.player_id) return;
+  if (!skipConfirm && !await uiConfirm(
+    `حظر «${msg.player_name}»؟\n\nما راح تشوف رسائله في الشات على هذا الجهاز، وتقدر تلغي الحظر من رأس الشات.`,
+    'احظر', 'إلغاء')) return;
+
+  const list = chatBlockedList().filter(b => b.id !== msg.player_id);
+  list.push({ id: msg.player_id, name: msg.player_name || '' });
+  saveJSON(CHAT_BLOCK_KEY, list);
+  renderChatMessages();
+}
+
+async function unblockAllChat() {
+  const list = chatBlockedList();
+  if (!list.length) return;
+  const names = list.map(b => b.name || '؟').join('، ');
+  if (!await uiConfirm(`إلغاء حظر: ${names}؟`, 'ألغِ الحظر', 'إلغاء')) return;
+  saveJSON(CHAT_BLOCK_KEY, []);
+  renderChatMessages();
+}
+
+function renderChatBlockedBtn() {
+  const btn = document.getElementById('chatBlockedBtn');
+  if (!btn) return;
+  const n = chatBlockedList().length;
+  btn.style.display = n ? '' : 'none';
+  btn.textContent = `🚫 ${n}`;
 }
 
 /* ============================= SEND MESSAGE ============================= */
@@ -58,7 +151,7 @@ async function sendChatMessage(messageText) {
         room_id: currentRoom.id,
         player_id: currentPlayer.player_id,
         player_name: currentPlayer.name,
-        message: messageText.trim(),
+        message: cleanChatText(messageText.trim()),
         reactions: {}
       });
 
@@ -159,16 +252,25 @@ function renderChatMessages() {
 
   chatContainer.innerHTML = '';
 
+  const myId = currentPlayer?.player_id;
   roomChatMessages.forEach(msg => {
+    if (isChatBlocked(msg)) return;
+    const mine = !!myId && msg.player_id === myId;
+    const msgId = escapeHtml(String(msg.id || ''));
+    const modBtns = (!mine && msg.id) ? `
+        <span class="chat-mod">
+          <button class="chat-mod-btn" title="إبلاغ" aria-label="إبلاغ عن الرسالة" onclick="reportChatMessage('${msgId}')">🚩</button>
+          <button class="chat-mod-btn" title="حظر" aria-label="حظر المرسل" onclick="blockChatSender('${msgId}')">🚫</button>
+        </span>` : '';
     const messageEl = createElement('div', {
       class: 'chat-message',
       'data-msg-id': msg.id || ''
     }, `
       <div class="chat-msg-header">
         <span class="chat-sender">${escapeHtml(msg.player_name)}</span>
-        <span class="chat-time">${formatTime(msg.created_at)}</span>
+        <span class="chat-time">${formatTime(msg.created_at)}</span>${modBtns}
       </div>
-      <div class="chat-text">${escapeHtml(msg.message)}</div>
+      <div class="chat-text">${escapeHtml(cleanChatText(msg.message))}</div>
       ${msg.reactions && Object.keys(msg.reactions).length > 0 ? `
         <div class="chat-reactions">
           ${Object.entries(msg.reactions).map(([emoji, players]) =>
@@ -183,6 +285,8 @@ function renderChatMessages() {
 
     chatContainer.appendChild(messageEl);
   });
+
+  renderChatBlockedBtn();
 
   // التمرير إلى آخر رسالة
   chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -224,6 +328,8 @@ function createChatPanel() {
     const panel = createElement('div', { id: 'chatPanel', class: 'chat-panel' }, `
       <div class="chat-panel-header">
         <h3>💬 الشات</h3>
+        <button class="chat-blocked-btn" id="chatBlockedBtn" title="المحظورون — اضغط لإلغاء الحظر"
+                onclick="unblockAllChat()" style="display:none"></button>
         <button class="chat-close" onclick="toggleChat()">✕</button>
       </div>
       <div class="chat-messages" id="roomChatMessages"></div>

@@ -323,7 +323,7 @@ function renderReports() {
           <span class="fb-cat">${escapeHtml(r.category || '')} · ${escapeHtml(r.difficulty || '')}</span>
         </div>
         <div class="fb-q">${escapeHtml(r.question || '')}</div>
-        <div class="fb-a">الإجابة المسجّلة: <b>${escapeHtml(r.answer || '—')}</b></div>
+        <div class="fb-a">${r.category === CHAT_REPORT_CATEGORY ? 'المرسل' : 'الإجابة المسجّلة'}: <b>${escapeHtml(r.answer || '—')}</b></div>
         ${r.note ? `<div class="fb-note">“${escapeHtml(r.note)}”</div>` : ''}
         <div class="fb-actions">
           <button class="btn btn-ghost" onclick="toggleReportResolved(${r.id}, ${!r.resolved})">
