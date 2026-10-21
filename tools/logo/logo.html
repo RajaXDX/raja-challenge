@@ -4,7 +4,7 @@
   أعاد رسمه Claude من تصميم صاحب المشروع (2026-10-21) بدقّة كاملة.
   يُصدَّر إلى PNG بـ tools/logo/render.sh — لا تعدّل الـPNG يدوياً.
 
-  ?v=icon   1024×1024 على كحلي — أيقونة التطبيق (بلا شفافية)
+  ?v=icon   1024×1024 على فحمي اللعبة — أيقونة التطبيق (بلا شفافية)
   ?v=mark   1024×1024 شفاف — الشعار داخل اللعبة بجانب العنوان
   ?v=share  1200×630 — صورة المشاركة (og:image)
 -->
@@ -13,7 +13,17 @@
 <style>html,body{margin:0;background:transparent}svg{display:block}</style></head><body>
 <script>
 const V = new URLSearchParams(location.search).get('v') || 'icon';
-const C = { navy:'#1D2D3D', navy2:'#15212E', blue:'#8DB2DA', blueDeep:'#5980A6', white:'#F7F7F5', ink:'#14202C' };
+// ألوان اللعبة نفسها — من :root في css/style.css
+const C = {
+  bgIn:  '#2A2321',   // مركز تدرّج الخلفية
+  night: '#141110',   // --night
+  gold:  '#C48D3A',   // --gold   الوجه الأيسر
+  goldS: '#E8C37A',   // --gold-soft
+  top:   '#F0E9DF',   // --sand   الوجه العلوي
+  side:  '#FAF5EC',   //          الوجه الأيمن (أفتح قليلاً ليبان الحدّ بين الوجهين)
+  clay:  '#8E2A2F',   // --clay   علامة «؟»
+  ink:   '#141110',
+};
 
 // مكعّب متساوي القياس: s ضلع الوجه، (cx,cy) مركز المكعّب
 function cube(cx, cy, s) {
@@ -25,17 +35,17 @@ function cube(cx, cy, s) {
   const sw = 9 * k;
   return `
   <g stroke="${C.ink}" stroke-width="${sw}" stroke-linejoin="round">
-    <polygon points="${P(N,E,O,W)}"   fill="${C.white}"/>
-    <polygon points="${P(W,O,S,SW)}"  fill="${C.blue}"/>
-    <polygon points="${P(O,E,SE,S)}"  fill="${C.white}"/>
+    <polygon points="${P(N,E,O,W)}"   fill="${C.top}"/>
+    <polygon points="${P(W,O,S,SW)}"  fill="${C.gold}"/>
+    <polygon points="${P(O,E,SE,S)}"  fill="${C.side}"/>
   </g>
   <!-- الأعلى: «؟» مستلقية على الوجه -->
   <g transform="matrix(${.866*k} ${-.5*k} ${.866*k} ${.5*k} ${cx} ${cy-h/2})">
-    <text x="0" y="78" ${font} font-size="250" fill="${C.blueDeep}">؟</text>
+    <text x="0" y="78" ${font} font-size="250" fill="${C.clay}">؟</text>
   </g>
   <!-- اليسار: «ر» -->
   <g transform="matrix(${.866*k} ${.5*k} 0 ${k} ${cx-w/2} ${cy+h/4})">
-    <text x="8" y="40" ${font} font-size="230" fill="${C.white}" stroke="${C.ink}" stroke-width="7" paint-order="stroke">ر</text>
+    <text x="8" y="40" ${font} font-size="230" fill="${C.side}" stroke="${C.ink}" stroke-width="7" paint-order="stroke">ر</text>
   </g>
   <!-- اليمين: «ت» -->
   <g transform="matrix(${.866*k} ${-.5*k} 0 ${k} ${cx+w/2} ${cy+h/4})">
@@ -45,7 +55,7 @@ function cube(cx, cy, s) {
 function plus(x, y, r, col) {
   return `<path d="M${x-r} ${y}H${x+r}M${x} ${y-r}V${y+r}" stroke="${col}" stroke-width="${r/4}" stroke-linecap="round"/>`;
 }
-const BG = (w,h) => `<defs><radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#26394D"/><stop offset="1" stop-color="${C.navy2}"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#bg)"/>`;
+const BG = (w,h) => `<defs><radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="${C.bgIn}"/><stop offset="1" stop-color="${C.night}"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#bg)"/>`;
 
 let svg;
 if (V === 'icon') {
@@ -53,12 +63,12 @@ if (V === 'icon') {
 } else if (V === 'mark') {
   svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024">${cube(512,512,340)}</svg>`;
 } else {
-  const p = '#5E7FA3';
+  const p = C.gold;
   svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">${BG(1200,630)}
     ${cube(880,315,165)}
     ${plus(705,110,18,p)}${plus(1055,110,18,p)}${plus(705,520,18,p)}${plus(1055,520,18,p)}
-    <text x="650" y="320" direction="rtl" text-anchor="start" font-family="Cairo" font-weight="900" font-size="122" fill="${C.white}">تحدي رجا</text>
-    <text x="650" y="420" text-anchor="end" font-family="Cairo" font-weight="900" font-size="30" letter-spacing="12" fill="${C.blue}">RAJA CHALLENGE</text>
+    <text x="650" y="320" direction="rtl" text-anchor="start" font-family="Cairo" font-weight="900" font-size="122" fill="${C.top}">تحدي رجا</text>
+    <text x="650" y="420" text-anchor="end" font-family="Cairo" font-weight="900" font-size="30" letter-spacing="12" fill="${C.gold}">RAJA CHALLENGE</text>
   </svg>`;
 }
 document.body.innerHTML = svg;
