@@ -2398,8 +2398,17 @@ supabase-feedback.sql       question_reports + game_ratings  ⚠️ لم يُش�
   بترتيب `store-listing.md`، عدا الثالثة: **اختيار الفئات بدل شاشة الروم**
   (الروم تحتاج لاعبين حقيقيين على أجهزة). تُعاد بـ`tools/store-shots.js`.
 
-- [ ] **79. باقي خطوات النشر** — على صاحب الحساب: الأسرار الثمانية في
-  GitHub، ثم سير `iOS` بـ`upload=true`، ثم صفحة المتجر والإرسال للمراجعة.
+- [x] **79. أول رفع إلى App Store Connect** — أُنجز 2026-10-21 (run 39616787781، البناء 4)
+  الأسرار الثمانية في GitHub (الشهادة ولّدها Claude من CSR محلي؛ المفتاح
+  الخاص وكلمات المرور في `apple-signing/` المستثنى من git). احتاج إصلاحين:
+  `verify-secrets.yml` كان يقارن بمعرّف «صراع الحروف»، وهدف App في Release
+  صار توقيعاً يدوياً (`Tahadi Raja AppStore`) بدل التلقائي.
+  ⚠️ «Cannot determine the Apple ID from Bundle ID» = التطبيق غير مسجّل في
+  App Store Connect ← My Apps.
+
+- [ ] **80. صفحة المتجر والإرسال للمراجعة** — على صاحب الحساب: نصوص
+  `store-listing.md`، اللقطات من `store/screenshots/`، ملصق الخصوصية،
+  التصنيف 12+، حساب `apple_review`، ثم اختيار البناء وSubmit.
   ⚠️ فئات الشعارات وصور المشاهير والأناشيد قد تُرفض بالبند 5.2 (ملكية فكرية).
 
 ---
